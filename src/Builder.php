@@ -6,7 +6,7 @@ namespace Firehed\Container;
 use Psr\Container\ContainerInterface;
 use UnexpectedValueException;
 
-class Builder
+class Builder implements BuilderInterface
 {
     /** @var mixed[] */
     private $defs = [];

@@ -12,12 +12,8 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
 {
     use ContainerBuilderTestTrait;
 
-    public function setUp(): void
+    protected function getBuilder(): BuilderInterface
     {
-        $builder = new Builder();
-        foreach ($this->getDefinitionFiles() as $file) {
-            $builder->addFile($file);
-        }
-        $this->container = $builder->build();
+        return new Builder();
     }
 }

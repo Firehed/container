@@ -17,6 +17,17 @@ trait ContainerBuilderTestTrait
     /** @var ContainerInterface */
     private $container;
 
+    public function setUp(): void
+    {
+        $builder = $this->getBuilder();
+        foreach ($this->getDefinitionFiles() as $file) {
+            $builder->addFile($file);
+        }
+        $this->container = $builder->build();
+    }
+
+    abstract protected function getBuilder(): BuilderInterface;
+
     private function getDefinitionFiles(): array
     {
         return [
