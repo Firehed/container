@@ -93,6 +93,7 @@ class Compiler implements BuilderInterface
     public function build(): ContainerInterface
     {
         $defs = [];
+        $factories = [];
         $mappings = [];
         foreach ($this->definitions as $key => $value) {
             // TODO: throw if a key collides
@@ -107,9 +108,13 @@ class Compiler implements BuilderInterface
         $tpl .= '// this file is automatically @gener'."ated\n";
         $tpl .= "class {$this->className} extends \\Firehed\\Container\\CompiledContainer\n";
         $tpl .= "{\n";
+        $tpl .= '    protected $factories = ';
+        $tpl .= var_export($factories, true);
+        $tpl .= ";\n";
         $tpl .= '    protected $mappings = ';
         $tpl .= var_export($mappings, true);
         $tpl .= ";\n";
+
         $tpl .= implode("\n\n", $defs);
         $tpl .= "}\n";
 
