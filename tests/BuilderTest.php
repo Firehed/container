@@ -5,6 +5,7 @@ namespace Firehed\Container;
 
 use DateTime;
 use Psr\Container\ContainerInterface;
+use SessionHandlerInterface;
 use SessionIdInterface;
 
 class BuilderTest extends \PHPUnit\Framework\TestCase
@@ -29,6 +30,14 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->container->has(Fixtures\SessionId::class));
         $sessionId = $this->container->get(Fixtures\SessionId::class);
         assert($sessionId instanceof Fixtures\SessionId);
+    }
+
+    public function testAutowiredDefinitionWithConstuctorArg()
+    {
+        $this->assertTrue($this->container->has(Fixtures\SessionHandler::class));
+        $sh = $this->container->get(Fixtures\SessionHandler::class);
+        assert($sh instanceof Fixtures\SessionHandler);
+        assert($sh instanceof SessionHandlerInterface);
     }
 
     public function testMultipleGetCallsToSameObjectReturnInstance()

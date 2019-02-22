@@ -8,6 +8,8 @@ use SessionIdInterface;
 
 class SessionHandler implements SessionIdInterface, SessionHandlerInterface
 {
+    private $id;
+
     public function __construct(SessionIdInterface $id)
     {
         $this->id = $id;
@@ -22,23 +24,23 @@ class SessionHandler implements SessionIdInterface, SessionHandlerInterface
         return $this->id->create_sid();
     }
 
-    public function destroy(string $session_id)
+    public function destroy($session_id)
     {
     }
 
-    public function gc(int $maxlifetime)
+    public function gc($maxlifetime)
     {
     }
 
-    public function open(string $save_path, string $session_name)
+    public function open($save_path, $session_name)
     {
     }
 
-    public function read(string $session_id)
+    public function read($session_id)
     {
     }
 
-    public function write(string $session_id, string $session_data)
+    public function write($session_id, $session_data)
     {
     }
 }
