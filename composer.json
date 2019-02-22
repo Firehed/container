@@ -1,0 +1,47 @@
+{
+    "name": "firehed/container",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Eric Stern",
+            "email": "eric@ericstern.com"
+        }
+    ],
+    "autoload": {
+      "files": [
+      ],
+      "psr-4": {
+        "Firehed\\Container\\": "src"
+      }
+    },
+    "autoload-dev": {
+      "psr-4": {
+        "Firehed\\Container\\": "tests"
+      }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "require": {
+        "psr/container": "^1.0"
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^0.11.2",
+        "phpstan/phpstan-phpunit": "^0.11.0",
+        "phpstan/phpstan-strict-rules": "^0.11.0",
+        "phpunit/phpunit": "^8.0",
+        "squizlabs/php_codesniffer": "^3.4"
+    },
+    "scripts": {
+        "test": [
+            "@phpunit",
+            "@phpstan",
+            "@phpcs"
+        ],
+        "autofix": "phpcbf src tests",
+        "phpunit": "phpunit",
+        "phpstan": "phpstan analyse --no-progress -c phpstan.neon -l7 src tests",
+        "phpcs": "phpcs src tests"
+    }
+}
