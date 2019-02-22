@@ -9,6 +9,11 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use UnexpectedValueException;
 
+// pp
+use PhpParser\Error;
+use PhpParser\ParserFactory;
+use PhpParser\PrettyPrinter\Standard;
+
 class Compiler implements BuilderInterface
 {
     /** @var string */
@@ -131,12 +136,26 @@ class Compiler implements BuilderInterface
         $tpl .= "\n";
         $tpl .= "}\n";
 
+        $tpl = $this->prettyPrint($tpl);
         $this->logger->info($tpl);
 
         file_put_contents($this->path, $tpl);
         // var_dump($this->path);exit;
         require_once $this->path;
         return new $this->className();
+    }
+
+    private function prettyPrint(string $code): string
+    {
+        $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
+        try {
+            $ast = $parser->parse($code);
+        } catch (Error $e) {
+            $this->logger->error((string)$e);
+        }
+
+        $printer = new Standard(['shortArraySyntax' => true]);
+        return $printer->prettyPrintFile($ast);
     }
 
     private function makeNameForKey(string $key): string
