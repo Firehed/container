@@ -30,4 +30,12 @@ return [
     Fixtures\ExplicitDefinitionInterface::class => function () {
         return new Fixtures\ExplicitDefinition();
     },
+
+    // Literals
+    'string_literal' => 'UnitTest',
+    'int_literal' => 42,
+    'float_literal' => 123.45,
+    'bool_literal' => true,
+    'array_literal' => ['a', 'b', 'c'],
+    'dict_literal' => ['a' => 1, 'b' => 2, 'c' => 3],
 ];

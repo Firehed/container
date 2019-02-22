@@ -138,4 +138,27 @@ trait ContainerBuilderTestTrait
         $edi = $this->container->get(Fixtures\ExplicitDefinitionInterface::class);
         assert($edi instanceof Fixtures\ExplicitDefinitionInterface);
     }
+
+    /**
+     * some_string => scalar_literak
+     * @dataProvider scalarLiterals
+     */
+    public function testScalarLiteral(string $key, $expectedValue)
+    {
+        $this->assertTrue($this->container->has($key));
+        $value = $this->container->get($key);
+        $this->assertSame($expectedValue, $value);
+    }
+
+    public function scalarLiterals(): array
+    {
+        return [
+            ['string_literal', 'UnitTest'],
+            ['int_literal', 42],
+            ['float_literal', 123.45],
+            ['bool_literal', true],
+            ['array_literal', ['a', 'b', 'c']],
+            ['dict_literal', ['a' => 1, 'b' => 2, 'c' => 3]],
+        ];
+    }
 }
