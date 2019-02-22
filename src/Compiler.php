@@ -76,14 +76,14 @@ class Compiler implements BuilderInterface
     {
         $this->logger->debug('Adding definition for "{key}"', ['key' => $key]);
         if ($value instanceof FactoryInterface) {
+            $this->factories[$key] = true;
             if ($value->hasDefinition()) {
                 $this->definitions[$key] = new Compiler\ClosureValue($value->getDefinition());
-                $this->factories[$key] = true;
             } else {
-                $produceKey = 'newCopyOf'.ucfirst($key);
-                $this->definitions[$produceKey] = new Compiler\AutowiredValue($key);
-                $this->definitions[$key] = new Compiler\ProxyValue($produceKey);
-                $this->factories[$key] = true;
+                // $produceKey = 'newCopyOf'.ucfirst($key);
+                // $this->definitions[$produceKey] = new Compiler\AutowiredValue($key);
+                // $this->definitions[$key] = new Compiler\ProxyValue($produceKey);
+                $this->definitions[$key] = new Compiler\AutowiredValue($key);
             }
             // $this->logger->error('FACTORY Unhandled value for {key}', ['key' => $key]);
         } elseif ($value instanceof AutowireInterface) {

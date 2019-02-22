@@ -13,8 +13,7 @@ return [
     SessionIdInterface::class => Fixtures\SessionId::class,
 
     // Factory
-    DateTime::class => factory(function ()
-    {
+    DateTime::class => factory(function () {
         return new DateTime();
     }),
 
