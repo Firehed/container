@@ -128,6 +128,7 @@ class Compiler implements BuilderInterface
         $tpl .= ";\n";
 
         $tpl .= implode("\n\n", $defs);
+        $tpl .= "\n";
         $tpl .= "}\n";
 
         $this->logger->info($tpl);
