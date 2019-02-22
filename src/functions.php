@@ -9,9 +9,21 @@ function autowire()
     };
 }
 
-function factory()
+function factory(\Closure $def = null)
 {
-    return new class implements FactoryInterface
+    return new class($def) implements FactoryInterface
     {
+        private $def;
+        public function __construct($def)
+        {
+            $this->def = $def;
+        }
+        public function __invoke($container)
+        {
+            if ($this->def) {
+                return ($this->def)($container);
+            }
+            return null;
+        }
     };
 }

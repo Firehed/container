@@ -69,7 +69,7 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
         assert($dt instanceof DateTime);
     }
 
-    public function testMultipleCallsToFactoryReturnDifferentObjects()
+    public function testMultipleCallsToFactoryWithBodyReturnDifferentObjects()
     {
         $this->assertTrue($this->container->has(DateTime::class));
         $dt1 = $this->container->get(DateTime::class);
@@ -81,5 +81,19 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertNotSame($dt1, $dt2);
         $this->assertNotSame($dt1, $dt3);
         $this->assertNotSame($dt2, $dt3);
+    }
+
+    public function testMultipleCallsToFactoryWithNoBodyReturnDifferentObjects()
+    {
+        $this->assertTrue($this->container->has(Fixtures\NoConstructorFactory::class));
+        $ncf1 = $this->container->get(Fixtures\NoConstructorFactory::class);
+        $ncf2 = $this->container->get(Fixtures\NoConstructorFactory::class);
+        $ncf3 = $this->container->get(Fixtures\NoConstructorFactory::class);
+        assert($ncf1 instanceof Fixtures\NoConstructorFactory);
+        assert($ncf2 instanceof Fixtures\NoConstructorFactory);
+        assert($ncf3 instanceof Fixtures\NoConstructorFactory);
+        $this->assertNotSame($ncf1, $ncf2);
+        $this->assertNotSame($ncf1, $ncf3);
+        $this->assertNotSame($ncf2, $ncf3);
     }
 }

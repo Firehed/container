@@ -13,7 +13,15 @@ return [
     SessionIdInterface::class => Fixtures\SessionId::class,
 
     // Factory
-    DateTime::class => factory(),
+    DateTime::class => factory(function () {
+        return new DateTime();
+    }),
+
+    Fixtures\NoConstructorFactory::class => factory(),
+
+    DateTimeImmutable::class => function () {
+        return new DateTimeImmutable();
+    },
 
     // Interface to factory implementation
     DateTimeInterface::class => DateTime::class,

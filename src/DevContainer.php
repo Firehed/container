@@ -25,12 +25,12 @@ class DevContainer implements Container\ContainerInterface
 
     public function get($id)
     {
-        if (!$this->has($id)) {
-            /// throw
-        }
-
         if (array_key_exists($id, $this->evaluated)) {
             return $this->evaluated[$id];
+        }
+
+        if (!$this->has($id)) {
+            /// throw
         }
 
         $def = $this->definitions[$id];
@@ -43,12 +43,27 @@ class DevContainer implements Container\ContainerInterface
         }
 
         if ($value instanceof \Closure) {
-            return $value($this);
+            $evaluated = $value($this);
+            $this->evaluated[$id] = $evaluated;
+            return $evaluated;
         }
+
+        if ($value instanceof FactoryInterface) {
+            $factoryResult = $value($this);
+            if ($factoryResult !== null) {
+                return $factoryResult;
+            }
+            return $this->autowire($id)($this);
+        }
+
         // var_dump($value);
         return $value;
     }
 
+    /**
+     * Returns a closure that takes the conatiner as its only argument and
+     * returns the instantiated object
+     */
     private function autowire($id)
     {
         if (!class_exists($id)) {
@@ -79,12 +94,14 @@ class DevContainer implements Container\ContainerInterface
             if (!$this->has($name)) {
                 throw new \Exception('undefined type in constructor param');
             }
-            $needed[] = $name;
-            // var_dump($name);
+            $needed[] = function ($c) use ($name) {
+                return $c->get($name);
+            };
         }
         return function ($container) use ($id, $needed) {
+            // print_r($needed);
             $args = array_map(function ($arg) use ($container) {
-                return $container->get($arg);
+                return $arg($container);
             }, $needed);
             return new $id(...$args);
         };

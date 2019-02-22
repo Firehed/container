@@ -28,10 +28,12 @@ class Builder
 
         foreach ($defs as $key => $value) {
             // bare array elements will be treated as an autowired class
-            if (is_int($key)) {
-                $key = $value;
-            }
+            // if (is_int($key)) {
+            //     $key = $value;
+            // }
 
+            // This assumes that any array key which is a FQCN for an interface
+            // is an interface-to-implementation wiring
             if (interface_exists($key)) {
                 $value = function ($c) use ($value) {
                     return $c->get($value);
