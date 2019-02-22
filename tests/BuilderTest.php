@@ -17,7 +17,6 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
     {
         $defFile1 = __DIR__ . '/ContainerTestDefinitionFile1.php';
         $defFile2 = __DIR__ . '/ContainerTestDefinitionFile2.php';
-        // $def = include $defFile;
 
         $builder = new Builder();
         $builder->addFile($defFile1);
@@ -25,6 +24,10 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
         $this->container = $builder->build();
     }
 
+    /**
+     * SomeImplementation::class => autowire()
+     * where SomeImplementation has no constructor arguments
+     */
     public function testAutowiredDefinition()
     {
         $this->assertTrue($this->container->has(Fixtures\SessionId::class));
@@ -32,6 +35,10 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
         assert($sessionId instanceof Fixtures\SessionId);
     }
 
+    /**
+     * SomeImplementation::class => autowire()
+     * where SomeImplementation has >=1 constructor arguments
+     */
     public function testAutowiredDefinitionWithConstuctorArg()
     {
         $this->assertTrue($this->container->has(Fixtures\SessionHandler::class));
@@ -54,6 +61,9 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($sessionId2, $sessionId3);
     }
 
+    /**
+     * SomeInterface::class => SomeImplementation::class
+     */
     public function testInterfaceMapping()
     {
         $this->assertTrue($this->container->has(SessionIdInterface::class));
@@ -69,6 +79,11 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
         assert($dt instanceof DateTime);
     }
 
+    /**
+     * SomeImplementation::class => factory(function ($c) {
+     *   return new SomeImplementation($c->get('param'));
+     * }
+     */
     public function testMultipleCallsToFactoryWithBodyReturnDifferentObjects()
     {
         $this->assertTrue($this->container->has(DateTime::class));
@@ -83,6 +98,9 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertNotSame($dt2, $dt3);
     }
 
+    /**
+     * SomeImplementation::class => factory()
+     */
     public function testMultipleCallsToFactoryWithNoBodyReturnDifferentObjects()
     {
         $this->assertTrue($this->container->has(Fixtures\NoConstructorFactory::class));
@@ -95,5 +113,17 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertNotSame($ncf1, $ncf2);
         $this->assertNotSame($ncf1, $ncf3);
         $this->assertNotSame($ncf2, $ncf3);
+    }
+
+    /**
+     * SomeInterface::class => function () {
+     *   return new SomeImplementation();
+     * }
+     */
+    public function testInterfaceKeyToExplicitDefinition()
+    {
+        $this->assertTrue($this->container->has(Fixtures\ExplicitDefinitionInterface::class));
+        $edi = $this->container->get(Fixtures\ExplicitDefinitionInterface::class);
+        assert($edi instanceof Fixtures\ExplicitDefinitionInterface);
     }
 }

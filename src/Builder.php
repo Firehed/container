@@ -27,17 +27,13 @@ class Builder
         $output = [];
 
         foreach ($defs as $key => $value) {
-            // bare array elements will be treated as an autowired class
-            // if (is_int($key)) {
-            //     $key = $value;
-            // }
-
             // This assumes that any array key which is a FQCN for an interface
-            // is an interface-to-implementation wiring
-            if (interface_exists($key)) {
-                $value = function ($c) use ($value) {
+            // is an interface-to-implementation wiring. This means that simple
+            // string value MUST NOT be keyed to an interface name
+            if (interface_exists($key) && is_string($value)) {
+                $value = (function ($c) use ($value) {
                     return $c->get($value);
-                };
+                })->bindTo(null);
             }
 
             $output[$key] = $value;

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Firehed\Container;
 
+use Closure;
 use Exception;
 use Psr\Container;
 use ReflectionClass;
@@ -39,12 +40,13 @@ class DevContainer implements Container\ContainerInterface
             $value = $this->autowire($id);
         } else {
             $value = $def;
-            // var_dump($def);
         }
 
-        if ($value instanceof \Closure) {
+        if ($value instanceof Closure) {
+            $value = $value->bindTo(null);
             $evaluated = $value($this);
             $this->evaluated[$id] = $evaluated;
+
             return $evaluated;
         }
 
@@ -56,7 +58,6 @@ class DevContainer implements Container\ContainerInterface
             return $this->autowire($id)($this);
         }
 
-        // var_dump($value);
         return $value;
     }
 
@@ -72,9 +73,9 @@ class DevContainer implements Container\ContainerInterface
         $rc = new ReflectionClass($id);
 
         if (!$rc->hasMethod('__construct')) {
-            return function () use ($id) {
+            return (function () use ($id) {
                 return new $id();
-            };
+            })->bindTo(null);
         }
 
         $construct = $rc->getMethod('__construct');
@@ -94,16 +95,15 @@ class DevContainer implements Container\ContainerInterface
             if (!$this->has($name)) {
                 throw new \Exception('undefined type in constructor param');
             }
-            $needed[] = function ($c) use ($name) {
+            $needed[] = (function ($c) use ($name) {
                 return $c->get($name);
-            };
+            })->bindTo(null);
         }
-        return function ($container) use ($id, $needed) {
-            // print_r($needed);
+        return (function ($container) use ($id, $needed) {
             $args = array_map(function ($arg) use ($container) {
                 return $arg($container);
             }, $needed);
             return new $id(...$args);
-        };
+        })->bindTo(null);
     }
 }

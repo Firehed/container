@@ -26,6 +26,8 @@ return [
     // Interface to factory implementation
     DateTimeInterface::class => DateTime::class,
 
-    // Redundant mapping
-    // Firehed\SimpleLogger\Stderr::class => Firehed\SimpleLogger\Stderr::class,
+
+    Fixtures\ExplicitDefinitionInterface::class => function () {
+        return new Fixtures\ExplicitDefinition();
+    },
 ];
