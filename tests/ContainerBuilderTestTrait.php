@@ -17,6 +17,14 @@ trait ContainerBuilderTestTrait
     /** @var ContainerInterface */
     private $container;
 
+    private function getDefinitionFiles(): array
+    {
+        return [
+            __DIR__ . '/ContainerTestDefinitionFile1.php',
+            __DIR__ . '/ContainerTestDefinitionFile2.php',
+        ];
+    }
+
     /**
      * SomeImplementation::class => autowire()
      * where SomeImplementation has no constructor arguments
