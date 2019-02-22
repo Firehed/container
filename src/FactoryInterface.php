@@ -5,5 +5,8 @@ namespace Firehed\Container;
 
 interface FactoryInterface
 {
+    // getDefinition
+    // hasDefinition
+    // invoke
 
 }

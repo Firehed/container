@@ -55,8 +55,9 @@ class CompilerTest extends \PHPUnit\Framework\TestCase
             }
             public function log($level, $message, $context = [])
             {
-                return;
+                // return;
                 if ($level === 'debug') return;
+                // if ($level === 'info') return;
                 echo "[$level] " . $this->interpolate($message, $context) . "\n";
             }
         };

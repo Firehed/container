@@ -71,9 +71,21 @@ class Compiler implements BuilderInterface
     {
         $this->logger->debug('Adding definition for "{key}"', ['key' => $key]);
         if ($value instanceof FactoryInterface) {
+            if ($value->hasDefinition()) {
+                $this->definitions[$key] = new Compiler\ClosureValue($value->getDefinition());
+                $this->factories[$key] = true;
+            } else {
+                $produceKey = 'newCopyOf'.ucfirst($key);
+                $this->definitions[$produceKey] = new Compiler\AutowiredValue($key);
+                $this->definitions[$key] = new Compiler\ProxyValue($produceKey);
+                $this->factories[$key] = true;
+            }
+            // $this->logger->error('FACTORY Unhandled value for {key}', ['key' => $key]);
         } elseif ($value instanceof AutowireInterface) {
             $this->definitions[$key] = new Compiler\AutowiredValue($key);
         } elseif ($value instanceof Closure) {
+            // $this->logger->error('CLOSURE Unhandled value for {key}', ['key' => $key]);
+            $this->definitions[$key] = new Compiler\ClosureValue($value);
         } elseif (is_scalar($value) || is_array($value)) {
             // Simple autowiring
             if (interface_exists($key) && is_string($value)) {
@@ -90,10 +102,10 @@ class Compiler implements BuilderInterface
         }
     }
 
+    private $factories = [];
     public function build(): ContainerInterface
     {
         $defs = [];
-        $factories = [];
         $mappings = [];
         foreach ($this->definitions as $key => $value) {
             // TODO: throw if a key collides
@@ -109,7 +121,7 @@ class Compiler implements BuilderInterface
         $tpl .= "class {$this->className} extends \\Firehed\\Container\\CompiledContainer\n";
         $tpl .= "{\n";
         $tpl .= '    protected $factories = ';
-        $tpl .= var_export($factories, true);
+        $tpl .= var_export($this->factories, true);
         $tpl .= ";\n";
         $tpl .= '    protected $mappings = ';
         $tpl .= var_export($mappings, true);
@@ -121,6 +133,7 @@ class Compiler implements BuilderInterface
         $this->logger->info($tpl);
 
         file_put_contents($this->path, $tpl);
+        // var_dump($this->path);exit;
         require_once $this->path;
         return new $this->className();
     }

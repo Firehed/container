@@ -20,6 +20,16 @@ function factory(?Closure $def = null): FactoryInterface
         {
             $this->def = $def;
         }
+        public function hasDefinition(): bool
+        {
+            return $this->def !== null;
+        }
+        public function getDefinition(): Closure
+        {
+            assert($this->hasDefinition());
+            return $this->def;
+        }
+
         public function __invoke($container)
         {
             if ($this->def) {
