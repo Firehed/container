@@ -68,9 +68,7 @@ trait ContainerBuilderTestTrait
         assert($sessionId1 instanceof Fixtures\SessionId);
         assert($sessionId2 instanceof Fixtures\SessionId);
         assert($sessionId3 instanceof Fixtures\SessionId);
-        $this->assertSame($sessionId1, $sessionId2);
-        $this->assertSame($sessionId1, $sessionId3);
-        $this->assertSame($sessionId2, $sessionId3);
+        $this->assertAllAreSame($sessionId1, $sessionId2, $sessionId3);
     }
 
     /**
@@ -105,9 +103,7 @@ trait ContainerBuilderTestTrait
         assert($dt1 instanceof DateTime);
         assert($dt2 instanceof DateTime);
         assert($dt3 instanceof DateTime);
-        $this->assertNotSame($dt1, $dt2);
-        $this->assertNotSame($dt1, $dt3);
-        $this->assertNotSame($dt2, $dt3);
+        $this->assertAllAreNotSame($dt1, $dt2, $dt3);
     }
 
     /**
@@ -122,9 +118,8 @@ trait ContainerBuilderTestTrait
         assert($ncf1 instanceof Fixtures\NoConstructorFactory);
         assert($ncf2 instanceof Fixtures\NoConstructorFactory);
         assert($ncf3 instanceof Fixtures\NoConstructorFactory);
-        $this->assertNotSame($ncf1, $ncf2);
-        $this->assertNotSame($ncf1, $ncf3);
-        $this->assertNotSame($ncf2, $ncf3);
+
+        $this->assertAllAreNotSame($ncf1, $ncf2, $ncf3);
     }
 
     /**
@@ -160,5 +155,25 @@ trait ContainerBuilderTestTrait
             ['array_literal', ['a', 'b', 'c']],
             ['dict_literal', ['a' => 1, 'b' => 2, 'c' => 3]],
         ];
+    }
+
+    private function assertAllAreSame(...$args)
+    {
+        while (count($args) >= 2) {
+            $first = array_shift($args);
+            foreach ($args as $arg) {
+                $this->assertSame($first, $arg);
+            }
+        }
+    }
+
+    private function assertAllAreNotSame(...$args)
+    {
+        while (count($args) >= 2) {
+            $first = array_shift($args);
+            foreach ($args as $arg) {
+                $this->assertNotSame($first, $arg);
+            }
+        }
     }
 }
