@@ -10,8 +10,10 @@ use ReflectionClass;
 
 class DevContainer implements Container\ContainerInterface
 {
+    /** @var mixed[] */
     private $definitions;
 
+    /** @var mixed[] */
     private $evaluated = [];
 
     public function __construct(array $definitions)
@@ -19,11 +21,21 @@ class DevContainer implements Container\ContainerInterface
         $this->definitions = $definitions;
     }
 
+    /**
+     * Docblock types for interface adherence
+     * @param string $id
+     * @return bool
+     */
     public function has($id)
     {
         return array_key_exists($id, $this->definitions);
     }
 
+    /**
+     * Docblock types for interface adherence
+     * @param string $id
+     * @return mixed
+     */
     public function get($id)
     {
         if (array_key_exists($id, $this->evaluated)) {
@@ -65,7 +77,7 @@ class DevContainer implements Container\ContainerInterface
      * Returns a closure that takes the conatiner as its only argument and
      * returns the instantiated object
      */
-    private function autowire($id)
+    private function autowire(string $id): Closure
     {
         if (!class_exists($id)) {
             throw new \Exception('not a class');

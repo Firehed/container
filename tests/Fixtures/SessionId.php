@@ -7,7 +7,9 @@ use SessionIdInterface;
 
 class SessionId implements SessionIdInterface
 {
-    public function create_sid()
+    // phpcs:disable PSR1.Methods.CamelCapsMethodName.NotCamelCaps
+    public function create_sid(): string
     {
     }
+    // phpcs:enable
 }

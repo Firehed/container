@@ -28,7 +28,7 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
      * SomeImplementation::class => autowire()
      * where SomeImplementation has no constructor arguments
      */
-    public function testAutowiredDefinition()
+    public function testAutowiredDefinition(): void
     {
         $this->assertTrue($this->container->has(Fixtures\SessionId::class));
         $sessionId = $this->container->get(Fixtures\SessionId::class);
@@ -39,15 +39,15 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
      * SomeImplementation::class => autowire()
      * where SomeImplementation has >=1 constructor arguments
      */
-    public function testAutowiredDefinitionWithConstuctorArg()
+    public function testAutowiredDefinitionWithConstuctorArg(): void
     {
         $this->assertTrue($this->container->has(Fixtures\SessionHandler::class));
         $sh = $this->container->get(Fixtures\SessionHandler::class);
-        assert($sh instanceof Fixtures\SessionHandler);
         assert($sh instanceof SessionHandlerInterface);
+        assert($sh instanceof Fixtures\SessionHandler);
     }
 
-    public function testMultipleGetCallsToSameObjectReturnInstance()
+    public function testMultipleGetCallsToSameObjectReturnInstance(): void
     {
         $this->assertTrue($this->container->has(Fixtures\SessionId::class));
         $sessionId1 = $this->container->get(Fixtures\SessionId::class);
@@ -64,7 +64,7 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * SomeInterface::class => SomeImplementation::class
      */
-    public function testInterfaceMapping()
+    public function testInterfaceMapping(): void
     {
         $this->assertTrue($this->container->has(SessionIdInterface::class));
         $sid = $this->container->get(SessionIdInterface::class);
@@ -72,7 +72,7 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
         assert($sid instanceof Fixtures\SessionId);
     }
 
-    public function testFirstCallToFactory()
+    public function testFirstCallToFactory(): void
     {
         $this->assertTrue($this->container->has(DateTime::class));
         $dt = $this->container->get(DateTime::class);
@@ -84,7 +84,7 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
      *   return new SomeImplementation($c->get('param'));
      * }
      */
-    public function testMultipleCallsToFactoryWithBodyReturnDifferentObjects()
+    public function testMultipleCallsToFactoryWithBodyReturnDifferentObjects(): void
     {
         $this->assertTrue($this->container->has(DateTime::class));
         $dt1 = $this->container->get(DateTime::class);
@@ -101,7 +101,7 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * SomeImplementation::class => factory()
      */
-    public function testMultipleCallsToFactoryWithNoBodyReturnDifferentObjects()
+    public function testMultipleCallsToFactoryWithNoBodyReturnDifferentObjects(): void
     {
         $this->assertTrue($this->container->has(Fixtures\NoConstructorFactory::class));
         $ncf1 = $this->container->get(Fixtures\NoConstructorFactory::class);
@@ -120,7 +120,7 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
      *   return new SomeImplementation();
      * }
      */
-    public function testInterfaceKeyToExplicitDefinition()
+    public function testInterfaceKeyToExplicitDefinition(): void
     {
         $this->assertTrue($this->container->has(Fixtures\ExplicitDefinitionInterface::class));
         $edi = $this->container->get(Fixtures\ExplicitDefinitionInterface::class);

@@ -4,14 +4,14 @@ namespace Firehed\Container;
 
 use Closure;
 
-function autowire()
+function autowire(): AutowireInterface
 {
     return new class implements AutowireInterface
     {
     };
 }
 
-function factory(?Closure $def = null)
+function factory(?Closure $def = null): FactoryInterface
 {
     return new class($def) implements FactoryInterface
     {

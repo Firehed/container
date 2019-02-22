@@ -8,6 +8,7 @@ use SessionIdInterface;
 
 class SessionHandler implements SessionIdInterface, SessionHandlerInterface
 {
+    /** @var SessionIdInterface */
     private $id;
 
     public function __construct(SessionIdInterface $id)
@@ -15,32 +16,51 @@ class SessionHandler implements SessionIdInterface, SessionHandlerInterface
         $this->id = $id;
     }
 
-    public function close()
+    public function close(): bool
     {
     }
 
-    public function create_sid()
+    // phpcs:disable PSR1.Methods.CamelCapsMethodName.NotCamelCaps
+    public function create_sid(): string
     {
         return $this->id->create_sid();
     }
+    // phpcs:enable
 
-    public function destroy($session_id)
+    /**
+     * @param string $session_id
+     */
+    public function destroy($session_id): bool
     {
     }
 
-    public function gc($maxlifetime)
+    /**
+     * @param int $maxlifetime
+     */
+    public function gc($maxlifetime): bool
     {
     }
 
-    public function open($save_path, $session_name)
+    /**
+     * @param string $save_path
+     * @param string $session_name
+     */
+    public function open($save_path, $session_name): bool
     {
     }
 
-    public function read($session_id)
+    /**
+     * @param string $session_id
+     */
+    public function read($session_id): string
     {
     }
 
-    public function write($session_id, $session_data)
+    /**
+     * @param string $session_id
+     * @param string $session_data
+     */
+    public function write($session_id, $session_data): bool
     {
     }
 }

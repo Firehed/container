@@ -8,6 +8,7 @@ use UnexpectedValueException;
 
 class Builder
 {
+    /** @var mixed[] */
     private $defs = [];
 
     public function addFile(string $path): void
@@ -22,7 +23,7 @@ class Builder
         $this->defs = array_merge($this->parseDefs($defs), $this->defs);
     }
 
-    private function parseDefs(array $defs)
+    private function parseDefs(array $defs): array
     {
         $output = [];
 
