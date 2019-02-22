@@ -3,26 +3,21 @@ declare(strict_types=1);
 
 namespace Firehed\Container\Compiler;
 
-// use Firehed\Container\FactoryInterface;
 use Closure;
 use ReflectionFunction;
 
 class ClosureValue implements CodeGeneratorInterface
 {
-    // private $fallback;
+    /** @var Closure */
     private $closure;
 
     public function __construct(Closure $closure)
     {
-        // assert($factory->hasDefinition());
-        // $this->fallback = $fallbackClass;
-        // $this->factory = $factory;
         $this->closure = $closure;
     }
 
     public function generateCode(string $functionName): string
     {
-        // $closure = $this->factory->getDefinition();
         $rf = new ReflectionFunction($this->closure);
 
         $sourceFile = $rf->getFileName();
