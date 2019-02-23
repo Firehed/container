@@ -32,9 +32,12 @@ class Builder implements BuilderInterface
             // is an interface-to-implementation wiring. This means that simple
             // string value MUST NOT be keyed to an interface name
             if (interface_exists($key) && is_string($value)) {
-                $value = (function ($c) use ($value) {
+                // This is a factory so that if the value being proxied is
+                // a factory, the behavior passes through. If it isn't, the
+                // downstream will still cache as expected
+                $value = factory(function ($c) use ($value) {
                     return $c->get($value);
-                })->bindTo(null);
+                });
             }
 
             $output[$key] = $value;

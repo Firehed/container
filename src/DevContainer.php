@@ -63,9 +63,8 @@ class DevContainer implements Container\ContainerInterface
         }
 
         if ($value instanceof FactoryInterface) {
-            $factoryResult = $value($this);
-            if ($factoryResult !== null) {
-                return $factoryResult;
+            if ($value->hasDefinition()) {
+                return $value->getDefinition()($this);
             }
             return $this->autowire($id)($this);
         }

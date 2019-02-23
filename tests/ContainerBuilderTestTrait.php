@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace Firehed\Container;
 
 use DateTime;
+use DateTimeImmutable;
+use DateTimeInterface;
 use Psr\Container\ContainerInterface;
 use SessionHandlerInterface;
 use SessionIdInterface;
@@ -91,6 +93,18 @@ trait ContainerBuilderTestTrait
     }
 
     /**
+     * SomeInterface::class => SomeImplementation::clas;
+     * SomeImplementation::class => factory(...)
+     */
+    public function testMultipleCallsToInterfaceMappedToFactoryDefinitionWithBody(): void
+    {
+        $this->assertGetFactory(
+            DateTimeInterface::class,
+            DateTime::class
+        );
+    }
+
+    /**
      * SomeImplementation::class => factory()
      */
     public function testMultipleCallsToFactoryWithNoBodyReturnDifferentObjects(): void
@@ -147,7 +161,7 @@ trait ContainerBuilderTestTrait
     private function assertGetFactory(string $key, ?string $type = null)
     {
         $type = $type ?? $key;
-        $this->assertTrue($this->container->has($key));
+        $this->assertTrue($this->container->has($key), "Container should have $key");
         $values = [];
         for ($i = 0; $i < 3; $i++) {
             $value = $this->container->get($key);

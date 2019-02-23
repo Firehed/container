@@ -98,6 +98,8 @@ class Compiler implements BuilderInterface
                     'key' => $key,
                     'value' => $value,
                 ]);
+                // Never cache proxied values in case they point to a factory
+                $this->factories[$key] = true;
                 $this->definitions[$key] = new Compiler\ProxyValue($value);
             } else {
                 $this->definitions[$key] = new Compiler\LiteralValue($value);

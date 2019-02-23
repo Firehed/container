@@ -12,23 +12,25 @@ return [
     // Interface to implementations
     SessionIdInterface::class => Fixtures\SessionId::class,
 
-    // Factory
+    // Factory w/ body
     DateTime::class => factory(function () {
         return new DateTime();
     }),
 
+    // Factory autowired
     Fixtures\NoConstructorFactory::class => factory(),
-
-    DateTimeImmutable::class => function () {
-        return new DateTimeImmutable();
-    },
 
     // Interface to factory implementation
     DateTimeInterface::class => DateTime::class,
 
 
+    // Simple closure definitions
     Fixtures\ExplicitDefinitionInterface::class => function () {
         return new Fixtures\ExplicitDefinition();
+    },
+
+    DateTimeImmutable::class => function () {
+        return new DateTimeImmutable();
     },
 
     // Literals
