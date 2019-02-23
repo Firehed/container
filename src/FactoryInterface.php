@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace Firehed\Container;
 
+use Closure;
+
 interface FactoryInterface
 {
-    // getDefinition
-    // hasDefinition
-    // invoke
-
+    public function getDefinition(): Closure;
+    public function hasDefinition(): bool;
 }
