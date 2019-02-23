@@ -25,6 +25,9 @@ class Compiler implements BuilderInterface
     /** @var bool */
     private $exists;
 
+    /** @var array<string, true> */
+    private $factories = [];
+
     /** @var LoggerInterface */
     private $logger;
 
@@ -109,7 +112,6 @@ class Compiler implements BuilderInterface
         }
     }
 
-    private $factories = [];
     public function build(): ContainerInterface
     {
         $defs = [];

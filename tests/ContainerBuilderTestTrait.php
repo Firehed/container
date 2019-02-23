@@ -123,10 +123,11 @@ trait ContainerBuilderTestTrait
     }
 
     /**
-     * some_string => scalar_literak
+     * some_string => scalar_literal
      * @dataProvider scalarLiterals
+     * @param mixed $expectedValue
      */
-    public function testScalarLiteral(string $key, $expectedValue)
+    public function testScalarLiteral(string $key, $expectedValue): void
     {
         $this->assertTrue($this->container->has($key));
         $value = $this->container->get($key);
@@ -145,7 +146,7 @@ trait ContainerBuilderTestTrait
         ];
     }
 
-    private function assertGetSingleton(string $key, ?string $type = null)
+    private function assertGetSingleton(string $key, ?string $type = null): void
     {
         $type = $type ?? $key;
         $this->assertTrue($this->container->has($key));
@@ -155,10 +156,10 @@ trait ContainerBuilderTestTrait
             $this->assertInstanceOf($type, $value);
             $values[] = $value;
         }
-        $this->assertAllAreSame(...$values);
+        $this->assertAllAreSame($values);
     }
 
-    private function assertGetFactory(string $key, ?string $type = null)
+    private function assertGetFactory(string $key, ?string $type = null): void
     {
         $type = $type ?? $key;
         $this->assertTrue($this->container->has($key), "Container should have $key");
@@ -168,10 +169,14 @@ trait ContainerBuilderTestTrait
             $this->assertInstanceOf($type, $value);
             $values[] = $value;
         }
-        $this->assertAllAreNotSame(...$values);
+        $this->assertAllAreNotSame($values);
     }
 
-    private function assertAllAreSame(...$args)
+
+    /**
+     * @param mixed[] $args
+     */
+    private function assertAllAreSame(array $args): void
     {
         while (count($args) >= 2) {
             $first = array_shift($args);
@@ -181,7 +186,10 @@ trait ContainerBuilderTestTrait
         }
     }
 
-    private function assertAllAreNotSame(...$args)
+    /**
+     * @param mixed[] $args
+     */
+    private function assertAllAreNotSame(array $args): void
     {
         while (count($args) >= 2) {
             $first = array_shift($args);
