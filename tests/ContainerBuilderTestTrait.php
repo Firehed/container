@@ -42,9 +42,20 @@ trait ContainerBuilderTestTrait
      */
     public function testAutowiredDefinition(): void
     {
-        $this->assertTrue($this->container->has(Fixtures\SessionId::class));
-        $sessionId = $this->container->get(Fixtures\SessionId::class);
-        assert($sessionId instanceof Fixtures\SessionId);
+        $this->assertGetSingleton(Fixtures\SessionId::class);
+    }
+
+    /**
+     * SomeInterface::class => SomeImplementation::class
+     * SomeImplementation::class => autowire()
+     * where SomeImplementation has no constructor arguments
+     */
+    public function testInterfaceMapping(): void
+    {
+        $this->assertGetSingleton(
+            SessionIdInterface::class,
+            Fixtures\SessionId::class
+        );
     }
 
     /**
@@ -53,40 +64,20 @@ trait ContainerBuilderTestTrait
      */
     public function testAutowiredDefinitionWithConstuctorArg(): void
     {
-        $this->assertTrue($this->container->has(Fixtures\SessionHandler::class));
-        $sh = $this->container->get(Fixtures\SessionHandler::class);
-        assert($sh instanceof SessionHandlerInterface);
-        assert($sh instanceof Fixtures\SessionHandler);
-    }
-
-    public function testMultipleGetCallsToSameObjectReturnInstance(): void
-    {
-        $this->assertTrue($this->container->has(Fixtures\SessionId::class));
-        $sessionId1 = $this->container->get(Fixtures\SessionId::class);
-        $sessionId2 = $this->container->get(Fixtures\SessionId::class);
-        $sessionId3 = $this->container->get(Fixtures\SessionId::class);
-        assert($sessionId1 instanceof Fixtures\SessionId);
-        assert($sessionId2 instanceof Fixtures\SessionId);
-        assert($sessionId3 instanceof Fixtures\SessionId);
-        $this->assertAllAreSame($sessionId1, $sessionId2, $sessionId3);
+        $this->assertGetSingleton(Fixtures\SessionHandler::class);
     }
 
     /**
      * SomeInterface::class => SomeImplementation::class
+     * SomeImplementation::class => autowire()
+     * where SomeImplementation has >= 1 constructor arguments
      */
-    public function testInterfaceMapping(): void
+    public function testInterfaceMappedToAutowiredDefinitionWithConstructorArg(): void
     {
-        $this->assertTrue($this->container->has(SessionIdInterface::class));
-        $sid = $this->container->get(SessionIdInterface::class);
-        assert($sid instanceof SessionIdInterface);
-        assert($sid instanceof Fixtures\SessionId);
-    }
-
-    public function testFirstCallToFactory(): void
-    {
-        $this->assertTrue($this->container->has(DateTime::class));
-        $dt = $this->container->get(DateTime::class);
-        assert($dt instanceof DateTime);
+        $this->assertGetSingleton(
+            SessionHandlerInterface::class,
+            Fixtures\SessionHandler::class
+        );
     }
 
     /**
@@ -96,14 +87,7 @@ trait ContainerBuilderTestTrait
      */
     public function testMultipleCallsToFactoryWithBodyReturnDifferentObjects(): void
     {
-        $this->assertTrue($this->container->has(DateTime::class));
-        $dt1 = $this->container->get(DateTime::class);
-        $dt2 = $this->container->get(DateTime::class);
-        $dt3 = $this->container->get(DateTime::class);
-        assert($dt1 instanceof DateTime);
-        assert($dt2 instanceof DateTime);
-        assert($dt3 instanceof DateTime);
-        $this->assertAllAreNotSame($dt1, $dt2, $dt3);
+        $this->assertGetFactory(DateTime::class);
     }
 
     /**
@@ -111,15 +95,7 @@ trait ContainerBuilderTestTrait
      */
     public function testMultipleCallsToFactoryWithNoBodyReturnDifferentObjects(): void
     {
-        $this->assertTrue($this->container->has(Fixtures\NoConstructorFactory::class));
-        $ncf1 = $this->container->get(Fixtures\NoConstructorFactory::class);
-        $ncf2 = $this->container->get(Fixtures\NoConstructorFactory::class);
-        $ncf3 = $this->container->get(Fixtures\NoConstructorFactory::class);
-        assert($ncf1 instanceof Fixtures\NoConstructorFactory);
-        assert($ncf2 instanceof Fixtures\NoConstructorFactory);
-        assert($ncf3 instanceof Fixtures\NoConstructorFactory);
-
-        $this->assertAllAreNotSame($ncf1, $ncf2, $ncf3);
+        $this->assertGetFactory(Fixtures\NoConstructorFactory::class);
     }
 
     /**
@@ -129,9 +105,7 @@ trait ContainerBuilderTestTrait
      */
     public function testInterfaceKeyToExplicitDefinition(): void
     {
-        $this->assertTrue($this->container->has(Fixtures\ExplicitDefinitionInterface::class));
-        $edi = $this->container->get(Fixtures\ExplicitDefinitionInterface::class);
-        assert($edi instanceof Fixtures\ExplicitDefinitionInterface);
+        $this->assertGetSingleton(Fixtures\ExplicitDefinitionInterface::class);
     }
 
     /**
@@ -155,6 +129,32 @@ trait ContainerBuilderTestTrait
             ['array_literal', ['a', 'b', 'c']],
             ['dict_literal', ['a' => 1, 'b' => 2, 'c' => 3]],
         ];
+    }
+
+    private function assertGetSingleton(string $key, ?string $type = null)
+    {
+        $type = $type ?? $key;
+        $this->assertTrue($this->container->has($key));
+        $values = [];
+        for ($i = 0; $i < 3; $i++) {
+            $value = $this->container->get($key);
+            $this->assertInstanceOf($type, $value);
+            $values[] = $value;
+        }
+        $this->assertAllAreSame(...$values);
+    }
+
+    private function assertGetFactory(string $key, ?string $type = null)
+    {
+        $type = $type ?? $key;
+        $this->assertTrue($this->container->has($key));
+        $values = [];
+        for ($i = 0; $i < 3; $i++) {
+            $value = $this->container->get($key);
+            $this->assertInstanceOf($type, $value);
+            $values[] = $value;
+        }
+        $this->assertAllAreNotSame(...$values);
     }
 
     private function assertAllAreSame(...$args)
