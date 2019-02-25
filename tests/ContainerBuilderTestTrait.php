@@ -7,12 +7,13 @@ use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use SessionHandlerInterface;
 use SessionIdInterface;
 
 /**
  * This is a test trait to help ensure all processes end up with the same
- * results
+ * results. These are primarily integration tests, not unit tests.
  */
 trait ContainerBuilderTestTrait
 {
@@ -134,6 +135,19 @@ trait ContainerBuilderTestTrait
         $this->assertSame($expectedValue, $value);
     }
 
+    public function testHasWithMissingKeyReturnsFalse()
+    {
+        $this->assertFalse($this->container->has('key_that_does_not_exist'));
+    }
+
+    public function testGetWithMissingKeyThrowsNotFoundException()
+    {
+        $this->expectException(NotFoundExceptionInterface::class);
+        $this->container->get('key_that_does_not_exist');
+    }
+
+    // Data Providers
+
     public function scalarLiterals(): array
     {
         return [
@@ -145,6 +159,8 @@ trait ContainerBuilderTestTrait
             ['dict_literal', ['a' => 1, 'b' => 2, 'c' => 3]],
         ];
     }
+
+    // Internal assertion wrappers
 
     private function assertGetSingleton(string $key, ?string $type = null): void
     {
@@ -171,7 +187,6 @@ trait ContainerBuilderTestTrait
         }
         $this->assertAllAreNotSame($values);
     }
-
 
     /**
      * @param mixed[] $args
