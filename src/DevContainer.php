@@ -69,6 +69,18 @@ class DevContainer implements Container\ContainerInterface
             return $this->autowire($id)($this);
         }
 
+        if ($value instanceof EnvironmentVariableInterface) {
+            $varName = $value->getName();
+            $envValue = getenv($varName);
+            if ($envValue === false) {
+                if ($value->hasDefault()) {
+                    return $value->getDefault();
+                }
+                throw new Exceptions\EnvironmentVariableNotSet($varName);
+            }
+            return $envValue;
+        }
+
         return $value;
     }
 

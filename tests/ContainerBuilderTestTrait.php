@@ -7,6 +7,7 @@ use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use SessionHandlerInterface;
 use SessionIdInterface;
@@ -27,7 +28,7 @@ trait ContainerBuilderTestTrait
     {
         $this->rawGetEnvValue = getenv('PWD'); // see CDF3
         $this->unittestEnvVar = md5((string)random_int(0, PHP_INT_MAX));
-        putenv("CONTAINER_UNITTEST={$this->unittestEnvVar}");
+        putenv("CONTAINER_UNITTEST_SET={$this->unittestEnvVar}");
 
         $builder = $this->getBuilder();
         foreach ($this->getDefinitionFiles() as $file) {
@@ -156,6 +157,9 @@ trait ContainerBuilderTestTrait
 
     // Environment variables
 
+    /**
+     * This test demonstrates a counterexample
+     */
     public function testRawGetenv()
     {
         $key = 'env_pwd';
@@ -164,14 +168,34 @@ trait ContainerBuilderTestTrait
         $this->assertSame($this->rawGetEnvValue, $value, 'get should return the value');
     }
 
-    public function testWrappedEnv()
+    /**
+     * @dataProvider envVarsThatAreSet
+     */
+    public function testWrappedEnv(string $key)
     {
-        $key = 'env_container_unittest';
         $this->assertTrue($this->container->has($key), 'has should be true');
         $value = $this->container->get($key);
         $this->assertSame($this->unittestEnvVar, $value, 'get should return the value');
     }
 
+    public function testNotSetEnvVarThrowsOnAccess()
+    {
+        $this->assertTrue($this->container->has('env_not_set'));
+        $this->expectException(ContainerExceptionInterface::class);
+        $this->container->get('env_not_set');
+    }
+
+    public function testNotSetEnvVarWithDefaultReturnsDefault()
+    {
+        $this->assertTrue($this->container->has('env_not_set_with_default'));
+        $this->assertSame('default', $this->container->get('env_not_set_with_default'));
+    }
+
+    public function testNotSetEnvVarWithNullDefaultReturnsNull()
+    {
+        $this->assertTrue($this->container->has('env_not_set_with_null_default'));
+        $this->assertNull($this->container->get('env_not_set_with_null_default'));
+    }
 
     // Data Providers
 
@@ -191,6 +215,15 @@ trait ContainerBuilderTestTrait
             ['zero_float_literal', 0.0],
             ['empty_string_literal', ''],
 
+        ];
+    }
+
+    public function envVarsThatAreSet(): array
+    {
+        return [
+            ['env_set'],
+            ['env_set_with_default'],
+            ['env_set_with_null_default'],
         ];
     }
 

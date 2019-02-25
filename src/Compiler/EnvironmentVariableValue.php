@@ -5,6 +5,8 @@ namespace Firehed\Container\Compiler;
 
 use Firehed\Container\EnvironmentVariableInterface;
 
+use Firehed\Container\Exceptions\EnvironmentVariableNotSet;
+
 class EnvironmentVariableValue implements CodeGeneratorInterface
 {
     /** @var EnvironmentVariableInterface */
@@ -23,10 +25,22 @@ protected function $functionName()
 {
     \$value = getenv('$envVarName');
     if (\$value === false) {
-
+        {$this->getDefaultBody()}
     }
     return \$value;
 }
 PHP;
+    }
+
+    private function getDefaultBody(): string
+    {
+        if ($this->env->hasDefault()) {
+            $default = var_export($this->env->getDefault(), true);
+            return "return $default;";
+        } else {
+            $varName = var_export($this->env->getName(), true);
+            $exClass = EnvironmentVariableNotSet::class;
+            return "throw new $exClass($varName);";
+        }
     }
 }
