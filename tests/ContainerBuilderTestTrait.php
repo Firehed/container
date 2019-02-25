@@ -130,9 +130,9 @@ trait ContainerBuilderTestTrait
      */
     public function testScalarLiteral(string $key, $expectedValue): void
     {
-        $this->assertTrue($this->container->has($key));
+        $this->assertTrue($this->container->has($key), 'has should be true');
         $value = $this->container->get($key);
-        $this->assertSame($expectedValue, $value);
+        $this->assertSame($expectedValue, $value, 'get should return the value');
     }
 
     public function testHasWithMissingKeyReturnsFalse()
