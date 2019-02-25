@@ -43,7 +43,7 @@ class DevContainer implements Container\ContainerInterface
         }
 
         if (!$this->has($id)) {
-            /// throw
+            throw new Exceptions\NotFound($id);
         }
 
         $def = $this->definitions[$id];

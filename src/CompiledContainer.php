@@ -40,7 +40,9 @@ abstract class CompiledContainer implements ContainerInterface
      */
     public function get($id)
     {
-        // if !has throw
+        if (!$this->has($id)) {
+            throw new Exceptions\NotFound($id);
+        }
 
         // Check the value cache
         if (isset($this->values[$id])) {
