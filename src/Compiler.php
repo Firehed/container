@@ -94,20 +94,17 @@ class Compiler implements BuilderInterface
         } elseif ($value instanceof Closure) {
             // $this->logger->error('CLOSURE Unhandled value for {key}', ['key' => $key]);
             $this->definitions[$key] = new Compiler\ClosureValue($value);
-        } elseif (is_scalar($value) || is_array($value)) {
+        } elseif (interface_exists($key) && is_string($value)) {
             // Simple autowiring
-            if (interface_exists($key) && is_string($value)) {
-                $this->logger->debug('Basic autowire {key} => {value}', [
-                    'key' => $key,
-                    'value' => $value,
-                ]);
-                // Never cache proxied values in case they point to a factory
-                $this->factories[$key] = true;
-                $this->definitions[$key] = new Compiler\ProxyValue($value);
-            } else {
-                $this->definitions[$key] = new Compiler\LiteralValue($value);
-            }
+            $this->logger->debug('Basic autowire {key} => {value}', [
+                'key' => $key,
+                'value' => $value,
+            ]);
+            // Never cache proxied values in case they point to a factory
+            $this->factories[$key] = true;
+            $this->definitions[$key] = new Compiler\ProxyValue($value);
         } else {
+            $this->definitions[$key] = new Compiler\LiteralValue($value);
             $this->logger->error('Unhandled value for {key}', ['key' => $key]);
         }
     }
