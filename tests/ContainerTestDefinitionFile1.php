@@ -40,4 +40,11 @@ return [
     'bool_literal' => true,
     'array_literal' => ['a', 'b', 'c'],
     'dict_literal' => ['a' => 1, 'b' => 2, 'c' => 3],
+
+    // Sanity checks on "empty" literals
+    'false_literal' => false,
+    'null_literal' => null,
+    'zero_litreal' => 0,
+    'zero_float_literal' => 0.0,
+    'empty_string_literal' => '',
 ];
