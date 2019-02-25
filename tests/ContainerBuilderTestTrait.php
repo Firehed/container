@@ -21,12 +21,15 @@ trait ContainerBuilderTestTrait
     /** @var ContainerInterface */
     private $container;
 
+    /** @var string */
     private $rawGetEnvValue;
+
+    /** @var string */
     private $unittestEnvVar;
 
     public function setUp(): void
     {
-        $this->rawGetEnvValue = getenv('PWD'); // see CDF3
+        $this->rawGetEnvValue = (string)getenv('PWD'); // see CDF3
         $this->unittestEnvVar = md5((string)random_int(0, PHP_INT_MAX));
         putenv("CONTAINER_UNITTEST_SET={$this->unittestEnvVar}");
 
@@ -144,12 +147,12 @@ trait ContainerBuilderTestTrait
         $this->assertSame($expectedValue, $value, 'get should return the value');
     }
 
-    public function testHasWithMissingKeyReturnsFalse()
+    public function testHasWithMissingKeyReturnsFalse(): void
     {
         $this->assertFalse($this->container->has('key_that_does_not_exist'));
     }
 
-    public function testGetWithMissingKeyThrowsNotFoundException()
+    public function testGetWithMissingKeyThrowsNotFoundException(): void
     {
         $this->expectException(NotFoundExceptionInterface::class);
         $this->container->get('key_that_does_not_exist');
@@ -158,9 +161,9 @@ trait ContainerBuilderTestTrait
     // Environment variables
 
     /**
-     * This test demonstrates a counterexample
+     * This test demonstrates a counterexample/compile-time value
      */
-    public function testRawGetenv()
+    public function testRawGetenv(): void
     {
         $key = 'env_pwd';
         $this->assertTrue($this->container->has($key), 'has should be true');
@@ -171,27 +174,27 @@ trait ContainerBuilderTestTrait
     /**
      * @dataProvider envVarsThatAreSet
      */
-    public function testWrappedEnv(string $key)
+    public function testWrappedEnv(string $key): void
     {
         $this->assertTrue($this->container->has($key), 'has should be true');
         $value = $this->container->get($key);
         $this->assertSame($this->unittestEnvVar, $value, 'get should return the value');
     }
 
-    public function testNotSetEnvVarThrowsOnAccess()
+    public function testNotSetEnvVarThrowsOnAccess(): void
     {
         $this->assertTrue($this->container->has('env_not_set'));
         $this->expectException(ContainerExceptionInterface::class);
         $this->container->get('env_not_set');
     }
 
-    public function testNotSetEnvVarWithDefaultReturnsDefault()
+    public function testNotSetEnvVarWithDefaultReturnsDefault(): void
     {
         $this->assertTrue($this->container->has('env_not_set_with_default'));
         $this->assertSame('default', $this->container->get('env_not_set_with_default'));
     }
 
-    public function testNotSetEnvVarWithNullDefaultReturnsNull()
+    public function testNotSetEnvVarWithNullDefaultReturnsNull(): void
     {
         $this->assertTrue($this->container->has('env_not_set_with_null_default'));
         $this->assertNull($this->container->get('env_not_set_with_null_default'));
