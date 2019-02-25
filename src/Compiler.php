@@ -94,6 +94,8 @@ class Compiler implements BuilderInterface
         } elseif ($value instanceof Closure) {
             // $this->logger->error('CLOSURE Unhandled value for {key}', ['key' => $key]);
             $this->definitions[$key] = new Compiler\ClosureValue($value);
+        } elseif ($value instanceof EnvironmentVariableInterface) {
+            $this->definitions[$key] = new Compiler\EnvironmentVariableValue($value);
         } elseif (interface_exists($key) && is_string($value)) {
             // Simple autowiring
             $this->logger->debug('Basic autowire {key} => {value}', [

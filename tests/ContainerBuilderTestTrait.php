@@ -20,8 +20,15 @@ trait ContainerBuilderTestTrait
     /** @var ContainerInterface */
     private $container;
 
+    private $rawGetEnvValue;
+    private $unittestEnvVar;
+
     public function setUp(): void
     {
+        $this->rawGetEnvValue = getenv('PWD'); // see CDF3
+        $this->unittestEnvVar = md5((string)random_int(0, PHP_INT_MAX));
+        putenv("CONTAINER_UNITTEST={$this->unittestEnvVar}");
+
         $builder = $this->getBuilder();
         foreach ($this->getDefinitionFiles() as $file) {
             $builder->addFile($file);
@@ -36,6 +43,7 @@ trait ContainerBuilderTestTrait
         return [
             __DIR__ . '/ContainerTestDefinitionFile1.php',
             __DIR__ . '/ContainerTestDefinitionFile2.php',
+            __DIR__ . '/ContainerTestDefinitionFile3.php',
         ];
     }
 
@@ -145,6 +153,25 @@ trait ContainerBuilderTestTrait
         $this->expectException(NotFoundExceptionInterface::class);
         $this->container->get('key_that_does_not_exist');
     }
+
+    // Environment variables
+
+    public function testRawGetenv()
+    {
+        $key = 'env_pwd';
+        $this->assertTrue($this->container->has($key), 'has should be true');
+        $value = $this->container->get($key);
+        $this->assertSame($this->rawGetEnvValue, $value, 'get should return the value');
+    }
+
+    public function testWrappedEnv()
+    {
+        $key = 'env_container_unittest';
+        $this->assertTrue($this->container->has($key), 'has should be true');
+        $value = $this->container->get($key);
+        $this->assertSame($this->unittestEnvVar, $value, 'get should return the value');
+    }
+
 
     // Data Providers
 
