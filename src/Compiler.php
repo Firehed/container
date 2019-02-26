@@ -163,14 +163,7 @@ class Compiler implements BuilderInterface
 
     private function makeNameForKey(string $key): string
     {
-        $name = ucfirst($key);
-        // strip out any other invalid characters?
-        $formatted = strtr($name, [
-            '\\' => '_',
-            // '/' => '_',
-            // ':' => '_',
-        ]);
-        $out = sprintf('get%s', $formatted);
+        $out = sprintf('get%s', md5($key));
         $this->logger->debug('Name generated: {key} => {out}', [
             'key' => $key,
             'out' => $out,

@@ -48,6 +48,7 @@ trait ContainerBuilderTestTrait
             __DIR__ . '/ContainerTestDefinitionFile1.php',
             __DIR__ . '/ContainerTestDefinitionFile2.php',
             __DIR__ . '/ContainerTestDefinitionFile3.php',
+            __DIR__ . '/ContainerTestDefinitionFile4.php',
         ];
     }
 
@@ -217,7 +218,11 @@ trait ContainerBuilderTestTrait
             ['zero_litreal', 0],
             ['zero_float_literal', 0.0],
             ['empty_string_literal', ''],
-
+            // Case-sensitive keys
+            ['case_sensitive', 1],
+            ['CASE_SENSITIVE', 2],
+            ['Case_Sensitive', 3],
+            ['CaSe_SeNsItIvE', 4],
         ];
     }
 
