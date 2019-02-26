@@ -107,7 +107,6 @@ class Compiler implements BuilderInterface
             $this->definitions[$key] = new Compiler\ProxyValue($value);
         } else {
             $this->definitions[$key] = new Compiler\LiteralValue($value);
-            $this->logger->error('Unhandled value for {key}', ['key' => $key]);
         }
     }
 
