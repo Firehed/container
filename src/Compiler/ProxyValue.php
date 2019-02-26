@@ -16,15 +16,11 @@ class ProxyValue implements CodeGeneratorInterface
         $this->class = $classToAutowire;
     }
 
-    public function generateCode(string $functionName): string
+    public function generateCode(): string
     {
-        $dest = sprintf('$this->get(%s)', var_export($this->class, true));
-        $code = <<<PHP
-protected function $functionName()
-{
-    return $dest;
-}
-PHP;
-        return $code;
+        return sprintf(
+            'return $this->get(%s);',
+            var_export($this->class, true)
+        );
     }
 }

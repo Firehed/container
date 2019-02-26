@@ -7,9 +7,10 @@ interface CodeGeneratorInterface
 {
     /**
      * Must return PHP code that evalutes to something like this:
-     *     protected function $functionName() {
-     *         return 'some_value';
-     *     }
+     *
+     *     return 'some_value';
+     *
+     * The outer function body will be provided by the calling compiler
      */
-    public function generateCode(string $functionName): string;
+    public function generateCode(): string;
 }

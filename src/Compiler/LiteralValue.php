@@ -14,14 +14,11 @@ class LiteralValue implements CodeGeneratorInterface
         $this->literal = $literal;
     }
 
-    public function generateCode(string $functionName): string
+    public function generateCode(): string
     {
-        $value = var_export($this->literal, true);
-        return <<<PHP
-protected function $functionName()
-{
-    return $value;
-}
-PHP;
+        return sprintf(
+            'return %s;',
+            var_export($this->literal, true)
+        );
     }
 }

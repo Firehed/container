@@ -119,7 +119,7 @@ class Compiler implements BuilderInterface
             $name = $this->makeNameForKey($key);
             $mappings[$key] = $name;
 
-            $defs[] = $value->generateCode($name);
+            $defs[] = $this->makeFunctionBody($name, $value);// $value->generateCode($name);
         }
 
         $tpl  = "<?php\n";
@@ -158,6 +158,16 @@ class Compiler implements BuilderInterface
 
         $printer = new Standard(['shortArraySyntax' => true]);
         return $printer->prettyPrintFile($ast);
+    }
+
+    private function makeFunctionBody(string $functionName, Compiler\CodeGeneratorInterface $definition): string
+    {
+        $body = $definition->generateCode();
+        return sprintf(
+            'protected function %s() { %s }',
+            $functionName,
+            $body
+        );
     }
 
     private function makeNameForKey(string $key): string

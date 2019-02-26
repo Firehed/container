@@ -18,7 +18,7 @@ class ClosureValue implements CodeGeneratorInterface
         $this->closure = $closure;
     }
 
-    public function generateCode(string $functionName): string
+    public function generateCode(): string
     {
 
         $analyzer = new AstAnalyzer();
@@ -36,11 +36,9 @@ class ClosureValue implements CodeGeneratorInterface
         //   a) Use only the body of the closure
         //   b) Replace $arg1 with $this
         // But gettting there will take a fair bit of AST hacking.
-        return <<<PHP
-protected function $functionName()
-{
-    return ($formatted)(\$this);
-}
-PHP;
+        return sprintf(
+            'return (%s)($this);',
+            $formatted
+        );
     }
 }

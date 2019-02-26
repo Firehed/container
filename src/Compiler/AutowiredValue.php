@@ -18,7 +18,7 @@ class AutowiredValue implements CodeGeneratorInterface
         $this->class = $classToAutowire;
     }
 
-    public function generateCode(string $functionName): string
+    public function generateCode(): string
     {
         $rc = new ReflectionClass($this->class);
         $args = [];
@@ -49,12 +49,9 @@ class AutowiredValue implements CodeGeneratorInterface
         $argInfo = implode(', ', $args);
 
         $code = <<<PHP
-protected function $functionName()
-{
     return new {$this->class}(
         $argInfo
     );
-}
 PHP;
         return $code;
     }
