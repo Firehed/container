@@ -13,6 +13,28 @@ with `make`). This is intended to reduce unpredictable behavior of services
 in concurrent environments while strictly adhering to the PSR container
 specification.
 
+### Differences from PHP-DI
+
+- Only `get()` and `has()` methods exist on the container
+
+- The `factory` function has _completely_ different behavior:
+  the closure it wraps will be called every time it is requested through `get` (PHP-DI exposes this as `$container->make()`).
+  In PHP-DI, `factory` is just alternate syntax for defining a service through a closure.
+
+- When an interface is mapped to an implementation, the default behavior is to return the configured implementation.
+  In PHP-DI, `SomeInterface::class => autowire(SomeImplementation::class)` does NOT point to an explcitly-configured `SomeImplementation`
+
+- A shorthand syntax for interface-to-implementation has been added
+
+- Implicit autowiring of classes is not supported.
+  This is intentional in order to maximize compiler optimizations.
+
+- When recursively resolving dependencies, all required parameters must also be explicitly configured (see above)
+
+- Annotations are not supported.
+  In future versions, `@param` annotations _may_ be supported; `@Inject` will never be.
+
+
 ## Installation
 
 ```
