@@ -25,7 +25,7 @@ composer require firehed/container
 
 ### factory
 
-### env
+### `env(string $variableName, ?string $default = null)
 Use `env` to embed environment variables in your container. Like other non-
 factory values, these will be cached for the lifetime of the script.
 
@@ -37,6 +37,7 @@ is used.
 
 If *and only if* you want a value compiled in, you must use `getenv` directly.
 
+Source definitions like this:
 ```php
 use function Firehed\Container\env;
 return [
@@ -48,8 +49,9 @@ return [
     'getenv' => getenv('VALUE_AT_COMPILE_TIME'),
 ];
 ```
+
+will compile to code similar to this:
 ```php
-use function Firehed\Container\env;
 return [
     'some_key' => function () {
         $value = getenv('SOME_ENV_VAR');
