@@ -18,8 +18,6 @@ use SessionIdInterface;
  */
 trait ContainerBuilderTestTrait
 {
-    /** @var ContainerInterface */
-    private $container;
 
     /** @var string */
     private $rawGetEnvValue;
@@ -27,7 +25,7 @@ trait ContainerBuilderTestTrait
     /** @var string */
     private $unittestEnvVar;
 
-    public function setUp(): void
+    public function getContainer(): ContainerInterface
     {
         $this->rawGetEnvValue = (string)getenv('PWD'); // see CDF3
         $this->unittestEnvVar = md5((string)random_int(0, PHP_INT_MAX));
@@ -37,7 +35,7 @@ trait ContainerBuilderTestTrait
         foreach ($this->getDefinitionFiles() as $file) {
             $builder->addFile($file);
         }
-        $this->container = $builder->build();
+        return $builder->build();
     }
 
     abstract protected function getBuilder(): BuilderInterface;
@@ -58,7 +56,11 @@ trait ContainerBuilderTestTrait
      */
     public function testAutowiredDefinition(): void
     {
-        $this->assertGetSingleton(Fixtures\SessionId::class);
+        $container = $this->getContainer();
+        $this->assertGetSingleton(
+            $container,
+            Fixtures\SessionId::class
+        );
     }
 
     /**
@@ -68,7 +70,9 @@ trait ContainerBuilderTestTrait
      */
     public function testInterfaceMapping(): void
     {
+        $container = $this->getContainer();
         $this->assertGetSingleton(
+            $container,
             SessionIdInterface::class,
             Fixtures\SessionId::class
         );
@@ -80,7 +84,11 @@ trait ContainerBuilderTestTrait
      */
     public function testAutowiredDefinitionWithConstuctorArg(): void
     {
-        $this->assertGetSingleton(Fixtures\SessionHandler::class);
+        $container = $this->getContainer();
+        $this->assertGetSingleton(
+            $container,
+            Fixtures\SessionHandler::class
+        );
     }
 
     /**
@@ -90,7 +98,9 @@ trait ContainerBuilderTestTrait
      */
     public function testInterfaceMappedToAutowiredDefinitionWithConstructorArg(): void
     {
+        $container = $this->getContainer();
         $this->assertGetSingleton(
+            $container,
             SessionHandlerInterface::class,
             Fixtures\SessionHandler::class
         );
@@ -103,7 +113,11 @@ trait ContainerBuilderTestTrait
      */
     public function testMultipleCallsToFactoryWithBodyReturnDifferentObjects(): void
     {
-        $this->assertGetFactory(DateTime::class);
+        $container = $this->getContainer();
+        $this->assertGetFactory(
+            $container,
+            DateTime::class
+        );
     }
 
     /**
@@ -112,7 +126,9 @@ trait ContainerBuilderTestTrait
      */
     public function testMultipleCallsToInterfaceMappedToFactoryDefinitionWithBody(): void
     {
+        $container = $this->getContainer();
         $this->assertGetFactory(
+            $container,
             DateTimeInterface::class,
             DateTime::class
         );
@@ -123,7 +139,11 @@ trait ContainerBuilderTestTrait
      */
     public function testMultipleCallsToFactoryWithNoBodyReturnDifferentObjects(): void
     {
-        $this->assertGetFactory(Fixtures\NoConstructorFactory::class);
+        $container = $this->getContainer();
+        $this->assertGetFactory(
+            $container,
+            Fixtures\NoConstructorFactory::class
+        );
     }
 
     /**
@@ -133,7 +153,11 @@ trait ContainerBuilderTestTrait
      */
     public function testInterfaceKeyToExplicitDefinition(): void
     {
-        $this->assertGetSingleton(Fixtures\ExplicitDefinitionInterface::class);
+        $container = $this->getContainer();
+        $this->assertGetSingleton(
+            $container,
+            Fixtures\ExplicitDefinitionInterface::class
+        );
     }
 
     /**
@@ -143,20 +167,23 @@ trait ContainerBuilderTestTrait
      */
     public function testScalarLiteral(string $key, $expectedValue): void
     {
-        $this->assertTrue($this->container->has($key), 'has should be true');
-        $value = $this->container->get($key);
+        $container = $this->getContainer();
+        $this->assertTrue($container->has($key), 'has should be true');
+        $value = $container->get($key);
         $this->assertSame($expectedValue, $value, 'get should return the value');
     }
 
     public function testHasWithMissingKeyReturnsFalse(): void
     {
-        $this->assertFalse($this->container->has('key_that_does_not_exist'));
+        $container = $this->getContainer();
+        $this->assertFalse($container->has('key_that_does_not_exist'));
     }
 
     public function testGetWithMissingKeyThrowsNotFoundException(): void
     {
+        $container = $this->getContainer();
         $this->expectException(NotFoundExceptionInterface::class);
-        $this->container->get('key_that_does_not_exist');
+        $container->get('key_that_does_not_exist');
     }
 
     // Environment variables
@@ -166,9 +193,10 @@ trait ContainerBuilderTestTrait
      */
     public function testRawGetenv(): void
     {
+        $container = $this->getContainer();
         $key = 'env_pwd';
-        $this->assertTrue($this->container->has($key), 'has should be true');
-        $value = $this->container->get($key);
+        $this->assertTrue($container->has($key), 'has should be true');
+        $value = $container->get($key);
         $this->assertSame($this->rawGetEnvValue, $value, 'get should return the value');
     }
 
@@ -177,28 +205,32 @@ trait ContainerBuilderTestTrait
      */
     public function testWrappedEnv(string $key): void
     {
-        $this->assertTrue($this->container->has($key), 'has should be true');
-        $value = $this->container->get($key);
+        $container = $this->getContainer();
+        $this->assertTrue($container->has($key), 'has should be true');
+        $value = $container->get($key);
         $this->assertSame($this->unittestEnvVar, $value, 'get should return the value');
     }
 
     public function testNotSetEnvVarThrowsOnAccess(): void
     {
-        $this->assertTrue($this->container->has('env_not_set'));
+        $container = $this->getContainer();
+        $this->assertTrue($container->has('env_not_set'));
         $this->expectException(ContainerExceptionInterface::class);
-        $this->container->get('env_not_set');
+        $container->get('env_not_set');
     }
 
     public function testNotSetEnvVarWithDefaultReturnsDefault(): void
     {
-        $this->assertTrue($this->container->has('env_not_set_with_default'));
-        $this->assertSame('default', $this->container->get('env_not_set_with_default'));
+        $container = $this->getContainer();
+        $this->assertTrue($container->has('env_not_set_with_default'));
+        $this->assertSame('default', $container->get('env_not_set_with_default'));
     }
 
     public function testNotSetEnvVarWithNullDefaultReturnsNull(): void
     {
-        $this->assertTrue($this->container->has('env_not_set_with_null_default'));
-        $this->assertNull($this->container->get('env_not_set_with_null_default'));
+        $container = $this->getContainer();
+        $this->assertTrue($container->has('env_not_set_with_null_default'));
+        $this->assertNull($container->get('env_not_set_with_null_default'));
     }
 
     // Data Providers
@@ -237,26 +269,26 @@ trait ContainerBuilderTestTrait
 
     // Internal assertion wrappers
 
-    private function assertGetSingleton(string $key, ?string $type = null): void
+    private function assertGetSingleton(ContainerInterface $container, string $key, ?string $type = null): void
     {
         $type = $type ?? $key;
-        $this->assertTrue($this->container->has($key));
+        $this->assertTrue($container->has($key));
         $values = [];
         for ($i = 0; $i < 3; $i++) {
-            $value = $this->container->get($key);
+            $value = $container->get($key);
             $this->assertInstanceOf($type, $value);
             $values[] = $value;
         }
         $this->assertAllAreSame($values);
     }
 
-    private function assertGetFactory(string $key, ?string $type = null): void
+    private function assertGetFactory(ContainerInterface $container, string $key, ?string $type = null): void
     {
         $type = $type ?? $key;
-        $this->assertTrue($this->container->has($key), "Container should have $key");
+        $this->assertTrue($container->has($key), "Container should have $key");
         $values = [];
         for ($i = 0; $i < 3; $i++) {
-            $value = $this->container->get($key);
+            $value = $container->get($key);
             $this->assertInstanceOf($type, $value);
             $values[] = $value;
         }
