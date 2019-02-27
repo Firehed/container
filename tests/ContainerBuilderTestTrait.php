@@ -43,12 +43,18 @@ trait ContainerBuilderTestTrait
 
     private function getDefinitionFiles(): array
     {
-        return [
-            __DIR__ . '/ContainerTestDefinitionFile1.php',
-            __DIR__ . '/ContainerTestDefinitionFile2.php',
-            __DIR__ . '/ContainerTestDefinitionFile3.php',
-            __DIR__ . '/ContainerTestDefinitionFile4.php',
+        $files = [
+            'Environment',
+            'CaseSensitive',
+            'RequiredParams',
+            'Factories',
+            'Literals',
+            'Closures',
+            'NoParams',
         ];
+        return array_map(function ($name) {
+            return sprintf('%s/ValidDefinitions/%s.php', __DIR__, $name);
+        }, $files);
     }
 
     /**
