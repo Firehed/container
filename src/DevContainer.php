@@ -110,13 +110,13 @@ class DevContainer implements Container\ContainerInterface
         $needed = [];
         foreach ($params as $param) {
             if (!$param->hasType()) {
-                throw new \Exception('untyped constructor param');
+                throw new Exceptions\UntypedValue($param->getName(), $id);
             }
             $type = $param->getType();
             assert($type !== null);
             $name = $type->getName();
             if (!$this->has($name)) {
-                throw new \Exception('undefined type in constructor param');
+                throw new Exceptions\UntypedValue($param->getName(), $id);
             }
             $needed[] = (function ($c) use ($name) {
                 return $c->get($name);

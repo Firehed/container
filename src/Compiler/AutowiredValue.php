@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace Firehed\Container\Compiler;
 
+use Firehed\Container\Exceptions\UntypedValue;
 use ReflectionClass;
+use ReflectionType;
 
 class AutowiredValue implements CodeGeneratorInterface
 {
@@ -31,15 +33,14 @@ class AutowiredValue implements CodeGeneratorInterface
             $params = $constructor->getParameters();
             foreach ($params as $param) {
                 if (!$param->hasType()) {
-                    var_dump($this->class);
-                    exit;
-                    throw new \Exception('untyped constructor param');
+                    throw new UntypedValue($param->getName(), $this->class);
                 }
                 $type = $param->getType();
                 assert($type !== null);
-                $name = $type->getName();
-                // validate exists?
-                $argClasses[] = $name;
+                if (!$this->isResolvableType($type)) {
+                    throw new UntypedValue($param->getName(), $this->class);
+                }
+                $argClasses[] = $type->getName();
             }
             $args = array_map(function ($type) {
                 return sprintf('$this->get(%s)', var_export($type, true));
@@ -54,5 +55,10 @@ class AutowiredValue implements CodeGeneratorInterface
     );
 PHP;
         return $code;
+    }
+
+    private function isResolvableType(ReflectionType $type): bool
+    {
+        return !$type->isBuiltin();
     }
 }

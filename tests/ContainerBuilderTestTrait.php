@@ -18,6 +18,7 @@ use SessionIdInterface;
  */
 trait ContainerBuilderTestTrait
 {
+    use ErrorDefinitionsTestTrait;
 
     /** @var string */
     private $rawGetEnvValue;
