@@ -51,6 +51,7 @@ trait ContainerBuilderTestTrait
             'Literals',
             'Closures',
             'NoParams',
+            'ScalarParams',
         ];
         return array_map(function ($name) {
             return sprintf('%s/ValidDefinitions/%s.php', __DIR__, $name);
@@ -180,6 +181,37 @@ trait ContainerBuilderTestTrait
         $this->assertSame($expectedValue, $value, 'get should return the value');
     }
 
+    /**
+     * DefaultScalarParam::class => autowire()
+     */
+    public function testDefaultScalarParamCanBeAutowired()
+    {
+        $container = $this->getContainer();
+        $dsp = $this->assertGetSingleton(
+            $container,
+            Fixtures\DefaultScalarParam::class
+        );
+        // Should have autowired with default from signature
+        $this->assertSame(
+            Fixtures\DefaultScalarParam::DEFAULT_VALUE,
+            $dsp->getParam()
+        );
+    }
+
+    /**
+     * OptionalScalarParam::class => autowire()
+     */
+    public function testOptionalScalarParamCanBeAutowired()
+    {
+        $container = $this->getContainer();
+        $osp = $this->assertGetSingleton(
+            $container,
+            Fixtures\OptionalScalarParam::class
+        );
+        // Should have autowired with null default from signature
+        $this->assertNull($osp->getParam());
+    }
+
     public function testHasWithMissingKeyReturnsFalse(): void
     {
         $container = $this->getContainer();
@@ -276,7 +308,8 @@ trait ContainerBuilderTestTrait
 
     // Internal assertion wrappers
 
-    private function assertGetSingleton(ContainerInterface $container, string $key, ?string $type = null): void
+    /** @return mixed The fetched value */
+    private function assertGetSingleton(ContainerInterface $container, string $key, ?string $type = null)
     {
         $type = $type ?? $key;
         $this->assertTrue($container->has($key));
@@ -287,6 +320,7 @@ trait ContainerBuilderTestTrait
             $values[] = $value;
         }
         $this->assertAllAreSame($values);
+        return $values[0];
     }
 
     private function assertGetFactory(ContainerInterface $container, string $key, ?string $type = null): void

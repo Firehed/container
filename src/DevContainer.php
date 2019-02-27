@@ -109,18 +109,24 @@ class DevContainer implements Container\ContainerInterface
         $params = $construct->getParameters();
         $needed = [];
         foreach ($params as $param) {
-            if (!$param->hasType()) {
-                throw new Exceptions\UntypedValue($param->getName(), $id);
+            if ($param->isOptional()) {
+                $needed[] = function () use ($param) {
+                    return $param->getDefaultValue();
+                };
+            } else {
+                if (!$param->hasType()) {
+                    throw new Exceptions\UntypedValue($param->getName(), $id);
+                }
+                $type = $param->getType();
+                assert($type !== null);
+                $name = $type->getName();
+                if (!$this->has($name)) {
+                    throw new Exceptions\UntypedValue($param->getName(), $id);
+                }
+                $needed[] = (function ($c) use ($name) {
+                    return $c->get($name);
+                })->bindTo(null);
             }
-            $type = $param->getType();
-            assert($type !== null);
-            $name = $type->getName();
-            if (!$this->has($name)) {
-                throw new Exceptions\UntypedValue($param->getName(), $id);
-            }
-            $needed[] = (function ($c) use ($name) {
-                return $c->get($name);
-            })->bindTo(null);
         }
         return (function ($container) use ($id, $needed) {
             $args = array_map(function ($arg) use ($container) {

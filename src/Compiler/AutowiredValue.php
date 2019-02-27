@@ -5,6 +5,7 @@ namespace Firehed\Container\Compiler;
 
 use Firehed\Container\Exceptions\UntypedValue;
 use ReflectionClass;
+use ReflectionParameter;
 use ReflectionType;
 
 class AutowiredValue implements CodeGeneratorInterface
@@ -31,20 +32,7 @@ class AutowiredValue implements CodeGeneratorInterface
                 throw new \Exception('not public construct');
             }
             $params = $constructor->getParameters();
-            foreach ($params as $param) {
-                if (!$param->hasType()) {
-                    throw new UntypedValue($param->getName(), $this->class);
-                }
-                $type = $param->getType();
-                assert($type !== null);
-                if (!$this->isResolvableType($type)) {
-                    throw new UntypedValue($param->getName(), $this->class);
-                }
-                $argClasses[] = $type->getName();
-            }
-            $args = array_map(function ($type) {
-                return sprintf('$this->get(%s)', var_export($type, true));
-            }, $argClasses);
+            $args = array_map([$this, 'getDefaultValue'], $params);
         }
 
         $argInfo = implode(', ', $args);
@@ -57,8 +45,32 @@ PHP;
         return $code;
     }
 
-    private function isResolvableType(ReflectionType $type): bool
+    private function isResolvableParam(ReflectionParameter $param): bool
     {
-        return !$type->isBuiltin();
+        if ($param->isOptional()) {
+            return true;
+        }
+        if ($param->hasType()) {
+            $type = $param->getType();
+            assert($type !== null);
+            return !$type->isBuiltin();
+        }
+        return false;
+    }
+
+    private function getDefaultValue(ReflectionParameter $param): string
+    {
+        if (!$this->isResolvableParam($param)) {
+            throw new UntypedValue($param->getName(), $this->class);
+        }
+        if ($param->isOptional()) {
+            return var_export($param->getDefaultValue(), true);
+        }
+        $type = $param->getType();
+        assert($type !== null);
+        return sprintf(
+            '$this->get(%s)',
+            var_export($type->getName(), true)
+        );
     }
 }
