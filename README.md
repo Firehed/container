@@ -105,11 +105,33 @@ If a scalar or array is provided as a value, that value will be returned unmodif
 ### Closures
 
 If a closure is provided as a value, that closure will be executed when `get()` is called and the value it returns will be returned.
+The container will be provided as the first and only parameter to the closure, so definitions may depend on other services.
+For services that do not have dependencies, the closure may be defined as a function that takes no parameters (a "thunk"), though at execution time the container will still be passed in (and subsequently ignored).
+Do not use the `use()` syntax to access other container definitions.
 
 Since computed values are cached (except when wrapped with `factory`, see below), the closure will only be executed once regardless of how many times `get()` is called.
 
 Any definition that should return an instance of an object **must** be defined by a closure, or using one of the helpers described below.
 Directly instantiating the class in the definition file is invalid.
+
+```php
+use Psr\Container\ContainerInterface;
+return [
+    // This will provide a single connection to your database, deferring the
+    // connection until either directly accessed or a service with PDO as a
+    // dependency is accessed.
+    // Note: you may opt to elide the `ContainerInterface` typehint for brevity
+	PDO::class => function (ContainerInterface $c) {
+	    // This example assumes pdo_dsn, database_user, and database_pass are
+        // defined elsewhere (probably using the `env` helper)
+	    return new PDO(
+	        $c->get('pdo_dsn'),
+	        $c->get('database_user'),
+	        $c->get('database_pass')
+	    );
+	},
+];
+```
 
 ### `autowire(?string $classToAutowire = null)`
 Using `autowire` will use reflection to attempt to determine the specified class's dependencies, recursively resolve them, and return a shared instance of that object.
