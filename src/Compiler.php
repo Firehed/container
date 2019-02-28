@@ -91,12 +91,8 @@ class Compiler implements BuilderInterface
             if ($value->hasDefinition()) {
                 $this->definitions[$key] = new Compiler\ClosureValue($value->getDefinition());
             } else {
-                // $produceKey = 'newCopyOf'.ucfirst($key);
-                // $this->definitions[$produceKey] = new Compiler\AutowiredValue($key);
-                // $this->definitions[$key] = new Compiler\ProxyValue($produceKey);
                 $this->definitions[$key] = new Compiler\AutowiredValue($key);
             }
-            // $this->logger->error('FACTORY Unhandled value for {key}', ['key' => $key]);
         } elseif ($value instanceof AutowireInterface) {
             $wiredClass = $value->getWiredClass();
             if ($wiredClass === null) {
@@ -104,7 +100,6 @@ class Compiler implements BuilderInterface
             }
             $this->definitions[$key] = new Compiler\AutowiredValue($wiredClass);
         } elseif ($value instanceof Closure) {
-            // $this->logger->error('CLOSURE Unhandled value for {key}', ['key' => $key]);
             $this->definitions[$key] = new Compiler\ClosureValue($value);
         } elseif ($value instanceof EnvironmentVariableInterface) {
             $this->definitions[$key] = new Compiler\EnvironmentVariableValue($value);
