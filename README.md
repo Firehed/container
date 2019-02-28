@@ -82,7 +82,11 @@ Required parameters with value types (scalars, arrays, etc) are not supported an
 
 Optional parameters will always have their default value provided.
 
-### factory
+### `factory(?closure $body = null)`
+Use `factory` to return a new copy of the class or value every time it is accessed through `get()`
+
+If a paramater is not provided to the definition, the key will be used to autowire a definition.
+If a closure is provided, that closure will be executed instead.
 
 ### `env(string $variableName, ?string $default = null)`
 Use `env` to embed environment variables in your container. Like other non-
