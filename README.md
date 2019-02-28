@@ -115,6 +115,7 @@ Any definition that should return an instance of an object **must** be defined b
 Directly instantiating the class in the definition file is invalid.
 
 ```php
+<?php
 use Psr\Container\ContainerInterface;
 return [
     // This will provide a single connection to your database, deferring the
@@ -148,23 +149,27 @@ In the returned definition array, having a bare string value with no key will tr
 The following are all equivalent definitions:
 
 ```php
+<?php
 return [
     MySpecialClass::class,
 ];
 ```
 ```php
+<?php
 use function Firehed\Container\autowire;
 return [
     MySpecialClass::class => autowire(),
 ];
 ```
 ```php
+<?php
 use function Firehed\Container\autowire;
 return [
     MySpecialClass::class => autowire(MySpecialClass::class),
 ];
 ```
 ```php
+<?php
 return [
     MySpecialClass::class => function () {
         return new MySpecialClass();
@@ -189,6 +194,7 @@ If *and only if* you want a value compiled in, you must use `getenv` directly.
 
 Source definitions like this:
 ```php
+<?php
 use function Firehed\Container\env;
 return [
     'some_key' => env('SOME_ENV_VAR'),
@@ -202,6 +208,7 @@ return [
 
 will compile to code similar to this:
 ```php
+<?php
 return [
     'some_key' => function () {
         $value = getenv('SOME_ENV_VAR');
