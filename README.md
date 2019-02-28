@@ -90,7 +90,37 @@ return $builder->build();
 
 ## Definition API
 
-### Automatic autowiring
+All files added to the `BuilderInterface` must `return` an `array`.
+The keys of the array will map to `$id`s that can be checked for existence with `has($id)`, and the values of the array will be returned when those keys are provided to `get($id)`.
+
+It is **highly recommended** that class instances use their fully-qualified class name as an array key, and to additionally create a separate interface-to-implementation mapping.
+The latter will happen automatically when a key is the fully-qualified name of an `interface` and the value is a string that maps to a class name.
+
+### Simple values
+
+If a scalar or array is provided as a value, that value will be returned unmodified.
+
+**Exception**: if the value is a `string` AND the key is the name of a declared `interface`, it will automatically be treated as an interface-to-implementation mapping and processed as `InterfaceName::class => autowire(ImplementationName::class)`
+
+### Closures
+
+If a closure is provided as a value, that closure will be executed when `get()` is called and the value it returns will be returned.
+
+Since computed values are cached (except when wrapped with `factory`, see below), the closure will only be executed once regardless of how many times `get()` is called.
+
+Any definition that should return an instance of an object **must** be defined by a closure, or using one of the helpers described below.
+Directly instantiating the class in the definition file is invalid.
+
+### `autowire(?string $classToAutowire = null)`
+Using `autowire` will use reflection to attempt to determine the specified class's dependencies, recursively resolve them, and return a shared instance of that object.
+
+Required parameters **must** have a typehint in order to be resolved.
+That typehint may be to either a class or an interface; in both cases, that dependency must also be defined (but can also be autowired).
+Required parameters with value types (scalars, arrays, etc) are not supported and must be manually wired.
+
+Optional parameters will always have their default value provided.
+
+#### Automatic autowiring
 In the returned definition array, having a bare string value with no key will treat the value as a key to be autowired.
 
 The following are all equivalent definitions:
@@ -119,16 +149,6 @@ return [
     },
 ];
 ```
-
-### `autowire(?string $classToAutowire = null)`
-Using `autowire` will use reflection to attempt to determine the specified class's dependencies, recursively resolve them, and return a shared instance of that object.
-
-Required parameters **must** have a typehint in order to be resolved.
-That typehint may be to either a class or an interface; in both cases, that dependency must also be defined (but can also be autowired).
-Required parameters with value types (scalars, arrays, etc) are not supported and must be manually wired.
-
-Optional parameters will always have their default value provided.
-
 ### `factory(?closure $body = null)`
 Use `factory` to return a new copy of the class or value every time it is accessed through `get()`
 
