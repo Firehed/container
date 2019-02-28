@@ -49,8 +49,9 @@ abstract class CompiledContainer implements ContainerInterface
             return $this->values[$id];
         }
 
-        $function = $this->mappings[$id];
-        $result = [$this, $function]();
+        /** @var callable */
+        $function = [$this, $this->mappings[$id]];
+        $result = $function();
         if (isset($this->factories[$id])) {
             // Do not insert into value cache
         } else {
