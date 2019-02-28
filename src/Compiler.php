@@ -90,7 +90,11 @@ class Compiler implements BuilderInterface
             }
             // $this->logger->error('FACTORY Unhandled value for {key}', ['key' => $key]);
         } elseif ($value instanceof AutowireInterface) {
-            $this->definitions[$key] = new Compiler\AutowiredValue($key);
+            $wiredClass = $value->getWiredClass();
+            if ($wiredClass === null) {
+                $wiredClass = $key;
+            }
+            $this->definitions[$key] = new Compiler\AutowiredValue($wiredClass);
         } elseif ($value instanceof Closure) {
             // $this->logger->error('CLOSURE Unhandled value for {key}', ['key' => $key]);
             $this->definitions[$key] = new Compiler\ClosureValue($value);

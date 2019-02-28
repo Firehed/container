@@ -43,11 +43,18 @@ composer require firehed/container
 
 ## Usage
 
-### autowire
+### `autowire(?string $classToAutowire = null)`
+Using `autowire` will use reflection to attempt to determine the specified class's dependencies, recursively resolve them, and return a shared instance of that object.
+
+Required parameters **must** have a typehint in order to be resolved.
+That typehint may be to either a class or an interface; in both cases, that dependency must also be defined (but can also be autowired).
+Required parameters with value types (scalars, arrays, etc) are not supported and must be manually wired.
+
+Optional parameters will always have their default value provided.
 
 ### factory
 
-### `env(string $variableName, ?string $default = null)
+### `env(string $variableName, ?string $default = null)`
 Use `env` to embed environment variables in your container. Like other non-
 factory values, these will be cached for the lifetime of the script.
 

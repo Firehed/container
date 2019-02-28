@@ -49,7 +49,8 @@ class DevContainer implements Container\ContainerInterface
         $def = $this->definitions[$id];
 
         if ($def instanceof AutowireInterface) {
-            $value = $this->autowire($id);
+            $classToAutowire = $def->getWiredClass() ?? $id;
+            $value = $this->autowire($classToAutowire);
         } else {
             $value = $def;
         }

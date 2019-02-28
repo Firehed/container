@@ -5,5 +5,5 @@ namespace Firehed\Container;
 
 interface AutowireInterface
 {
-
+    public function getWiredClass(): ?string;
 }

@@ -4,11 +4,9 @@ namespace Firehed\Container;
 
 use Closure;
 
-function autowire(): AutowireInterface
+function autowire(?string $class = null): AutowireInterface
 {
-    return new class implements AutowireInterface
-    {
-    };
+    return new AutowiredClass($class);
 }
 
 function env(string $name, ?string $default = null): EnvironmentVariableInterface
