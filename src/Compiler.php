@@ -45,6 +45,7 @@ class Compiler implements BuilderInterface
             return;
         }
         $info = pathinfo($path);
+        assert(isset($info['extension']));
         if ($info['extension'] !== 'php') {
             throw new UnexpectedValueException('Must be a php file');
         }
@@ -168,6 +169,7 @@ class Compiler implements BuilderInterface
         }
 
         $printer = new Standard(['shortArraySyntax' => true]);
+        assert($ast != null);
         return $printer->prettyPrintFile($ast);
     }
 
