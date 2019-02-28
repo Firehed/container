@@ -19,6 +19,9 @@ class Compiler implements BuilderInterface
     /** @var mixed[] */
     private $definitions = [];
 
+    /** @var array<string, true> */
+    private $dependencies = [];
+
     /** @var bool */
     private $exists;
 
@@ -130,6 +133,12 @@ class Compiler implements BuilderInterface
 
             $defs[] = $this->makeFunctionBody($name, $value);// $value->generateCode($name);
         }
+        // makeFunctionBody fills in dependencies
+        foreach ($this->dependencies as $name => $_) {
+            if (!array_key_exists($name, $mappings)) {
+                throw new Exceptions\NotFound($name);
+            }
+        }
 
         $tpl  = "<?php\n";
         $tpl .= "declare(strict_types=1);\n";
@@ -170,6 +179,9 @@ class Compiler implements BuilderInterface
     private function makeFunctionBody(string $functionName, Compiler\CodeGeneratorInterface $definition): string
     {
         $body = $definition->generateCode();
+        foreach ($definition->getDependencies() as $dependency) {
+            $this->dependencies[$dependency] = true;
+        }
         return sprintf(
             'protected function %s() { %s }',
             $functionName,

@@ -5,6 +5,8 @@ namespace Firehed\Container\Compiler;
 
 class LiteralValue implements CodeGeneratorInterface
 {
+    use NoDependenciesTrait;
+
     /** @var scalar|array */
     private $literal;
 

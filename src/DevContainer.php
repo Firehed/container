@@ -120,9 +120,12 @@ class DevContainer implements Container\ContainerInterface
                 }
                 $type = $param->getType();
                 assert($type !== null);
+                if ($type->isBuiltin()) {
+                    throw new Exceptions\UntypedValue($param->getName(), $id);
+                }
                 $name = $type->getName();
                 if (!$this->has($name)) {
-                    throw new Exceptions\UntypedValue($param->getName(), $id);
+                    throw new Exceptions\NotFound($param->getName());
                 }
                 $needed[] = (function ($c) use ($name) {
                     return $c->get($name);

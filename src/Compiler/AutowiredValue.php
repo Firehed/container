@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Firehed\Container\Compiler;
 
+use BadMethodCallException;
 use Firehed\Container\Exceptions\UntypedValue;
 use ReflectionClass;
 use ReflectionParameter;
@@ -12,6 +13,9 @@ class AutowiredValue implements CodeGeneratorInterface
 {
     /** @var string FQCN */
     private $class;
+
+    /** @var array */
+    private $dependencies;
 
     public function __construct(string $classToAutowire)
     {
@@ -23,6 +27,10 @@ class AutowiredValue implements CodeGeneratorInterface
 
     public function generateCode(): string
     {
+        // This is initialized here rather than in the defintion to allow the
+        // runtimeexception to be thrown
+        $this->dependencies = [];
+
         $rc = new ReflectionClass($this->class);
         $args = [];
         if ($rc->hasMethod('__construct')) {
@@ -43,6 +51,14 @@ class AutowiredValue implements CodeGeneratorInterface
     );
 PHP;
         return $code;
+    }
+
+    public function getDependencies(): array
+    {
+        if ($this->dependencies === null) {
+            throw new BadMethodCallException(__METHOD__ . ' can only be used after generateCode');
+        }
+        return $this->dependencies;
     }
 
     private function isResolvableParam(ReflectionParameter $param): bool
@@ -68,6 +84,7 @@ PHP;
         }
         $type = $param->getType();
         assert($type !== null);
+        $this->dependencies[] = $type->getName();
         return sprintf(
             '$this->get(%s)',
             var_export($type->getName(), true)

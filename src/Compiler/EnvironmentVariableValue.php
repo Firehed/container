@@ -9,6 +9,8 @@ use Firehed\Container\Exceptions\EnvironmentVariableNotSet;
 
 class EnvironmentVariableValue implements CodeGeneratorInterface
 {
+    use NoDependenciesTrait;
+
     /** @var EnvironmentVariableInterface */
     private $env;
 

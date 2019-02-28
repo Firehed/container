@@ -13,4 +13,10 @@ interface CodeGeneratorInterface
      * The outer function body will be provided by the calling compiler
      */
     public function generateCode(): string;
+
+    /**
+     * This method must return an array of strings which correspond to $id
+     * values (typically FQCNs)
+     */
+    public function getDependencies(): array;
 }

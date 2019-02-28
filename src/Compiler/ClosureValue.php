@@ -10,6 +10,11 @@ use SuperClosure\Analyzer\AstAnalyzer;
 
 class ClosureValue implements CodeGeneratorInterface
 {
+    // This is not strictly accurate yet, but a correct implememntation
+    // requires pretty deep AST analysis. This should be treated as a known bug
+    // for now.
+    use NoDependenciesTrait;
+
     /** @var Closure */
     private $closure;
 

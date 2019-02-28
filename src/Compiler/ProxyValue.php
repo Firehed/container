@@ -23,4 +23,11 @@ class ProxyValue implements CodeGeneratorInterface
             var_export($this->class, true)
         );
     }
+
+    public function getDependencies(): array
+    {
+        return [
+            $this->class,
+        ];
+    }
 }

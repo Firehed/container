@@ -24,4 +24,13 @@ trait ErrorDefinitionsTestTrait
         $c = $builder->build();
         $c->get(Fixtures\ConstructorUntyped::class);
     }
+
+    public function testConstructorWithUndefiendTypedArgErrors(): void
+    {
+        $builder = $this->getBuilder();
+        $builder->addFile(__DIR__ . '/ErrorDefinitions/RequiredParams.php');
+        $this->expectException(Exceptions\NotFound::class);
+        $c = $builder->build();
+        $c->get(Fixtures\SessionHandler::class);
+    }
 }
