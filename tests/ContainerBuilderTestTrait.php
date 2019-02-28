@@ -210,7 +210,7 @@ trait ContainerBuilderTestTrait
     /**
      * DefaultScalarParam::class => autowire()
      */
-    public function testDefaultScalarParamCanBeAutowired()
+    public function testDefaultScalarParamCanBeAutowired(): void
     {
         $container = $this->getContainer();
         $dsp = $this->assertGetSingleton(
@@ -227,7 +227,7 @@ trait ContainerBuilderTestTrait
     /**
      * OptionalScalarParam::class => autowire()
      */
-    public function testOptionalScalarParamCanBeAutowired()
+    public function testOptionalScalarParamCanBeAutowired(): void
     {
         $container = $this->getContainer();
         $osp = $this->assertGetSingleton(
@@ -334,7 +334,9 @@ trait ContainerBuilderTestTrait
 
     // Internal assertion wrappers
 
-    /** @return mixed The fetched value */
+    /**
+     * @return mixed The fetched value
+     */
     private function assertGetSingleton(ContainerInterface $container, string $key, ?string $type = null)
     {
         $type = $type ?? $key;
