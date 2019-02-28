@@ -10,8 +10,8 @@ trait ErrorDefinitionsTestTrait
     public function testConstructorWithScalarArgErrors(): void
     {
         $builder = $this->getBuilder();
-        $this->expectException(Exceptions\UntypedValue::class);
         $builder->addFile(__DIR__ . '/ErrorDefinitions/ConstructorScalar.php');
+        $this->expectException(Exceptions\UntypedValue::class);
         $c = $builder->build();
         $c->get(Fixtures\ConstructorScalar::class);
     }
@@ -19,8 +19,8 @@ trait ErrorDefinitionsTestTrait
     public function testConstructorWithUntypedArgErrors(): void
     {
         $builder = $this->getBuilder();
-        $this->expectException(Exceptions\UntypedValue::class);
         $builder->addFile(__DIR__ . '/ErrorDefinitions/ConstructorUntyped.php');
+        $this->expectException(Exceptions\UntypedValue::class);
         $c = $builder->build();
         $c->get(Fixtures\ConstructorUntyped::class);
     }
