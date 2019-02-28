@@ -68,6 +68,13 @@ class Compiler implements BuilderInterface
             ));
         }
         foreach ($defs as $key => $value) {
+            if (is_int($key)) {
+                $this->logger->debug('Treating bare value {value} as autowired', [
+                    'value' => $value,
+                ]);
+                $key = $value;
+                $value = autowire();
+            }
             $this->add($key, $value);
         }
     }

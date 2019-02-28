@@ -28,6 +28,11 @@ class Builder implements BuilderInterface
         $output = [];
 
         foreach ($defs as $key => $value) {
+            if (is_int($key)) {
+                // Remap extra-lazy autowiring
+                $key = $value;
+                $value = autowire();
+            }
             // This assumes that any array key which is a FQCN for an interface
             // is an interface-to-implementation wiring. This means that simple
             // string value MUST NOT be keyed to an interface name

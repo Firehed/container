@@ -11,6 +11,9 @@ return [
     // PHP-DI style autowiring
     'AliasOfSessionIdManual' => autowire(Fixtures\SessionIdManual::class),
 
+    // Super shorthand
+    Fixtures\SessionIdImplicit::class,
+
     // Interface to implementations
     SessionIdInterface::class => Fixtures\SessionId::class,
 ];

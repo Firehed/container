@@ -43,6 +43,36 @@ composer require firehed/container
 
 ## Usage
 
+### Automatic autowiring
+In the returned definition array, having a bare string value with no key will treat the value as a key to be autowired.
+
+The following are all equivalent definitions:
+
+```php
+return [
+    MySpecialClass::class,
+];
+```
+```php
+use function Firehed\Container\autowire;
+return [
+    MySpecialClass::class => autowire(),
+];
+```
+```php
+use function Firehed\Container\autowire;
+return [
+    MySpecialClass::class => autowire(MySpecialClass::class),
+];
+```
+```php
+return [
+    MySpecialClass::class => function () {
+        return new MySpecialClass();
+    },
+];
+```
+
 ### `autowire(?string $classToAutowire = null)`
 Using `autowire` will use reflection to attempt to determine the specified class's dependencies, recursively resolve them, and return a shared instance of that object.
 

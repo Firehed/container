@@ -86,6 +86,18 @@ trait ContainerBuilderTestTrait
     }
 
     /**
+     * SomeImplementation::class,
+     */
+    public function testImplcitAutowiredDefinition(): void
+    {
+        $container = $this->getContainer();
+        $this->assertGetSingleton(
+            $container,
+            Fixtures\SessionIdImplicit::class
+        );
+    }
+
+    /**
      * SomeInterface::class => SomeImplementation::class
      * SomeImplementation::class => autowire()
      * where SomeImplementation has no constructor arguments
