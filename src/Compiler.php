@@ -132,12 +132,11 @@ class Compiler implements BuilderInterface
         $defs = [];
         $mappings = [];
         foreach ($this->definitions as $key => $value) {
-            // TODO: throw if a key collides
             $name = $this->makeNameForKey($key);
             $mappings[$key] = $name;
-
-            $defs[] = $this->makeFunctionBody($name, $value);// $value->generateCode($name);
+            $defs[] = $this->makeFunctionBody($name, $value);
         }
+
         // makeFunctionBody fills in dependencies
         foreach ($this->dependencies as $name => $_) {
             if (!array_key_exists($name, $mappings)) {
@@ -148,7 +147,8 @@ class Compiler implements BuilderInterface
         $tpl  = "<?php\n";
         $tpl .= "declare(strict_types=1);\n";
         $tpl .= '// this file is automatically @gener'."ated\n";
-        $tpl .= "class {$this->className} extends \\Firehed\\Container\\CompiledContainer\n";
+        $tpl .= "class {$this->className}\n";
+        $tpl .= "extends \\Firehed\\Container\\CompiledContainer\n";
         $tpl .= "{\n";
         $tpl .= '    protected $factories = ';
         $tpl .= var_export($this->factories, true);
