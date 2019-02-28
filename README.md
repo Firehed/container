@@ -122,15 +122,15 @@ return [
     // connection until either directly accessed or a service with PDO as a
     // dependency is accessed.
     // Note: you may opt to elide the `ContainerInterface` typehint for brevity
-	PDO::class => function (ContainerInterface $c) {
-	    // This example assumes pdo_dsn, database_user, and database_pass are
+    PDO::class => function (ContainerInterface $c) {
+        // This example assumes pdo_dsn, database_user, and database_pass are
         // defined elsewhere (probably using the `env` helper)
-	    return new PDO(
-	        $c->get('pdo_dsn'),
-	        $c->get('database_user'),
-	        $c->get('database_pass')
-	    );
-	},
+        return new PDO(
+            $c->get('pdo_dsn'),
+            $c->get('database_user'),
+            $c->get('database_pass')
+        );
+    },
 ];
 ```
 
