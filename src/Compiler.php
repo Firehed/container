@@ -119,6 +119,16 @@ class Compiler implements BuilderInterface
 
     public function build(): ContainerInterface
     {
+        $this->compile();
+        require_once $this->path;
+        return new $this->className();
+    }
+
+    private function compile(): void
+    {
+        if ($this->exists) {
+            return;
+        }
         $defs = [];
         $mappings = [];
         foreach ($this->definitions as $key => $value) {
@@ -151,13 +161,10 @@ class Compiler implements BuilderInterface
         $tpl .= "\n";
         $tpl .= "}\n";
 
-        $tpl = $this->prettyPrint($tpl);
-        $this->logger->info($tpl);
+        $code = $this->prettyPrint($tpl);
+        $this->logger->info($code);
 
-        file_put_contents($this->path, $tpl);
-        // var_dump($this->path);exit;
-        require_once $this->path;
-        return new $this->className();
+        file_put_contents($this->path, $code);
     }
 
     private function prettyPrint(string $code): string
