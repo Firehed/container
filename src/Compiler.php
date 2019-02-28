@@ -4,15 +4,12 @@ declare(strict_types=1);
 namespace Firehed\Container;
 
 use Closure;
+use PhpParser\ParserFactory;
+use PhpParser\PrettyPrinter\Standard;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use UnexpectedValueException;
-
-// pp
-use PhpParser\Error;
-use PhpParser\ParserFactory;
-use PhpParser\PrettyPrinter\Standard;
 
 class Compiler implements BuilderInterface
 {
@@ -161,12 +158,9 @@ class Compiler implements BuilderInterface
 
     private function prettyPrint(string $code): string
     {
-        $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
-        try {
-            $ast = $parser->parse($code);
-        } catch (Error $e) {
-            $this->logger->error((string)$e);
-        }
+        $parser = (new ParserFactory())
+            ->create(ParserFactory::PREFER_PHP7);
+        $ast = $parser->parse($code);
 
         $printer = new Standard(['shortArraySyntax' => true]);
         assert($ast != null);
