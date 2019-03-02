@@ -5,5 +5,4 @@ namespace Firehed\Container\Fixtures;
 
 class NoConstructorFactory
 {
-
 }
