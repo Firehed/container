@@ -22,12 +22,13 @@ class EnvironmentVariableValue implements CodeGeneratorInterface
     public function generateCode(): string
     {
         $envVarName = $this->env->getName();
+        $cast = $this->env->getCast();
         return <<<PHP
 \$value = getenv('$envVarName');
 if (\$value === false) {
     {$this->getDefaultBody()}
 }
-return \$value;
+return ($cast)\$value;
 PHP;
     }
 

@@ -79,7 +79,19 @@ class DevContainer implements Container\ContainerInterface
                 }
                 throw new Exceptions\EnvironmentVariableNotSet($varName);
             }
-            return $envValue;
+            $cast = $value->getCast();
+            switch ($cast) {
+                case 'string':
+                    return $envValue;
+                case 'bool':
+                    return (bool) $envValue;
+                case 'int':
+                    return (int) $envValue;
+                case 'float':
+                    return (float) $envValue;
+                default:
+                    throw new \DomainException('Invalid cast ' . $cast);
+            }
         }
 
         return $value;
