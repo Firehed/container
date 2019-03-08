@@ -59,12 +59,44 @@ trait EnvironmentDefinitionsTestTrait
         $this->assertNull($container->get('env_not_set_with_null_default'));
     }
 
+    /**
+     * @dataProvider casts
+     */
+    public function testCastingBehavior(string $containerKey, $expected)
+    {
+        putenv(self::$prefix . 'ONE_POINT_FIVE=1.5');
+        putenv(self::$prefix . 'ONE=1');
+        putenv(self::$prefix . 'ZERO=0');
+        putenv(self::$prefix . 'TRUE=true');
+        putenv(self::$prefix . 'FALSE=false');
+        putenv(self::$prefix . 'EMTPY=\'\'');
+        $container = $this->getContainer();
+        $this->assertTrue($container->has($containerKey));
+        $this->assertSame($expected, $container->get($containerKey));
+    }
+
     public function envVarsThatAreSet(): array
     {
         return [
             ['env_set'],
             ['env_set_with_default'],
             ['env_set_with_null_default'],
+        ];
+    }
+
+    public function casts(): array
+    {
+        return [
+            ['env_asbool_one', true],
+            ['env_asbool_zero', false],
+            ['env_asbool_true', true],
+            ['env_asbool_false', false],
+            ['env_asbool_empty', false],
+            ['env_asint_one', 1],
+            ['env_asint_zero', 0],
+            ['env_asfloat_one_point_five', 1.5],
+            ['env_asfloat_one', 1.0],
+            ['env_asfloat_zero', 0.0],
         ];
     }
 }
