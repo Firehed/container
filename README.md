@@ -210,6 +210,10 @@ return [
     'some_key_with_default' => env('SOME_ENV_VAR', 'default_value'),
     'some_key_with_null_default' => env('SOME_ENV_VAR', null),
 
+    'some_bool' => env('SOME_BOOL')->asBool(),
+    'some_int' => env('SOME_INT')->asInt(),
+    'some_float' => env('SOME_FLOAT')->asFloat(),
+
     // Counterexample!
     'getenv' => getenv('VALUE_AT_COMPILE_TIME'),
 ];
@@ -239,6 +243,35 @@ return [
             return null;
         }
         return $value;
+    },
+
+    'some_bool' => function () {
+        $value = getenv('SOME_ENV_VAR');
+        if ($value === false) {
+            throw new Firehed\Container\Exceptions\EnvironmentVariableNotSet('SOME_ENV_VAR');
+        }
+        $value = strtolower($value);
+        if ($value === '1' || $value === 'true') {
+            return true;
+        } elseif ($value === '0' || $value === 'false') {
+            return false;
+        } else {
+            throw new OutOfBoundsException('Invalid boolean value');
+        }
+    },
+    'some_int' => function () {
+        $value = getenv('SOME_INT');
+        if ($value === false) {
+            throw new Firehed\Container\Exceptions\EnvironmentVariableNotSet('SOME_INT');
+        }
+        return (int)$value;
+    },
+    'some_float' => function () {
+        $value = getenv('SOME_FLOAT');
+        if ($value === false) {
+            throw new Firehed\Container\Exceptions\EnvironmentVariableNotSet('SOME_FLOAT');
+        }
+        return (float)$value;
     },
 
     // Counterexample!
