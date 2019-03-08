@@ -134,7 +134,7 @@ class Compiler implements BuilderInterface
         foreach ($this->definitions as $key => $value) {
             $name = $this->makeNameForKey($key);
             $mappings[$key] = $name;
-            $defs[] = $this->makeFunctionBody($name, $value);
+            $defs[] = $this->makeFunctionBody($key, $name, $value);
         }
 
         // makeFunctionBody fills in dependencies
@@ -178,14 +178,18 @@ class Compiler implements BuilderInterface
         return $printer->prettyPrintFile($ast);
     }
 
-    private function makeFunctionBody(string $functionName, Compiler\CodeGeneratorInterface $definition): string
-    {
+    private function makeFunctionBody(
+        string $originalName,
+        string $functionName,
+        Compiler\CodeGeneratorInterface $definition
+    ): string {
         $body = $definition->generateCode();
         foreach ($definition->getDependencies() as $dependency) {
             $this->dependencies[$dependency] = true;
         }
         return sprintf(
-            'protected function %s() { %s }',
+            "// %s\nprotected function %s() { %s }",
+            $originalName,
             $functionName,
             $body
         );
