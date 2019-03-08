@@ -186,6 +186,15 @@ If a closure is provided, that closure will be executed instead.
 Use `env` to embed environment variables in your container.
 Like other non-factory values, these will be cached for the lifetime of the script.
 
+`env` embeds a tiny DSL, allowing you to get the values set in the environment as an int, float, or bool rather than the native string read from the environment.
+To use this, the following methods exist:
+
+- `asBool`
+- `asInt`
+- `asFloat`
+
+These are roughly equivalent to e.g. `(int) getenv('SOME_ENV_VAR')`, with the exception that `asBool` will only allow values `0`, `1`, `"true"`, and `"false"` (case-insensitively).
+
 **IMPORTANT**: Do not use `getenv` or `$_ENV` to access environment variables!
 If you do so, compiled containers will get the *compile-time* value set, which is almost certainly not the behavior you want.
 Instead, use the `env` wrapper, which will defer the access of the environment variable until the first time it is used.
