@@ -20,13 +20,8 @@ trait ContainerBuilderTestTrait
     use EnvironmentDefinitionsTestTrait;
     use ErrorDefinitionsTestTrait;
 
-    /** @var string */
-    private $rawGetEnvValue;
-
     public function getContainer(): ContainerInterface
     {
-        $this->rawGetEnvValue = (string)getenv('PWD'); // see CDF3
-
         $builder = $this->getBuilder();
         foreach ($this->getDefinitionFiles() as $file) {
             $builder->addFile($file);
