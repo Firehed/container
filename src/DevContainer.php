@@ -84,7 +84,18 @@ class DevContainer implements Container\ContainerInterface
                 case 'string':
                     return $envValue;
                 case 'bool':
-                    return (bool) $envValue;
+                    switch (strtolower($envValue)) {
+                        case '1':
+                        case 'true':
+                            return true;
+                        case '0':
+                        case 'false':
+                            return false;
+                        default:
+                            throw new \OutOfBoundsException('Invalid boolean value');
+                    }
+                    // This is to keep phpstan happy, unreachable
+                    throw new \Exception();
                 case 'int':
                     return (int) $envValue;
                 case 'float':

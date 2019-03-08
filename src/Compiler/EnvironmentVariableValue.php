@@ -28,7 +28,27 @@ class EnvironmentVariableValue implements CodeGeneratorInterface
 if (\$value === false) {
     {$this->getDefaultBody()}
 }
-return ($cast)\$value;
+{$this->castBody()}
+PHP;
+    }
+
+    private function castBody(): string
+    {
+        $cast = $this->env->getCast();
+        if ($cast !== 'bool') {
+            return sprintf('return (%s)$value;', $cast);
+        }
+        return <<<PHP
+switch (strtolower(\$value)) {
+    case '1':  // fallthrough
+    case 'true':
+        return true;
+    case '0':  // fallthrough
+    case 'false':
+        return false;
+    default:
+        throw new \OutOfBoundsException('Invalid boolean value');
+}
 PHP;
     }
 
