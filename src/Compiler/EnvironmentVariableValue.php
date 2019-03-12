@@ -43,6 +43,7 @@ switch (strtolower(\$value)) {
     case '1':  // fallthrough
     case 'true':
         return true;
+    case '': // fallthrough
     case '0':  // fallthrough
     case 'false':
         return false;

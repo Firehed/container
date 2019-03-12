@@ -69,7 +69,7 @@ trait EnvironmentDefinitionsTestTrait
         putenv(self::$prefix . 'ZERO=0');
         putenv(self::$prefix . 'TRUE=true');
         putenv(self::$prefix . 'FALSE=false');
-        putenv(self::$prefix . 'EMTPY=\'\'');
+        putenv(self::$prefix . 'EMPTY=');
         $container = $this->getContainer();
         $this->assertTrue($container->has($containerKey));
         $this->assertSame($expected, $container->get($containerKey));

@@ -85,10 +85,11 @@ class DevContainer implements Container\ContainerInterface
                     return $envValue;
                 case 'bool':
                     switch (strtolower($envValue)) {
-                        case '1':
+                        case '1': // fallthrough
                         case 'true':
                             return true;
-                        case '0':
+                        case '': // fallthrough
+                        case '0': // fallthrough
                         case 'false':
                             return false;
                         default:
