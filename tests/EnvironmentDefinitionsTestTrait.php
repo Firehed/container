@@ -8,6 +8,9 @@ use Psr\Container\ContainerExceptionInterface;
 trait EnvironmentDefinitionsTestTrait
 {
     // Want const, traits can't have them
+    /**
+     * @var string
+     */
     private static $prefix = 'CONTAINER_UNITTEST_';
 
     /**
@@ -61,8 +64,10 @@ trait EnvironmentDefinitionsTestTrait
 
     /**
      * @dataProvider casts
+     * @var string $containerKey Access key
+     * @var mixed $expected
      */
-    public function testCastingBehavior(string $containerKey, $expected)
+    public function testCastingBehavior(string $containerKey, $expected): void
     {
         putenv(self::$prefix . 'ONE_POINT_FIVE=1.5');
         putenv(self::$prefix . 'ONE=1');
