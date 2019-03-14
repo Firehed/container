@@ -64,8 +64,8 @@ trait EnvironmentDefinitionsTestTrait
 
     /**
      * @dataProvider casts
-     * @var string $containerKey Access key
-     * @var mixed $expected
+     * @param string $containerKey Access key
+     * @param mixed $expected Expected value (post-casting)
      */
     public function testCastingBehavior(string $containerKey, $expected): void
     {
