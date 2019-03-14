@@ -7,7 +7,6 @@ use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Psr\Container\ContainerInterface;
-use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use SessionHandlerInterface;
 use SessionIdInterface;
@@ -18,20 +17,11 @@ use SessionIdInterface;
  */
 trait ContainerBuilderTestTrait
 {
+    use EnvironmentDefinitionsTestTrait;
     use ErrorDefinitionsTestTrait;
-
-    /** @var string */
-    private $rawGetEnvValue;
-
-    /** @var string */
-    private $unittestEnvVar;
 
     public function getContainer(): ContainerInterface
     {
-        $this->rawGetEnvValue = (string)getenv('PWD'); // see CDF3
-        $this->unittestEnvVar = md5((string)random_int(0, PHP_INT_MAX));
-        putenv("CONTAINER_UNITTEST_SET={$this->unittestEnvVar}");
-
         $builder = $this->getBuilder();
         foreach ($this->getDefinitionFiles() as $file) {
             $builder->addFile($file);
@@ -251,53 +241,6 @@ trait ContainerBuilderTestTrait
         $container->get('key_that_does_not_exist');
     }
 
-    // Environment variables
-
-    /**
-     * This test demonstrates a counterexample/compile-time value
-     */
-    public function testRawGetenv(): void
-    {
-        $container = $this->getContainer();
-        $key = 'env_pwd';
-        $this->assertTrue($container->has($key), 'has should be true');
-        $value = $container->get($key);
-        $this->assertSame($this->rawGetEnvValue, $value, 'get should return the value');
-    }
-
-    /**
-     * @dataProvider envVarsThatAreSet
-     */
-    public function testWrappedEnv(string $key): void
-    {
-        $container = $this->getContainer();
-        $this->assertTrue($container->has($key), 'has should be true');
-        $value = $container->get($key);
-        $this->assertSame($this->unittestEnvVar, $value, 'get should return the value');
-    }
-
-    public function testNotSetEnvVarThrowsOnAccess(): void
-    {
-        $container = $this->getContainer();
-        $this->assertTrue($container->has('env_not_set'));
-        $this->expectException(ContainerExceptionInterface::class);
-        $container->get('env_not_set');
-    }
-
-    public function testNotSetEnvVarWithDefaultReturnsDefault(): void
-    {
-        $container = $this->getContainer();
-        $this->assertTrue($container->has('env_not_set_with_default'));
-        $this->assertSame('default', $container->get('env_not_set_with_default'));
-    }
-
-    public function testNotSetEnvVarWithNullDefaultReturnsNull(): void
-    {
-        $container = $this->getContainer();
-        $this->assertTrue($container->has('env_not_set_with_null_default'));
-        $this->assertNull($container->get('env_not_set_with_null_default'));
-    }
-
     // Data Providers
 
     public function scalarLiterals(): array
@@ -320,15 +263,6 @@ trait ContainerBuilderTestTrait
             ['CASE_SENSITIVE', 2],
             ['Case_Sensitive', 3],
             ['CaSe_SeNsItIvE', 4],
-        ];
-    }
-
-    public function envVarsThatAreSet(): array
-    {
-        return [
-            ['env_set'],
-            ['env_set_with_default'],
-            ['env_set_with_null_default'],
         ];
     }
 

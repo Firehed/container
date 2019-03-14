@@ -22,12 +22,34 @@ class EnvironmentVariableValue implements CodeGeneratorInterface
     public function generateCode(): string
     {
         $envVarName = $this->env->getName();
+        $cast = $this->env->getCast();
         return <<<PHP
 \$value = getenv('$envVarName');
 if (\$value === false) {
     {$this->getDefaultBody()}
 }
-return \$value;
+{$this->castBody()}
+PHP;
+    }
+
+    private function castBody(): string
+    {
+        $cast = $this->env->getCast();
+        if ($cast !== 'bool') {
+            return sprintf('return (%s)$value;', $cast);
+        }
+        return <<<PHP
+switch (strtolower(\$value)) {
+    case '1':  // fallthrough
+    case 'true':
+        return true;
+    case '': // fallthrough
+    case '0':  // fallthrough
+    case 'false':
+        return false;
+    default:
+        throw new \OutOfBoundsException('Invalid boolean value');
+}
 PHP;
     }
 

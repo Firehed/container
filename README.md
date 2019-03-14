@@ -186,6 +186,15 @@ If a closure is provided, that closure will be executed instead.
 Use `env` to embed environment variables in your container.
 Like other non-factory values, these will be cached for the lifetime of the script.
 
+`env` embeds a tiny DSL, allowing you to get the values set in the environment as an int, float, or bool rather than the native string read from the environment.
+To use this, the following methods exist:
+
+- `asBool`
+- `asInt`
+- `asFloat`
+
+These are roughly equivalent to e.g. `(int) getenv('SOME_ENV_VAR')`, with the exception that `asBool` will only allow values `0`, `1`, `"true"`, and `"false"` (case-insensitively).
+
 **IMPORTANT**: Do not use `getenv` or `$_ENV` to access environment variables!
 If you do so, compiled containers will get the *compile-time* value set, which is almost certainly not the behavior you want.
 Instead, use the `env` wrapper, which will defer the access of the environment variable until the first time it is used.
@@ -200,6 +209,10 @@ return [
     'some_key' => env('SOME_ENV_VAR'),
     'some_key_with_default' => env('SOME_ENV_VAR', 'default_value'),
     'some_key_with_null_default' => env('SOME_ENV_VAR', null),
+
+    'some_bool' => env('SOME_BOOL')->asBool(),
+    'some_int' => env('SOME_INT')->asInt(),
+    'some_float' => env('SOME_FLOAT')->asFloat(),
 
     // Counterexample!
     'getenv' => getenv('VALUE_AT_COMPILE_TIME'),
@@ -230,6 +243,35 @@ return [
             return null;
         }
         return $value;
+    },
+
+    'some_bool' => function () {
+        $value = getenv('SOME_ENV_VAR');
+        if ($value === false) {
+            throw new Firehed\Container\Exceptions\EnvironmentVariableNotSet('SOME_ENV_VAR');
+        }
+        $value = strtolower($value);
+        if ($value === '1' || $value === 'true') {
+            return true;
+        } elseif ($value === '0' || $value === 'false') {
+            return false;
+        } else {
+            throw new OutOfBoundsException('Invalid boolean value');
+        }
+    },
+    'some_int' => function () {
+        $value = getenv('SOME_INT');
+        if ($value === false) {
+            throw new Firehed\Container\Exceptions\EnvironmentVariableNotSet('SOME_INT');
+        }
+        return (int)$value;
+    },
+    'some_float' => function () {
+        $value = getenv('SOME_FLOAT');
+        if ($value === false) {
+            throw new Firehed\Container\Exceptions\EnvironmentVariableNotSet('SOME_FLOAT');
+        }
+        return (float)$value;
     },
 
     // Counterexample!

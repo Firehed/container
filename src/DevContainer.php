@@ -79,7 +79,31 @@ class DevContainer implements Container\ContainerInterface
                 }
                 throw new Exceptions\EnvironmentVariableNotSet($varName);
             }
-            return $envValue;
+            $cast = $value->getCast();
+            switch ($cast) {
+                case 'string':
+                    return $envValue;
+                case 'bool':
+                    switch (strtolower($envValue)) {
+                        case '1': // fallthrough
+                        case 'true':
+                            return true;
+                        case '': // fallthrough
+                        case '0': // fallthrough
+                        case 'false':
+                            return false;
+                        default:
+                            throw new \OutOfBoundsException('Invalid boolean value');
+                    }
+                    // This is to keep phpstan happy, unreachable
+                    throw new \Exception();
+                case 'int':
+                    return (int) $envValue;
+                case 'float':
+                    return (float) $envValue;
+                default:
+                    throw new \DomainException('Invalid cast ' . $cast);
+            }
         }
 
         return $value;
