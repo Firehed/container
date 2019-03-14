@@ -1,6 +1,9 @@
 # Container
 A PSR-11 compliant Dependency Inversion Container
 
+[![Build Status](https://travis-ci.org/Firehed/container.svg?branch=master)](https://travis-ci.org/Firehed/container)
+![Packagist](https://img.shields.io/packagist/v/firehed/container.svg)
+
 ## Why another container implementation?
 
 The primary motivation for creating this was to have a container implementation that's optimized for containerized deployment in a long-running process (like ReactPHP and PHP-PM).
