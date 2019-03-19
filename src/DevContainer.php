@@ -75,9 +75,10 @@ class DevContainer implements Container\ContainerInterface
             $envValue = getenv($varName);
             if ($envValue === false) {
                 if ($value->hasDefault()) {
-                    return $value->getDefault();
+                    $envValue = $value->getDefault();
+                } else {
+                    throw new Exceptions\EnvironmentVariableNotSet($varName);
                 }
-                throw new Exceptions\EnvironmentVariableNotSet($varName);
             }
             $cast = $value->getCast();
             switch ($cast) {
