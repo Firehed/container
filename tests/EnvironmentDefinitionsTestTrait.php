@@ -97,11 +97,14 @@ trait EnvironmentDefinitionsTestTrait
             ['env_asbool_true', true],
             ['env_asbool_false', false],
             ['env_asbool_empty', false],
+            ['env_asbool_notset', true],
             ['env_asint_one', 1],
             ['env_asint_zero', 0],
+            ['env_asint_notset', 3],
             ['env_asfloat_one_point_five', 1.5],
             ['env_asfloat_one', 1.0],
             ['env_asfloat_zero', 0.0],
+            ['env_asfloat_notset', 3.14],
         ];
     }
 }
