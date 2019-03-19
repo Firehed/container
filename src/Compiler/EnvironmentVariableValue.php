@@ -57,7 +57,7 @@ PHP;
     {
         if ($this->env->hasDefault()) {
             $default = var_export($this->env->getDefault(), true);
-            return "return $default;";
+            return "\$value = $default;";
         } else {
             $varName = var_export($this->env->getName(), true);
             $exClass = EnvironmentVariableNotSet::class;
