@@ -24,16 +24,16 @@ return [
     'env_asbool_zero' => env($prefix . 'ZERO')->asBool(),
     'env_asbool_false' => env($prefix . 'FALSE')->asBool(),
     'env_asbool_empty' => env($prefix . 'EMPTY')->asBool(),
-    'env_asbool_notset' => env($prefix . 'NOT_SET')->asBool(),
+    'env_asbool_notset' => env($prefix . 'NOT_SET', 'true')->asBool(),
 
     // Casting: int
     'env_asint_one' => env($prefix . 'ONE')->asInt(),
     'env_asint_zero' => env($prefix . 'ZERO')->asInt(),
-    'env_asint_notset' => env($prefix . 'NOT_SET')->asInt(),
+    'env_asint_notset' => env($prefix . 'NOT_SET', '3')->asInt(),
 
     // Casting: float
     'env_asfloat_one' => env($prefix . 'ONE')->asFloat(),
     'env_asfloat_one_point_five' => env($prefix . 'ONE_POINT_FIVE')->asFloat(),
     'env_asfloat_zero' => env($prefix . 'ZERO')->asFloat(),
-    'env_asfloat_notset' => env($prefix . 'NOT_SET')->asFloat(),
+    'env_asfloat_notset' => env($prefix . 'NOT_SET', '3.14')->asFloat(),
 ];
