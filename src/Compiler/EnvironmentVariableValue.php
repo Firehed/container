@@ -35,7 +35,9 @@ PHP;
     private function castBody(): string
     {
         $cast = $this->env->getCast();
-        if ($cast !== 'bool') {
+        if ($cast === '') {
+            return 'return $value;';
+        } elseif ($cast !== 'bool') {
             return sprintf('return (%s)$value;', $cast);
         }
         return <<<PHP
@@ -57,7 +59,7 @@ PHP;
     {
         if ($this->env->hasDefault()) {
             $default = var_export($this->env->getDefault(), true);
-            return "return $default;";
+            return "\$value = $default;";
         } else {
             $varName = var_export($this->env->getName(), true);
             $exClass = EnvironmentVariableNotSet::class;

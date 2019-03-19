@@ -15,7 +15,7 @@ interface EnvironmentVariableInterface
 
     /**
      * @internal
-     * Return the casting type: string, bool, int, or float
+     * Return the casting type: bool, int, float, or ''
      */
     public function getCast(): string;
 
