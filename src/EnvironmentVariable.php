@@ -6,7 +6,7 @@ namespace Firehed\Container;
 class EnvironmentVariable implements EnvironmentVariableInterface
 {
     /** @var string */
-    private $cast = 'string';
+    private $cast = '';
     /** @var ?string */
     private $default;
     /** @var bool */
