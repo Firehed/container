@@ -82,7 +82,7 @@ class DevContainer implements Container\ContainerInterface
             }
             $cast = $value->getCast();
             switch ($cast) {
-                case 'string':
+                case '':
                     return $envValue;
                 case 'bool':
                     switch (strtolower($envValue)) {
