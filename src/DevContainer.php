@@ -85,7 +85,7 @@ class DevContainer implements Container\ContainerInterface
                 case '':
                     return $envValue;
                 case 'bool':
-                    switch (strtolower($envValue)) {
+                    switch (strtolower((string)$envValue)) {
                         case '1': // fallthrough
                         case 'true':
                             return true;
