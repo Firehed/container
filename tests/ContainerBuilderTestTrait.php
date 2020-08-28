@@ -185,6 +185,38 @@ trait ContainerBuilderTestTrait
     }
 
     /**
+     * SomeName => function ($container) {
+     *   return useContainerValue($container);
+     * }
+     */
+    public function testClosureThatUsesConatiner(): void
+    {
+        $container = $this->getContainer();
+        assert($container->has('literalValueForComplex'));
+        $expected = $container->get('literalValueForComplex');
+        $actual = $container->get('complexDefinition');
+        $this->assertSame(
+            $expected,
+            $actual,
+            'Complex definition which consumed container evaluated incorrectly',
+        );
+    }
+
+    public function testShortClosureThatUsesContainer(): void
+    {
+        $container = $this->getContainer();
+        assert($container->has('literalValueForComplex'));
+        $expected = $container->get('literalValueForComplex');
+        $actual = $container->get('shortClosure');
+        $this->assertSame(
+            $expected,
+            $actual,
+            'Complex definition which consumed container evaluated incorrectly',
+        );
+    }
+
+
+    /**
      * some_string => scalar_literal
      * @dataProvider scalarLiterals
      * @param mixed $expectedValue

@@ -13,4 +13,11 @@ return [
         return new DateTimeImmutable();
     },
 
+    'literalValueForComplex' => 42,
+
+    'complexDefinition' => function ($container) {
+        return $container->get('literalValueForComplex');
+    },
+
+    'shortClosure' => fn ($c) => $c->get('literalValueForComplex'),
 ];
