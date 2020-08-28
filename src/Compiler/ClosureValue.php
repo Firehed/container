@@ -4,9 +4,8 @@ declare(strict_types=1);
 namespace Firehed\Container\Compiler;
 
 use Closure;
-use PhpParser\PrettyPrinter\Standard;
+use Opis\Closure\ReflectionClosure;
 use ReflectionFunction;
-use SuperClosure\Analyzer\AstAnalyzer;
 
 class ClosureValue implements CodeGeneratorInterface
 {
@@ -25,13 +24,8 @@ class ClosureValue implements CodeGeneratorInterface
 
     public function generateCode(): string
     {
-
-        $analyzer = new AstAnalyzer();
-        $analsis = $analyzer->analyze($this->closure);
-        $closureAst = $analsis['ast'];
-
-        $printer = new Standard();
-        $formatted = $printer->prettyPrint([$closureAst]);
+        $sc = new ReflectionClosure($this->closure);
+        $code = $sc->getCode();
 
         // This is a clumsy approach - it copies the raw text of the closure
         // (with use statements correctly expanded) INCLUDING the outer
@@ -43,7 +37,7 @@ class ClosureValue implements CodeGeneratorInterface
         // But gettting there will take a fair bit of AST hacking.
         return sprintf(
             'return (%s)($this);',
-            $formatted
+            $code
         );
     }
 }
