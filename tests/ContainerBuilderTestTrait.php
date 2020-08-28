@@ -210,7 +210,7 @@ trait ContainerBuilderTestTrait
     public function testShortClosureThatUsesContainer(): void
     {
         if (version_compare(PHP_VERSION, '7.4.0', '<')) {
-            $this->markTestSkipped('Short closures only testable in 7.4 or later');
+            self::markTestSkipped('Short closures only testable in 7.4 or later');
         }
         $container = $this->getContainer();
         assert($container->has('valueForShortClosure'));
