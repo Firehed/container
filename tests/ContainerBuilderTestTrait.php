@@ -11,6 +11,8 @@ use Psr\Container\NotFoundExceptionInterface;
 use SessionHandlerInterface;
 use SessionIdInterface;
 
+use function version_compare;
+
 /**
  * This is a test trait to help ensure all processes end up with the same
  * results. These are primarily integration tests, not unit tests.
@@ -43,6 +45,9 @@ trait ContainerBuilderTestTrait
             'NoParams',
             'ScalarParams',
         ];
+        if (version_compare(PHP_VERSION, '7.4.0', '>=')) {
+            $files[] = 'ShortClosures';
+        }
         return array_map(function ($name) {
             return sprintf('%s/ValidDefinitions/%s.php', __DIR__, $name);
         }, $files);
@@ -204,9 +209,12 @@ trait ContainerBuilderTestTrait
 
     public function testShortClosureThatUsesContainer(): void
     {
+        if (version_compare(PHP_VERSION, '7.4.0', '<')) {
+            $this->markTestSkipped('Short closures only testable in 7.4 or later');
+        }
         $container = $this->getContainer();
-        assert($container->has('literalValueForComplex'));
-        $expected = $container->get('literalValueForComplex');
+        assert($container->has('valueForShortClosure'));
+        $expected = $container->get('valueForShortClosure');
         $actual = $container->get('shortClosure');
         $this->assertSame(
             $expected,

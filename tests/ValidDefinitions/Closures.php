@@ -18,6 +18,4 @@ return [
     'complexDefinition' => function ($container) {
         return $container->get('literalValueForComplex');
     },
-
-    'shortClosure' => fn ($c) => $c->get('literalValueForComplex'),
 ];
