@@ -23,6 +23,10 @@ class Builder implements BuilderInterface
         $this->defs = array_merge($this->parseDefs($defs), $this->defs);
     }
 
+    /**
+     * @param mixed[] $defs
+     * @return mixed[]
+     */
     private function parseDefs(array $defs): array
     {
         $output = [];

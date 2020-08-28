@@ -10,6 +10,7 @@ class SessionId implements SessionIdInterface
     // phpcs:disable PSR1.Methods.CamelCapsMethodName.NotCamelCaps
     public function create_sid(): string
     {
+        return 'sid';
     }
     // phpcs:enable
 }

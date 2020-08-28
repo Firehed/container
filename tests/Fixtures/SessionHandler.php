@@ -18,6 +18,7 @@ class SessionHandler implements SessionIdInterface, SessionHandlerInterface
 
     public function close(): bool
     {
+        return true;
     }
 
     // phpcs:disable PSR1.Methods.CamelCapsMethodName.NotCamelCaps
@@ -32,6 +33,7 @@ class SessionHandler implements SessionIdInterface, SessionHandlerInterface
      */
     public function destroy($session_id): bool
     {
+        return true;
     }
 
     /**
@@ -39,6 +41,7 @@ class SessionHandler implements SessionIdInterface, SessionHandlerInterface
      */
     public function gc($maxlifetime): bool
     {
+        return true;
     }
 
     /**
@@ -47,6 +50,7 @@ class SessionHandler implements SessionIdInterface, SessionHandlerInterface
      */
     public function open($save_path, $session_name): bool
     {
+        return true;
     }
 
     /**
@@ -54,6 +58,7 @@ class SessionHandler implements SessionIdInterface, SessionHandlerInterface
      */
     public function read($session_id): string
     {
+        return '';
     }
 
     /**
@@ -62,5 +67,6 @@ class SessionHandler implements SessionIdInterface, SessionHandlerInterface
      */
     public function write($session_id, $session_data): bool
     {
+        return true;
     }
 }

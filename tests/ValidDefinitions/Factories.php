@@ -1,12 +1,13 @@
 <?php
 declare(strict_types=1);
 
-use function Firehed\Container\factory;
 use Firehed\Container\Fixtures;
+
+use function Firehed\Container\factory;
 
 return [
     // Factory w/ body
-    DateTime::class => factory(function () {
+    DateTime::class => factory(function (): DateTime {
         return new DateTime();
     }),
 

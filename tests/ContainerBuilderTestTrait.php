@@ -33,6 +33,7 @@ trait ContainerBuilderTestTrait
 
     abstract protected function getBuilder(): BuilderInterface;
 
+    /** @return string[] */
     private function getDefinitionFiles(): array
     {
         $files = [
@@ -48,7 +49,7 @@ trait ContainerBuilderTestTrait
         if (version_compare(PHP_VERSION, '7.4.0', '>=')) {
             $files[] = 'ShortClosures';
         }
-        return array_map(function ($name) {
+        return array_map(function ($name): string {
             return sprintf('%s/ValidDefinitions/%s.php', __DIR__, $name);
         }, $files);
     }
@@ -283,6 +284,7 @@ trait ContainerBuilderTestTrait
 
     // Data Providers
 
+    /** @return mixed[][] */
     public function scalarLiterals(): array
     {
         return [
@@ -309,10 +311,12 @@ trait ContainerBuilderTestTrait
     // Internal assertion wrappers
 
     /**
+     * @param ?class-string $type
      * @return mixed The fetched value
      */
     private function assertGetSingleton(ContainerInterface $container, string $key, ?string $type = null)
     {
+        /** @var class-string $type */
         $type = $type ?? $key;
         $this->assertTrue($container->has($key));
         $values = [];
@@ -325,8 +329,12 @@ trait ContainerBuilderTestTrait
         return $values[0];
     }
 
+    /**
+     * @param ?class-string $type
+     */
     private function assertGetFactory(ContainerInterface $container, string $key, ?string $type = null): void
     {
+        /** @var class-string $type */
         $type = $type ?? $key;
         $this->assertTrue($container->has($key), "Container should have $key");
         $values = [];

@@ -80,6 +80,7 @@ trait EnvironmentDefinitionsTestTrait
         $this->assertSame($expected, $container->get($containerKey));
     }
 
+    /** @return string[][] */
     public function envVarsThatAreSet(): array
     {
         return [
@@ -89,6 +90,7 @@ trait EnvironmentDefinitionsTestTrait
         ];
     }
 
+    /** @return mixed[][] */
     public function casts(): array
     {
         return [
