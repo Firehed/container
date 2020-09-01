@@ -1,7 +1,7 @@
 # Container
 A PSR-11 compliant Dependency Inversion Container
 
-[![Build Status](https://travis-ci.org/Firehed/container.svg?branch=master)](https://travis-ci.org/Firehed/container)
+[![Build Status](https://github.com/Firehed/container/workflows/Test/badge.svg?branch=master)](https://github.com/Firehed/container/actions?query=workflow%3ATest+branch%3Amaster)
 [![Packagist](https://img.shields.io/packagist/v/firehed/container.svg)](https://packagist.org/packages/firehed/container)
 
 ## Why another container implementation?
