@@ -19,8 +19,6 @@ jobs:
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
-        with:
-          coverage: xdebug
 
       - name: Cache Composer packages
         id: composer-cache
