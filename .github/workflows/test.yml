@@ -56,7 +56,8 @@ jobs:
           --optimize-autoloader
 
       - name: PHPUnit
-        run: composer phpunit
+        run: composer phpunit \
+          --coverage-clover coverage.xml
 
       - name: Submit code coverage
         run: bash <(curl -s https://codecov.io/bash)
