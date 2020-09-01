@@ -46,7 +46,7 @@
         ],
         "autofix": "phpcbf src tests",
         "phpunit": "phpunit",
-        "phpstan": "phpstan analyse --no-progress -c phpstan.neon -l7 src tests",
+        "phpstan": "phpstan analyse src tests",
         "phpcs": "phpcs src tests"
     }
 }

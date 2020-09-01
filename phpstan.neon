@@ -4,3 +4,4 @@ includes:
 parameters:
     ignoreErrors:
         - '#^Dynamic call to static method PHPUnit\\Framework\\Assert::assert#'
+    level: max
