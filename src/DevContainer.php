@@ -7,6 +7,7 @@ use Closure;
 use Exception;
 use Psr\Container;
 use ReflectionClass;
+use ReflectionNamedType;
 
 class DevContainer implements Container\ContainerInterface
 {
@@ -16,6 +17,7 @@ class DevContainer implements Container\ContainerInterface
     /** @var mixed[] */
     private $evaluated = [];
 
+    /** @param mixed[] $definitions */
     public function __construct(array $definitions)
     {
         $this->definitions = $definitions;
@@ -96,8 +98,7 @@ class DevContainer implements Container\ContainerInterface
                         default:
                             throw new \OutOfBoundsException('Invalid boolean value');
                     }
-                    // This is to keep phpstan happy, unreachable
-                    throw new \Exception();
+                    // comment line for phpcs, otherwise irrelevant
                 case 'int':
                     return (int) $envValue;
                 case 'float':
@@ -148,6 +149,7 @@ class DevContainer implements Container\ContainerInterface
                 if ($type->isBuiltin()) {
                     throw new Exceptions\UntypedValue($param->getName(), $id);
                 }
+                assert($type instanceof ReflectionNamedType);
                 $name = $type->getName();
                 if (!$this->has($name)) {
                     throw new Exceptions\NotFound($param->getName());

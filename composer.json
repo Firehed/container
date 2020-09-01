@@ -32,9 +32,9 @@
     },
     "require-dev": {
         "firehed/simplelogger": "^2.1",
-        "phpstan/phpstan": "^0.11.2",
-        "phpstan/phpstan-phpunit": "^0.11.0",
-        "phpstan/phpstan-strict-rules": "^0.11.0",
+        "phpstan/phpstan": "^0.12.40",
+        "phpstan/phpstan-phpunit": "^0.12.16",
+        "phpstan/phpstan-strict-rules": "^0.12.4",
         "phpunit/phpunit": "^8.0",
         "squizlabs/php_codesniffer": "^3.4"
     },
@@ -46,7 +46,7 @@
         ],
         "autofix": "phpcbf src tests",
         "phpunit": "phpunit",
-        "phpstan": "phpstan analyse --no-progress -c phpstan.neon -l7 src tests",
+        "phpstan": "phpstan analyse src tests",
         "phpcs": "phpcs src tests"
     }
 }

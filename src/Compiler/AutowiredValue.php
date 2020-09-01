@@ -7,14 +7,14 @@ use BadMethodCallException;
 use Firehed\Container\Exceptions\UntypedValue;
 use ReflectionClass;
 use ReflectionParameter;
-use ReflectionType;
+use ReflectionNamedType;
 
 class AutowiredValue implements CodeGeneratorInterface
 {
-    /** @var string FQCN */
+    /** @var class-string FQCN */
     private $class;
 
-    /** @var array */
+    /** @var string[] */
     private $dependencies;
 
     public function __construct(string $classToAutowire)
@@ -83,7 +83,7 @@ PHP;
             return var_export($param->getDefaultValue(), true);
         }
         $type = $param->getType();
-        assert($type !== null);
+        assert($type instanceof ReflectionNamedType);
         $this->dependencies[] = $type->getName();
         return sprintf(
             '$this->get(%s)',
