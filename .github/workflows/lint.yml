@@ -1,4 +1,4 @@
-name: PHPCS
+name: Lint
 
 on:
   push:
