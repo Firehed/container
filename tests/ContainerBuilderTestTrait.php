@@ -204,7 +204,7 @@ trait ContainerBuilderTestTrait
         $this->assertSame(
             $expected,
             $actual,
-            'Complex definition which consumed container evaluated incorrectly',
+            'Complex definition which consumed container evaluated incorrectly'
         );
     }
 
@@ -220,7 +220,7 @@ trait ContainerBuilderTestTrait
         $this->assertSame(
             $expected,
             $actual,
-            'Complex definition which consumed container evaluated incorrectly',
+            'Complex definition which consumed container evaluated incorrectly'
         );
     }
 
