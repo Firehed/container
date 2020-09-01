@@ -7,10 +7,10 @@ class LiteralValue implements CodeGeneratorInterface
 {
     use NoDependenciesTrait;
 
-    /** @var scalar|array */
+    /** @var scalar|scalar[] */
     private $literal;
 
-    /** @param scalar|array $literal */
+    /** @param scalar|scalar[] $literal */
     public function __construct($literal)
     {
         $this->literal = $literal;
