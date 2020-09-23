@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 use Firehed\Container\Fixtures;
-use Psr\Log\LoggerInterface as AliasedLoggerInterface;
+use Firehed\Container\Fixtures\EmptyInterface as EI;
 
 return [
     // Simple closure definitions
@@ -20,19 +20,13 @@ return [
         return $container->get('literalValueForComplex');
     },
 
-    AliasedLoggerInterface::class => function (): AliasedLoggerInterface {
-        return new class implements AliasedLoggerInterface
+    EI::class => function (): EI {
+        return new class implements EI
         {
-            use \Psr\Log\LoggerTrait;
-
-            public function log($level, $message, $context = [])
-            {
-                // no-op
-            }
         };
     },
 
-    'somethingUsingAliasedLogger' => function ($c) {
-        return $c->get(AliasedLoggerInterface::class);
+    'somethingUsingAliasedName' => function ($c) {
+        return $c->get(EI::class);
     },
 ];

@@ -8,7 +8,6 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Psr\Log\LoggerInterface;
 use SessionHandlerInterface;
 use SessionIdInterface;
 
@@ -286,10 +285,10 @@ trait ContainerBuilderTestTrait
     public function testAliasedImportsAreNotMangled(): void
     {
         $container = $this->getContainer();
-        $l1 = $container->get(LoggerInterface::class);
-        $l2 = $container->get('somethingUsingAliasedLogger');
-        $this->assertSame($l1, $l2);
-        $this->assertInstanceOf(LoggerInterface::class, $l1);
+        $i1 = $container->get(Fixtures\EmptyInterface::class);
+        $i2 = $container->get('somethingUsingAliasedName');
+        $this->assertSame($i1, $i2);
+        $this->assertInstanceOf(Fixtures\EmptyInterface::class, $i1);
     }
 
     // Data Providers
