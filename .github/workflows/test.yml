@@ -47,7 +47,6 @@ jobs:
 
       - name: Install dependencies
         run: composer update
-          --ignore-platform-reqs
           --no-ansi
           --no-interaction
           --no-progress
