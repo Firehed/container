@@ -46,7 +46,9 @@ jobs:
             ${{ runner.os }}-${{ matrix.php }}-${{ matrix.dep-version }}-php-
 
       - name: Install dependencies
-        run: composer update
+        env:
+          IGNORE_PLATFORM_REQS: ${{ matrix.php == '8.0' }}
+        run: env ; composer update
           --no-ansi
           --no-interaction
           --no-progress
