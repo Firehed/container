@@ -43,7 +43,7 @@ jobs:
           path: vendor
           key: ${{ runner.os }}-php-${{ hashFiles('**/composer.json') }}
           restore-keys: |
-            ${{ runner.os }}-${{ matrix.php }}-${{ matrix.dep-version }}-php-
+            ${{ runner.os }}-${{ matrix.php }}-${{ matrix.dependencies }}-php-
 
       - name: Install dependencies
         env:
