@@ -16,9 +16,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        dep-version:
-          - --prefer-lowest
-          - ''
+        dependencies:
+          - 'high'
+          - 'low'
         php:
           - '7.2'
           - '7.3'
@@ -47,6 +47,7 @@ jobs:
 
       - name: Install dependencies
         env:
+          DEPENDENCIES: ${{ matrix.dependencies }}
           IGNORE_PLATFORM_REQS: ${{ matrix.php == '8.0' }}
         run: composer update
           --no-ansi
@@ -55,7 +56,7 @@ jobs:
           --no-suggest
           --prefer-dist
           $([ $IGNORE_PLATFORM_REQS = "true" ] && echo -n '--ignore-platform-reqs')
-          ${{ matrix.dep-version }}
+          $([ $DEPENDENCIES = "low" ] && echo -n '--prefer-lowest')
           --optimize-autoloader
 
       - name: PHPUnit
