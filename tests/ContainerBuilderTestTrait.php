@@ -282,6 +282,10 @@ trait ContainerBuilderTestTrait
         $container->get('key_that_does_not_exist');
     }
 
+    /**
+     * @covers Compiler\ClosureValue
+     * @covers Compiler\ClosureVisitor
+     */
     public function testAliasedImportsAreNotMangled(): void
     {
         $container = $this->getContainer();
