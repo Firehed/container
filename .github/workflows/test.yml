@@ -50,7 +50,6 @@ jobs:
           DEPENDENCIES: ${{ matrix.dependencies }}
           PHP8: ${{ matrix.php == '8.0' }}
         run: composer update
-          $([ $PHP8 = "true" ] && echo -n '--ignore-platform-reqs')
           --no-ansi
           --no-interaction
           --no-progress
