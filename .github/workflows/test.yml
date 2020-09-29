@@ -49,15 +49,13 @@ jobs:
             ${{ runner.os }}-php-
 
       - name: Install dependencies
-        env:
-          DEPENDENCIES: ${{ matrix.dependencies }}
         run: composer update
           --no-ansi
           --no-interaction
           --no-progress
           --no-suggest
           --prefer-dist
-          $([ ${{ matrix.dependencies }} = "low" ] && echo -n '--prefer-lowest')
+          $([ "${{ matrix.dependencies }}" = "low" ] && echo -n '--prefer-lowest')
 
       - name: PHPUnit
         run: vendor/bin/phpunit
