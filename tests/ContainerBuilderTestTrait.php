@@ -283,8 +283,8 @@ trait ContainerBuilderTestTrait
     }
 
     /**
-     * @covers Compiler\ClosureValue
-     * @covers Compiler\ClosureVisitor
+     * @covers \Firehed\Container\Compiler\ClosureValue
+     * @covers \Firehed\Container\Compiler\ClosureVisitor
      */
     public function testAliasedImportsAreNotMangled(): void
     {
