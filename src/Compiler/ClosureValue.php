@@ -4,8 +4,15 @@ declare(strict_types=1);
 namespace Firehed\Container\Compiler;
 
 use Closure;
-use Opis\Closure\ReflectionClosure;
+use PhpParser\{
+    NodeTraverser,
+    NodeVisitor\NameResolver,
+    NodeVisitorAbstract,
+    ParserFactory,
+    PrettyPrinter\Standard,
+};
 use ReflectionFunction;
+use UnexpectedValueException;
 
 class ClosureValue implements CodeGeneratorInterface
 {
@@ -22,10 +29,50 @@ class ClosureValue implements CodeGeneratorInterface
         $this->closure = $closure;
     }
 
+    /**
+     * @throws \PhpParser\Error if the AST cannot be parsed or modified
+     */
     public function generateCode(): string
     {
-        $sc = new ReflectionClosure($this->closure);
-        $code = $sc->getCode();
+        // This detects the boundaries in the source file that defines the
+        // closure, which is used in AST analysis.
+
+        $rf = new ReflectionFunction($this->closure);
+
+        $startLine = $rf->getStartLine();
+        assert(is_int($startLine));
+        $endLine = $rf->getEndLine();
+        assert(is_int($endLine));
+
+        $definingFile = $rf->getFileName();
+        assert($definingFile !== false);
+        $code = file_get_contents($definingFile);
+        assert($code !== false);
+
+        $visitor = new ClosureVisitor($startLine, $endLine);
+
+        $parser = (new ParserFactory())
+            ->create(ParserFactory::PREFER_PHP7);
+
+        $ast = $parser->parse($code);
+        assert($ast !== null);
+
+        // Before doing anything, apply the built-in name resolution to the
+        // entire AST so that any `use` statements (including aliased ones) in
+        // the code are expanded.
+        $traverser = new NodeTraverser();
+        $traverser->addVisitor(new NameResolver());
+        $astWithResolvedNames = $traverser->traverse($ast);
+
+        // Travserse with our visitor, which will attempt to extract the code
+        // of the closure.
+        $traverser = new NodeTraverser();
+        $traverser->addVisitor($visitor);
+        $traverser->traverse($astWithResolvedNames);
+        $code = $visitor->getCode();
+        if ($code === '') {
+            throw new UnexpectedValueException('No closure source code found');
+        }
 
         // This is a clumsy approach - it copies the raw text of the closure
         // (with use statements correctly expanded) INCLUDING the outer

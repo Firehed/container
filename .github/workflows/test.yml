@@ -16,14 +16,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        dep-version:
-          - --prefer-lowest
-          - ''
+        dependencies:
+          - 'high'
+          - 'low'
         php:
           - '7.2'
           - '7.3'
           - '7.4'
-          # - '8.0'
+          - '8.0'
 
     steps:
       - name: Check out code
@@ -32,8 +32,8 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          coverage: xdebug
-          ini-values: zend.assertions=1, assert.exception=1
+          coverage: pcov
+          ini-values: zend.assertions=1, assert.exception=1, error_reporting=-1
           php-version: ${{ matrix.php }}
 
       - name: Cache Composer packages
@@ -41,23 +41,24 @@ jobs:
         uses: actions/cache@v2
         with:
           path: vendor
-          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.json') }}
+          key: ${{ runner.os }}-php-${{ matrix.dependencies }}-${{ matrix.php }}-${{ hashFiles('**/composer.json') }}
           restore-keys: |
-            ${{ runner.os }}-${{ matrix.php }}-${{ matrix.dep-version }}-php-
+            ${{ runner.os }}-php-${{ matrix.dependencies }}-${{ matrix.php }}-${{ hashFiles('**/composer.json') }}
+            ${{ runner.os }}-php-${{ matrix.dependencies }}-${{ matrix.php }}-
+            ${{ runner.os }}-php-${{ matrix.dependencies }}-
+            ${{ runner.os }}-php-
 
       - name: Install dependencies
-        run: composer update \
-          --ignore-platform-reqs \
-          --no-ansi \
-          --no-interaction \
-          --no-progress \
-          --no-suggest \
-          --prefer-dist \
-          ${{ matrix.dep-version }} \
-          --optimize-autoloader
+        run: composer update
+          --no-ansi
+          --no-interaction
+          --no-progress
+          --no-suggest
+          --prefer-dist
+          $([ "${{ matrix.dependencies }}" = "low" ] && echo -n '--prefer-lowest')
 
       - name: PHPUnit
-        run: composer phpunit \
+        run: vendor/bin/phpunit
           --coverage-clover coverage.xml
 
       - name: Submit code coverage

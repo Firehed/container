@@ -282,6 +282,19 @@ trait ContainerBuilderTestTrait
         $container->get('key_that_does_not_exist');
     }
 
+    /**
+     * @covers \Firehed\Container\Compiler\ClosureValue
+     * @covers \Firehed\Container\Compiler\ClosureVisitor
+     */
+    public function testAliasedImportsAreNotMangled(): void
+    {
+        $container = $this->getContainer();
+        $i1 = $container->get(Fixtures\EmptyInterface::class);
+        $i2 = $container->get('somethingUsingAliasedName');
+        $this->assertSame($i1, $i2);
+        $this->assertInstanceOf(Fixtures\EmptyInterface::class, $i1);
+    }
+
     // Data Providers
 
     /** @return mixed[][] */
