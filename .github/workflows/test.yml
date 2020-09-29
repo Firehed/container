@@ -51,7 +51,6 @@ jobs:
       - name: Install dependencies
         env:
           DEPENDENCIES: ${{ matrix.dependencies }}
-          PHP8: ${{ matrix.php == '8.0' }}
         run: composer update
           --no-ansi
           --no-interaction
@@ -59,7 +58,6 @@ jobs:
           --no-suggest
           --prefer-dist
           $([ $DEPENDENCIES = "low" ] && echo -n '--prefer-lowest')
-          --optimize-autoloader
 
       - name: PHPUnit
         run: vendor/bin/phpunit
