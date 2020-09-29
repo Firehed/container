@@ -55,7 +55,7 @@ jobs:
           --no-progress
           --no-suggest
           --prefer-dist
-          $([ $DEPENDENCIES = "low" ] && [ $PHP8 != "true" ] && echo -n '--prefer-lowest')
+          $([ $DEPENDENCIES = "low" ] && echo -n '--prefer-lowest')
           --optimize-autoloader
 
       - name: PHPUnit
