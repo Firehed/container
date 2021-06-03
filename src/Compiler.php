@@ -89,15 +89,19 @@ class Compiler implements BuilderInterface
         if ($value instanceof FactoryInterface) {
             $this->factories[$key] = true;
             if ($value->hasDefinition()) {
+                // Something::class => factory(fn ($container) => new Something(...))
                 $this->definitions[$key] = new Compiler\ClosureValue($value->getDefinition());
             } else {
+                // Something::class => factory()
+                assert(class_exists($key));
                 $this->definitions[$key] = new Compiler\AutowiredValue($key);
             }
         } elseif ($value instanceof AutowireInterface) {
             $wiredClass = $value->getWiredClass();
-            if ($wiredClass === null) {
+            if ($wiredClass === null) { // Something::class => autowire() or non-indexed Something::class
                 $wiredClass = $key;
-            }
+            } // else SomeInterface::class => autowire(SomeClass::class)
+            assert(class_exists($wiredClass));
             $this->definitions[$key] = new Compiler\AutowiredValue($wiredClass);
         } elseif ($value instanceof Closure) {
             $this->definitions[$key] = new Compiler\ClosureValue($value);

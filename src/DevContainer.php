@@ -58,8 +58,9 @@ class DevContainer implements Container\ContainerInterface
         }
 
         if ($value instanceof Closure) {
-            $value = $value->bindTo(null);
-            $evaluated = $value($this);
+            $rebound = $value->bindTo(null);
+            assert($rebound !== false);
+            $evaluated = $rebound($this);
             $this->evaluated[$id] = $evaluated;
 
             return $evaluated;
@@ -146,10 +147,10 @@ class DevContainer implements Container\ContainerInterface
                 }
                 $type = $param->getType();
                 assert($type !== null);
+                assert($type instanceof ReflectionNamedType);
                 if ($type->isBuiltin()) {
                     throw new Exceptions\UntypedValue($param->getName(), $id);
                 }
-                assert($type instanceof ReflectionNamedType);
                 $name = $type->getName();
                 if (!$this->has($name)) {
                     throw new Exceptions\NotFound($param->getName());

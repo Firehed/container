@@ -4,6 +4,7 @@ namespace Firehed\Container;
 
 use Closure;
 
+/** @param ?class-string $class */
 function autowire(?string $class = null): AutowireInterface
 {
     return new AutowiredClass($class);
