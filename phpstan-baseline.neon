@@ -1,6 +1,11 @@
 parameters:
 	ignoreErrors:
 		-
+			message: "#^Constructor of class Firehed\\\\Container\\\\Compiler\\\\ProxyValue has an unused parameter \\$interfaceName\\.$#"
+			count: 1
+			path: src/Compiler/ProxyValue.php
+
+		-
 			message: "#^Parameter \\#1 \\$exception of method PHPUnit\\\\Framework\\\\TestCase\\:\\:expectException\\(\\) expects class\\-string\\<Throwable\\>, string given\\.$#"
 			count: 2
 			path: tests/BuilderTest.php

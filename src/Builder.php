@@ -4,12 +4,16 @@ declare(strict_types=1);
 namespace Firehed\Container;
 
 use Psr\Container\ContainerInterface;
+use Psr\Container\ContainerExceptionInterface;
 use UnexpectedValueException;
 
 class Builder implements BuilderInterface
 {
     /** @var mixed[] */
     private $defs = [];
+
+    /** @var ContainerExceptionInterface[] */
+    private $errors = [];
 
     public function addFile(string $path): void
     {
@@ -41,6 +45,10 @@ class Builder implements BuilderInterface
             // is an interface-to-implementation wiring. This means that simple
             // string value MUST NOT be keyed to an interface name
             if (interface_exists($key) && is_string($value)) {
+                if (!class_exists($value)) {
+                    $this->errors[] = new Exceptions\InvalidClassMapping($key, $value);
+                    continue;
+                }
                 // This is a factory so that if the value being proxied is
                 // a factory, the behavior passes through. If it isn't, the
                 // downstream will still cache as expected
@@ -57,6 +65,9 @@ class Builder implements BuilderInterface
 
     public function build(): ContainerInterface
     {
+        if ($this->errors !== []) {
+            throw $this->errors[0];
+        }
         $container = new DevContainer($this->defs);
 
         return $container;
