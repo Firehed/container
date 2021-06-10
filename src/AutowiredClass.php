@@ -5,14 +5,16 @@ namespace Firehed\Container;
 
 class AutowiredClass implements AutowireInterface
 {
-    /** @var ?string */
+    /** @var ?class-string */
     private $class;
 
+    /** @param ?class-string $class */
     public function __construct(?string $class = null)
     {
         $this->class = $class;
     }
 
+    /** @inheritdoc */
     public function getWiredClass(): ?string
     {
         return $this->class;

@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Firehed\Container;
 
+use SessionHandlerInterface;
+
 trait ErrorDefinitionsTestTrait
 {
     abstract protected function getBuilder(): BuilderInterface;
@@ -32,5 +34,50 @@ trait ErrorDefinitionsTestTrait
         $this->expectException(Exceptions\NotFound::class);
         $c = $builder->build();
         $c->get(Fixtures\SessionHandler::class);
+    }
+
+    public function testImplicitInterfaceAutowire(): void
+    {
+        $builder = $this->getBuilder();
+        $builder->addFile(__DIR__ . '/ErrorDefinitions/AmbiguousInterfaceImplicit.php');
+        $this->expectException(Exceptions\AmbiguousMapping::class);
+        $c = $builder->build();
+        $c->get(SessionHandlerInterface::class);
+    }
+
+    public function testExplicitInterfaceAutowire(): void
+    {
+        $builder = $this->getBuilder();
+        $builder->addFile(__DIR__ . '/ErrorDefinitions/AmbiguousInterfaceExplicit.php');
+        $this->expectException(Exceptions\AmbiguousMapping::class);
+        $c = $builder->build();
+        $c->get(SessionHandlerInterface::class);
+    }
+
+    public function testInterfaceToNonClass(): void
+    {
+        $builder = $this->getBuilder();
+        $builder->addFile(__DIR__ . '/ErrorDefinitions/InterfaceToNonClass.php');
+        $this->expectException(Exceptions\InvalidClassMapping::class);
+        $c = $builder->build();
+        $c->get(SessionHandlerInterface::class);
+    }
+
+    public function testInterfaceFactory(): void
+    {
+        $builder = $this->getBuilder();
+        $builder->addFile(__DIR__ . '/ErrorDefinitions/InterfaceFactory.php');
+        $this->expectException(Exceptions\AmbiguousMapping::class);
+        $c = $builder->build();
+        $c->get(SessionHandlerInterface::class);
+    }
+
+    public function testStringFactory(): void
+    {
+        $builder = $this->getBuilder();
+        $builder->addFile(__DIR__ . '/ErrorDefinitions/StringFactory.php');
+        $this->expectException(Exceptions\AmbiguousMapping::class);
+        $c = $builder->build();
+        $c->get('hello');
     }
 }
