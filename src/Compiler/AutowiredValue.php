@@ -17,11 +17,10 @@ class AutowiredValue implements CodeGeneratorInterface
     /** @var string[] */
     private $dependencies;
 
+    /** @param class-string $classToAutowire */
     public function __construct(string $classToAutowire)
     {
-        if (!class_exists($classToAutowire)) {
-            // throw
-        }
+        assert(class_exists($classToAutowire));
         $this->class = $classToAutowire;
     }
 
@@ -68,7 +67,7 @@ PHP;
         }
         if ($param->hasType()) {
             $type = $param->getType();
-            assert($type !== null);
+            assert($type instanceof ReflectionNamedType);
             return !$type->isBuiltin();
         }
         return false;

@@ -6,6 +6,7 @@ namespace Firehed\Container;
 use Closure;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -21,6 +22,9 @@ class Compiler implements BuilderInterface
 
     /** @var array<string, true> */
     private $dependencies = [];
+
+    /** @var ContainerExceptionInterface[] */
+    private $errors = [];
 
     /** @var bool */
     private $exists;
@@ -89,29 +93,50 @@ class Compiler implements BuilderInterface
         if ($value instanceof FactoryInterface) {
             $this->factories[$key] = true;
             if ($value->hasDefinition()) {
+                // Something::class => factory(fn ($container) => new Something(...))
                 $this->definitions[$key] = new Compiler\ClosureValue($value->getDefinition());
             } else {
-                $this->definitions[$key] = new Compiler\AutowiredValue($key);
+                if (class_exists($key)) {
+                    // Something::class => factory()
+                    $this->definitions[$key] = new Compiler\AutowiredValue($key);
+                } else {
+                    $this->errors[] = new Exceptions\AmbiguousMapping($key);
+                }
             }
         } elseif ($value instanceof AutowireInterface) {
+            // someName => autowire(...)
+            // someName,
             $wiredClass = $value->getWiredClass();
+            // autowire called without parameters: assume key is destination
             if ($wiredClass === null) {
                 $wiredClass = $key;
             }
-            $this->definitions[$key] = new Compiler\AutowiredValue($wiredClass);
+            if (class_exists($wiredClass)) {
+                $this->definitions[$key] = new Compiler\AutowiredValue($wiredClass);
+            } else {
+                $this->errors[] = new Exceptions\AmbiguousMapping($key);
+            }
         } elseif ($value instanceof Closure) {
+            // someName => fn ($container) => new Something(...)
             $this->definitions[$key] = new Compiler\ClosureValue($value);
         } elseif ($value instanceof EnvironmentVariableInterface) {
+            // someName => env('SOME_NAME')
             $this->definitions[$key] = new Compiler\EnvironmentVariableValue($value);
-        } elseif (interface_exists($key) && is_string($value)) {
-            // Simple autowiring
-            $this->logger->debug('Basic autowire {key} => {value}', [
-                'key' => $key,
-                'value' => $value,
-            ]);
-            // Never cache proxied values in case they point to a factory
-            $this->factories[$key] = true;
-            $this->definitions[$key] = new Compiler\ProxyValue($value);
+        } elseif (interface_exists($key)) {
+            if (class_exists($value)) {
+                // Simple autowiring
+                // SomeInterface::class => Something::class
+                $this->logger->debug('Basic autowire {key} => {value}', [
+                    'key' => $key,
+                    'value' => $value,
+                ]);
+                // Never cache proxied values in case they point to a factory
+                $this->factories[$key] = true;
+                $this->definitions[$key] = new Compiler\ProxyValue($key, $value);
+            } else {
+                $this->errors[] = new Exceptions\InvalidClassMapping($key, $value);
+                    // SomeInterface::class => nonClassString
+            }
         } else {
             $this->definitions[$key] = new Compiler\LiteralValue($value);
         }
@@ -126,6 +151,11 @@ class Compiler implements BuilderInterface
 
     private function compile(): void
     {
+        if ($this->errors !== []) {
+            // Ideally all would be thrown, but then there's all sorts of messy
+            // chaining to handle.
+            throw $this->errors[0];
+        }
         if ($this->exists) {
             return;
         }
