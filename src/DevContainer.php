@@ -26,9 +26,8 @@ class DevContainer implements Container\ContainerInterface
     /**
      * Docblock types for interface adherence
      * @param string $id
-     * @return bool
      */
-    public function has($id)
+    public function has($id): bool
     {
         return array_key_exists($id, $this->definitions);
     }
