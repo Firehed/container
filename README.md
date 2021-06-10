@@ -24,9 +24,6 @@ This is intended to reduce unpredictable behavior of services in concurrent envi
 
 - A shorthand syntax for interface-to-implementation has been added
 
-- Implicit autowiring of classes is not supported.
-  This is intentional in order to maximize compiler optimizations.
-
 - When recursively resolving dependencies, all required parameters must also be explicitly configured (see above)
 
 - Annotations are not supported.
