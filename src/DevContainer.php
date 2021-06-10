@@ -119,7 +119,7 @@ class DevContainer implements Container\ContainerInterface
     private function autowire(string $id): Closure
     {
         if (!class_exists($id)) {
-            throw new \Exception('not a class');
+            throw new Exceptions\AmbiguousMapping($id);
         }
         $rc = new ReflectionClass($id);
 
