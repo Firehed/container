@@ -20,9 +20,7 @@ class AutowiredValue implements CodeGeneratorInterface
     /** @param class-string $classToAutowire */
     public function __construct(string $classToAutowire)
     {
-        if (!class_exists($classToAutowire)) {
-            // throw
-        }
+        assert(class_exists($classToAutowire));
         $this->class = $classToAutowire;
     }
 

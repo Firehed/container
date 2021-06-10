@@ -3,16 +3,22 @@ declare(strict_types=1);
 
 namespace Firehed\Container\Compiler;
 
+/**
+ * This maps an interface to a class-string implementation
+ */
 class ProxyValue implements CodeGeneratorInterface
 {
-    /** @var string FQCN */
+    /** @var class-string */
     private $class;
 
-    public function __construct(string $classToAutowire)
+    /**
+     * @param class-string $interfaceName
+     * @param class-string $classToAutowire
+     */
+    public function __construct(string $interfaceName, string $classToAutowire)
     {
-        if (!class_exists($classToAutowire)) {
-            // throw
-        }
+        assert(class_exists($classToAutowire));
+        // TODO: Warn if class doesn't implement interface?
         $this->class = $classToAutowire;
     }
 

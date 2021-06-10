@@ -33,4 +33,48 @@ trait ErrorDefinitionsTestTrait
         $c = $builder->build();
         $c->get(Fixtures\SessionHandler::class);
     }
+
+    public function testImplicitInterfaceAutowire(): void
+    {
+        $builder = $this->getBuilder();
+        $builder->addFile(__DIR__ . '/ErrorDefinitions/AmbiguousInterfaceImplicit.php');
+        $this->expectException(Exceptions\AmbiguousMapping::class);
+        $c = $builder->build();
+        $c->get(Fixtures\SessionHandlerInterface::class);
+    }
+
+    public function testExplicitInterfaceAutowire(): void
+    {
+        $builder = $this->getBuilder();
+        $builder->addFile(__DIR__ . '/ErrorDefinitions/AmbiguousInterfaceExplicit.php');
+        $this->expectException(Exceptions\AmbiguousMapping::class);
+        $c = $builder->build();
+        $c->get(Fixtures\SessionHandlerInterface::class);
+    }
+
+    public function testInterfaceToNonClass(): void
+    {
+        $builder = $this->getBuilder();
+        $builder->addFile(__DIR__ . '/ErrorDefinitions/InterfaceToNonClass.php');
+        $this->expectException(Exceptions\InvalidClassMapping::class);
+        $c = $builder->build();
+        $c->get(Fixtures\SessionHandlerInterface::class);
+    }
+
+    public function testInterfaceFactory(): void
+    {
+        $builder = $this->getBuilder();
+        $builder->addFile(__DIR__ . '/ErrorDefinitions/InterfaceFactory.php');
+        $this->expectException(Exceptions\AmbiguousMapping::class);
+        $c = $builder->build();
+        $c->get(Fixtures\SessionHandlerInterface::class);
+    }
+    public function testStringFactory(): void
+    {
+        $builder = $this->getBuilder();
+        $builder->addFile(__DIR__ . '/ErrorDefinitions/StringFactory.php');
+        $this->expectException(Exceptions\AmbiguousMapping::class);
+        $c = $builder->build();
+        $c->get(Fixtures\SessionHandlerInterface::class);
+    }
 }
