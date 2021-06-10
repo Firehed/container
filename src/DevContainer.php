@@ -59,7 +59,7 @@ class DevContainer implements Container\ContainerInterface
 
         if ($value instanceof Closure) {
             $rebound = $value->bindTo(null);
-            assert($rebound !== false);
+            assert($rebound !== null);
             $evaluated = $rebound($this);
             $this->evaluated[$id] = $evaluated;
 
