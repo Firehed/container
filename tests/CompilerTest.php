@@ -6,9 +6,7 @@ namespace Firehed\Container;
 use Psr\Log\AbstractLogger;
 
 /**
- * @coversDefaultClass Firehed\Container\Compiler
- * @covers ::<protected>
- * @covers ::<private>
+ * @covers Firehed\Container\Compiler
  * @covers Firehed\Container\CompiledContainer
  */
 class CompilerTest extends \PHPUnit\Framework\TestCase
