@@ -248,6 +248,7 @@ trait ContainerBuilderTestTrait
             $container,
             Fixtures\DefaultScalarParam::class
         );
+        assert($dsp instanceof Fixtures\DefaultScalarParam);
         // Should have autowired with default from signature
         $this->assertSame(
             Fixtures\DefaultScalarParam::DEFAULT_VALUE,
@@ -265,6 +266,7 @@ trait ContainerBuilderTestTrait
             $container,
             Fixtures\OptionalScalarParam::class
         );
+        assert($osp instanceof Fixtures\OptionalScalarParam);
         // Should have autowired with null default from signature
         $this->assertNull($osp->getParam());
     }
@@ -329,7 +331,7 @@ trait ContainerBuilderTestTrait
      */
     private function assertGetSingleton(ContainerInterface $container, string $key, ?string $type = null)
     {
-        /** @var class-string $type */
+        /** @var class-string<object> $type */
         $type = $type ?? $key;
         $this->assertTrue($container->has($key));
         $values = [];
