@@ -14,10 +14,10 @@ use UnexpectedValueException;
 
 class Compiler implements BuilderInterface
 {
-    /** @var string */
+    /** @var class-string<ContainerInterface> */
     private $className;
 
-    /** @var mixed[] */
+    /** @var Compiler\CodeGeneratorInterface[] */
     private $definitions = [];
 
     /** @var array<string, true> */
@@ -41,6 +41,7 @@ class Compiler implements BuilderInterface
     public function __construct(string $path = 'cc.php', ?LoggerInterface $logger = null)
     {
         $this->logger = $logger ?? new NullLogger();
+        // @phpstan-ignore-next-line This class will be generated
         $this->className = 'CC_' . md5($path);
 
         if (file_exists($path)) {
@@ -123,6 +124,7 @@ class Compiler implements BuilderInterface
             // someName => env('SOME_NAME')
             $this->definitions[$key] = new Compiler\EnvironmentVariableValue($value);
         } elseif (interface_exists($key)) {
+            assert(is_string($value), 'Values without keys must be strings that correspond to autowirable classes');
             if (class_exists($value)) {
                 // Simple autowiring
                 // SomeInterface::class => Something::class
@@ -138,6 +140,7 @@ class Compiler implements BuilderInterface
                     // SomeInterface::class => nonClassString
             }
         } else {
+            assert(is_scalar($value) || is_array($value), 'Literal values must be scalars or arrays of scalars');
             $this->definitions[$key] = new Compiler\LiteralValue($value);
         }
     }
