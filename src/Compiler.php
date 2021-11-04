@@ -140,7 +140,10 @@ class Compiler implements BuilderInterface
                     // SomeInterface::class => nonClassString
             }
         } else {
-            assert(is_scalar($value) || is_array($value), 'Literal values must be scalars or arrays of scalars');
+            assert(
+                is_scalar($value) || is_array($value) || $value === null,
+                'Literal values must be scalars or arrays of scalars'
+            );
             $this->definitions[$key] = new Compiler\LiteralValue($value);
         }
     }
