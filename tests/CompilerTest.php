@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Firehed\Container;
@@ -33,8 +34,22 @@ class CompilerTest extends \PHPUnit\Framework\TestCase
 
     protected function getBuilder(): BuilderInterface
     {
-        $logger = new \Firehed\SimpleLogger\Stderr();
-        $logger->setLevel('error');
+        $logger = new class extends AbstractLogger
+        {
+            /**
+             * @inheritdoc
+             * @param mixed[] $context
+             */
+            public function log($level, $message, array $context = []): void
+            {
+                if ($level === 'debug' || $level === 'info') {
+                    return;
+                }
+                $ctx = json_encode($context);
+                assert(is_string($level));
+                fwrite(STDERR, "[$level] $message ($ctx)\n");
+            }
+        };
         return new Compiler($this->file, $logger);
     }
 }

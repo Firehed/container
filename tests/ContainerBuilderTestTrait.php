@@ -331,7 +331,7 @@ trait ContainerBuilderTestTrait
      */
     private function assertGetSingleton(ContainerInterface $container, string $key, ?string $type = null)
     {
-        /** @var class-string $type */
+        /** @var class-string<object> $type */
         $type = $type ?? $key;
         $this->assertTrue($container->has($key));
         $values = [];
