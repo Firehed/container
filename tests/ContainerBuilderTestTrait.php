@@ -248,6 +248,7 @@ trait ContainerBuilderTestTrait
             $container,
             Fixtures\DefaultScalarParam::class
         );
+        assert($dsp instanceof Fixtures\DefaultScalarParam);
         // Should have autowired with default from signature
         $this->assertSame(
             Fixtures\DefaultScalarParam::DEFAULT_VALUE,
@@ -265,6 +266,7 @@ trait ContainerBuilderTestTrait
             $container,
             Fixtures\OptionalScalarParam::class
         );
+        assert($osp instanceof Fixtures\OptionalScalarParam);
         // Should have autowired with null default from signature
         $this->assertNull($osp->getParam());
     }
