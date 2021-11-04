@@ -38,6 +38,7 @@ class Builder implements BuilderInterface
         foreach ($defs as $key => $value) {
             if (is_int($key)) {
                 // Remap extra-lazy autowiring
+                assert(is_string($value), 'Values without keys must be strings that correspond to autowirable classes');
                 $key = $value;
                 $value = autowire();
             }
