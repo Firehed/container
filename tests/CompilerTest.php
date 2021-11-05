@@ -52,4 +52,27 @@ class CompilerTest extends \PHPUnit\Framework\TestCase
         };
         return new Compiler($this->file, $logger);
     }
+
+    public function testMakingPathWritable(): void
+    {
+        $tmp = sys_get_temp_dir();
+        $path = sprintf(
+            '%s/%d/%d/%d.php',
+            $tmp,
+            random_int(0, PHP_INT_MAX),
+            random_int(0, PHP_INT_MAX),
+            random_int(0, PHP_INT_MAX),
+        );
+        assert(!is_writable($path));
+        $compiler = new Compiler($path);
+        $compiler->addFile(__DIR__ . '/ValidDefinitions/Literals.php');
+        try {
+            $container = $compiler->build();
+            self::assertFileExists($path, 'File was not written');
+        } finally {
+            if (file_exists($path)) {
+                unlink($path);
+            }
+        }
+    }
 }
