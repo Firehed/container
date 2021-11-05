@@ -61,7 +61,7 @@ class CompilerTest extends \PHPUnit\Framework\TestCase
             $tmp,
             random_int(0, PHP_INT_MAX),
             random_int(0, PHP_INT_MAX),
-            random_int(0, PHP_INT_MAX),
+            random_int(0, PHP_INT_MAX)
         );
         assert(!is_writable($path));
         $compiler = new Compiler($path);
