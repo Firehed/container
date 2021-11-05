@@ -5,13 +5,3 @@ parameters:
 			count: 1
 			path: src/Compiler/ProxyValue.php
 
-		-
-			message: "#^Parameter \\#1 \\$exception of method PHPUnit\\\\Framework\\\\TestCase\\:\\:expectException\\(\\) expects class\\-string\\<Throwable\\>, string given\\.$#"
-			count: 2
-			path: tests/BuilderTest.php
-
-		-
-			message: "#^Parameter \\#1 \\$exception of method PHPUnit\\\\Framework\\\\TestCase\\:\\:expectException\\(\\) expects class\\-string\\<Throwable\\>, string given\\.$#"
-			count: 2
-			path: tests/CompilerTest.php
-

@@ -5,6 +5,5 @@ includes:
 parameters:
     ignoreErrors:
         - '#^Dynamic call to static method PHPUnit\\Framework\\Assert::assert#'
-        - '#^Invalid type Psr\\Container\\ContainerExceptionInterface to throw.#'
         - '#^Property .* is never read, only written.$#'
     level: max
