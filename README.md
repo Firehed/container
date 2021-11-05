@@ -96,6 +96,10 @@ The keys of the array will map to `$id`s that can be checked for existence with 
 It is **highly recommended** that class instances use their fully-qualified class name as an array key, and to additionally create a separate interface-to-implementation mapping.
 The latter will happen automatically when a key is the fully-qualified name of an `interface` and the value is a string that maps to a class name.
 
+### Examples
+
+The most concise examples are all part of the unit tests: [`tests/ValidDefintions`](tests/ValidDefintions).
+
 ### Simple values
 
 If a scalar or array is provided as a value, that value will be returned unmodified.
