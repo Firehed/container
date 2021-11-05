@@ -98,7 +98,7 @@ The latter will happen automatically when a key is the fully-qualified name of a
 
 ### Examples
 
-The most concise examples are all part of the unit tests: [`tests/ValidDefintions`](tests/ValidDefintions).
+The most concise examples are all part of the unit tests: [`tests/ValidDefinitions`](tests/ValidDefinitions).
 
 ### Simple values
 
