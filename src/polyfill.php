@@ -27,9 +27,16 @@ if (!interface_exists('BackedEnum')) {
     assert(version_compare(PHP_VERSION, '8.1.0', '<'));
     interface BackedEnum extends UnitEnum
     {
-        /** @param int|string $scalar */
-        public static function from($scalar): static;
-        /** @param int|string $scalar */
-        public static function tryFrom($scalar): ?static;
+        /**
+         * @param int|string $scalar
+         * @return static
+         */
+        public static function from($scalar);
+
+        /**
+         * @param int|string $scalar
+         * @return ?static
+         */
+        public static function tryFrom($scalar);
     }
 }
