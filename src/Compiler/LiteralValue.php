@@ -3,14 +3,17 @@ declare(strict_types=1);
 
 namespace Firehed\Container\Compiler;
 
+/**
+ * @phpstan-type ScalarLike null|scalar|scalar[]|\UnitEnum
+ */
 class LiteralValue implements CodeGeneratorInterface
 {
     use NoDependenciesTrait;
 
-    /** @var null|scalar|scalar[] */
+    /** @var ScalarLike */
     private $literal;
 
-    /** @param null|scalar|scalar[] $literal */
+    /** @param ScalarLike $literal */
     public function __construct($literal)
     {
         $this->literal = $literal;

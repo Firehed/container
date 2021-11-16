@@ -11,6 +11,7 @@ use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use UnexpectedValueException;
+use UnitEnum;
 
 use function array_key_exists;
 use function assert;
@@ -154,7 +155,10 @@ class Compiler implements BuilderInterface
             }
         } else {
             assert(
-                is_scalar($value) || is_array($value) || $value === null,
+                is_scalar($value)
+                || is_array($value)
+                || $value === null
+                || $value instanceof UnitEnum,
                 'Literal values must be scalars or arrays of scalars'
             );
             $this->definitions[$key] = new Compiler\LiteralValue($value);
