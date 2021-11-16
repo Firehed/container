@@ -49,7 +49,7 @@ trait ContainerBuilderTestTrait
         if (version_compare(PHP_VERSION, '7.4.0', '>=')) {
             $files[] = 'ShortClosures';
         }
-        if (version_compare(PHP_VERSION, '8.1.0', '>=')) {
+        if (version_compare(PHP_VERSION, '8.1.0-dev', '>=')) {
             $files[] = 'Enums';
         }
         return array_map(function ($name): string {
