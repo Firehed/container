@@ -229,7 +229,7 @@ trait ContainerBuilderTestTrait
 
     public function testDynamicEnum(): void
     {
-        if (version_compare(PHP_VERSION, '8.1.0', '<')) {
+        if (version_compare(PHP_VERSION, '8.1.0-dev', '<')) {
             self::markTestSkipped('Enums only testable in 8.1 or later');
         }
         $container = $this->getContainer();
@@ -241,7 +241,7 @@ trait ContainerBuilderTestTrait
 
     public function testHardcodedEnum(): void
     {
-        if (version_compare(PHP_VERSION, '8.1.0', '<')) {
+        if (version_compare(PHP_VERSION, '8.1.0-dev', '<')) {
             self::markTestSkipped('Enums only testable in 8.1 or later');
         }
         $container = $this->getContainer();
