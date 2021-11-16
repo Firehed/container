@@ -2,6 +2,20 @@
     "name": "firehed/container",
     "type": "library",
     "license": "MIT",
+    "description": "Dependency inversion container with advanced autowiring and compilation support. PSR-11 compliant.",
+    "keywords": [
+        "psr-11",
+        "psr11",
+        "container",
+        "container-interface",
+        "container-interop",
+        "autowire",
+        "di",
+        "ioc"
+    ],
+    "provide": {
+        "psr/container-implementation": "^1.0"
+    },
     "authors": [
         {
             "name": "Eric Stern",
