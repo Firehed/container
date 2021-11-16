@@ -96,11 +96,20 @@ The keys of the array will map to `$id`s that can be checked for existence with 
 It is **highly recommended** that class instances use their fully-qualified class name as an array key, and to additionally create a separate interface-to-implementation mapping.
 The latter will happen automatically when a key is the fully-qualified name of an `interface` and the value is a string that maps to a class name.
 
+### Examples
+
+The most concise examples are all part of the unit tests: [`tests/ValidDefinitions`](tests/ValidDefinitions).
+
 ### Simple values
 
 If a scalar or array is provided as a value, that value will be returned unmodified.
 
 **Exception**: if the value is a `string` AND the key is the name of a declared `interface`, it will automatically be treated as an interface-to-implementation mapping and processed as `InterfaceName::class => autowire(ImplementationName::class)`
+When doing so, you **SHOULD** write the mapping with a `::class` literal; e.g. `\Psr\Log\LoggerInterface::class => SomeLoggerImplementation::class`.
+This approach (as compared to strings) not only provides additional clarity when reading the file, but allows static analysis tools to detect some errors.
+
+Objects **may not** be directly provided as a value and **must** be provided as a closure; see below.
+This is because the compiler cannot create an actual object instance, and thus would only work in development mode.
 
 ### Closures
 
@@ -150,8 +159,21 @@ The following are all equivalent definitions:
 
 ```php
 <?php
+/**
+class MySpecialClass
+{
+}
+class MyOtherClass
+{
+    public function __construct(MySpecialClass $required)
+    {
+        // ...
+    }
+}
+*/
 return [
     MySpecialClass::class,
+    MyOtherClass::class,
 ];
 ```
 ```php
@@ -159,6 +181,7 @@ return [
 use function Firehed\Container\autowire;
 return [
     MySpecialClass::class => autowire(),
+    MyOtherClass::class => autowire(),
 ];
 ```
 ```php
@@ -166,6 +189,7 @@ return [
 use function Firehed\Container\autowire;
 return [
     MySpecialClass::class => autowire(MySpecialClass::class),
+    MyOtherClass::class => autowire(MyOtherClass::class),
 ];
 ```
 ```php
@@ -174,8 +198,12 @@ return [
     MySpecialClass::class => function () {
         return new MySpecialClass();
     },
+    MyOtherClass::class => function (ContainerInterface $c) {
+        return new MyOtherClass($c->get(MySpecialClass::class));
+    },
 ];
 ```
+
 ### `factory(?closure $body = null)`
 Use `factory` to return a new copy of the class or value every time it is accessed through `get()`
 
