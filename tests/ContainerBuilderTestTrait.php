@@ -235,7 +235,7 @@ trait ContainerBuilderTestTrait
         $container = $this->getContainer();
         assert($container->has(Fixtures\Environment::class));
         $expected = Fixtures\Environment::TESTING;
-        $actual = $c->get(Fixtures\Environment::class);
+        $actual = $container->get(Fixtures\Environment::class);
         $this->assertSame($expected, $actual, 'Dynamic enum value mismatched');
     }
 
@@ -247,7 +247,7 @@ trait ContainerBuilderTestTrait
         $container = $this->getContainer();
         assert($container->has('enum_hardcoded'));
         $expected = Fixtures\Environment::STAGING;
-        $actual = $c->get('enum_hardcoded');
+        $actual = $container->get('enum_hardcoded');
         $this->assertSame($expected, $actual, 'Hardcoded enum value mismatched');
     }
 
