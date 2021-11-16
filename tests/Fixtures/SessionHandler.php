@@ -40,6 +40,7 @@ class SessionHandler implements SessionIdInterface, SessionHandlerInterface
      * @param int $maxlifetime
      * @return int|false
      */
+    #[\ReturnTypeWillChange]
     public function gc($maxlifetime)
     {
         return 0;
