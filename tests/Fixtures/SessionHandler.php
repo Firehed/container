@@ -38,10 +38,11 @@ class SessionHandler implements SessionIdInterface, SessionHandlerInterface
 
     /**
      * @param int $maxlifetime
+     * @return int|false
      */
-    public function gc($maxlifetime): bool
+    public function gc($maxlifetime)
     {
-        return true;
+        return 0;
     }
 
     /**
