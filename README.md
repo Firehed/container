@@ -198,6 +198,9 @@ To use this, the following methods exist:
 
 These are roughly equivalent to e.g. `(int) getenv('SOME_ENV_VAR')`, with the exception that `asBool` will only allow values `0`, `1`, `"true"`, and `"false"` (case-insensitively).
 
+The default value (if defined) will only be provided if the environment variable is not defined at all.
+It will **not** be returned 
+
 **IMPORTANT**: Do not use `getenv` or `$_ENV` to access environment variables!
 If you do so, compiled containers will get the *compile-time* value set, which is almost certainly not the behavior you want.
 Instead, use the `env` wrapper, which will defer the access of the environment variable until the first time it is used.

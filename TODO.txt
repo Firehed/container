@@ -1,0 +1,2 @@
+- Warn if factories depend on non-factory services
+- Detect circuluar deps

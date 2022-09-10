@@ -57,8 +57,9 @@ class Compiler implements BuilderInterface
 
     public function addFile(string $file): void
     {
-        $this->logger->debug('Adding file {file}', ['file' => $file]);
+        $this->logger->info('Adding file {file}', ['file' => $file]);
         if ($this->exists) {
+            $this->logger->debug('Skipping defintion due to compiled file existing');
             return;
         }
         $defs = require $file;
@@ -138,10 +139,15 @@ class Compiler implements BuilderInterface
         }
 
         // makeFunctionBody fills in dependencies
+        $need = [];
         foreach ($this->dependencies as $name => $_) {
             if (!array_key_exists($name, $mappings)) {
-                throw new Exceptions\NotFound($name);
+                $need[] = $name;
+                // throw new Exceptions\NotFound($name);
             }
+        }
+        if ($need) {
+            throw new Exceptions\NotFound(implode(', ', $need));
         }
 
         $tpl  = "<?php\n";
