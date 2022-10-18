@@ -267,6 +267,7 @@ class Compiler implements BuilderInterface
     private function tryToMakePathWritable(string $destFile): void
     {
         $pathInfo = pathinfo($destFile);
+        assert(array_key_exists('dirname', $pathInfo));
 
         if (is_writable($pathInfo['dirname'])) {
             // Directory exists and is writable, should be ok.
