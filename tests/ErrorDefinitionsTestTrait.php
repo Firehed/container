@@ -32,6 +32,9 @@ trait ErrorDefinitionsTestTrait
         $builder = $this->getBuilder();
         $builder->addFile(__DIR__ . '/ErrorDefinitions/RequiredParams.php');
         $this->expectException(Exceptions\NotFound::class);
+        // Make sure messages are useful - #20
+        $this->expectExceptionMessage(\SessionIdInterface::class, 'NotFound should contain missing class name');
+        $this->expectExceptionMessage('$id', 'NotFound should contain constructor property name');
         $c = $builder->build();
         $c->get(Fixtures\SessionHandler::class);
     }
