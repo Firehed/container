@@ -142,7 +142,7 @@ class DevContainer implements TypedContainerInterface
                 }
                 $name = $type->getName();
                 if (!$this->has($name)) {
-                    throw new Exceptions\NotFound($param->getName());
+                    throw new Exceptions\AutowireNotFound($name, $param->getName(), $id);
                 }
                 $needed[] = (function ($c) use ($name) {
                     return $c->get($name);
