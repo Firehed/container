@@ -51,9 +51,9 @@ You may or may not agree, but it's important to document them to help you make a
 
   return [
       MyInterface::class => function ($c) {
-        return $c->get('use_mocks')
-            ? $c->get(MyImplementationMock::class)
-            : $c->get(MyImplementationReal::class);
+          return $c->get('use_mocks')
+              ? $c->get(MyImplementationMock::class)
+              : $c->get(MyImplementationReal::class);
       },
   ];
   ```
