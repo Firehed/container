@@ -7,7 +7,6 @@ use Closure;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
 use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use UnexpectedValueException;
@@ -28,7 +27,7 @@ use function realpath;
 
 class Compiler implements BuilderInterface
 {
-    /** @var class-string<ContainerInterface> */
+    /** @var class-string<TypedContainerInterface> */
     private $className;
 
     /** @var Compiler\CodeGeneratorInterface[] */
@@ -165,7 +164,7 @@ class Compiler implements BuilderInterface
         }
     }
 
-    public function build(): ContainerInterface
+    public function build(): TypedContainerInterface
     {
         $this->compile();
         require_once $this->path;
