@@ -49,6 +49,9 @@ trait ContainerBuilderTestTrait
         if (version_compare(PHP_VERSION, '7.4.0', '>=')) {
             $files[] = 'ShortClosures';
         }
+        if (version_compare(PHP_VERSION, '8.1.0-dev', '>=')) {
+            $files[] = 'Enums';
+        }
         return array_map(function ($name): string {
             return sprintf('%s/ValidDefinitions/%s.php', __DIR__, $name);
         }, $files);
@@ -224,6 +227,29 @@ trait ContainerBuilderTestTrait
         );
     }
 
+    public function testDynamicEnum(): void
+    {
+        if (version_compare(PHP_VERSION, '8.1.0-dev', '<')) {
+            self::markTestSkipped('Enums only testable in 8.1 or later');
+        }
+        $container = $this->getContainer();
+        assert($container->has(Fixtures\Environment::class));
+        $expected = Fixtures\Environment::TESTING;
+        $actual = $container->get(Fixtures\Environment::class);
+        $this->assertSame($expected, $actual, 'Dynamic enum value mismatched');
+    }
+
+    public function testHardcodedEnum(): void
+    {
+        if (version_compare(PHP_VERSION, '8.1.0-dev', '<')) {
+            self::markTestSkipped('Enums only testable in 8.1 or later');
+        }
+        $container = $this->getContainer();
+        assert($container->has('enum_hardcoded'));
+        $expected = Fixtures\Environment::STAGING;
+        $actual = $container->get('enum_hardcoded');
+        $this->assertSame($expected, $actual, 'Hardcoded enum value mismatched');
+    }
 
     /**
      * some_string => scalar_literal

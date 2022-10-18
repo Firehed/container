@@ -102,7 +102,7 @@ The most concise examples are all part of the unit tests: [`tests/ValidDefinitio
 
 ### Simple values
 
-If a scalar or array is provided as a value, that value will be returned unmodified.
+If a scalar, array, or Enum is provided as a value, that value will be returned unmodified.
 
 **Exception**: if the value is a `string` AND the key is the name of a declared `interface`, it will automatically be treated as an interface-to-implementation mapping and processed as `InterfaceName::class => autowire(ImplementationName::class)`
 When doing so, you **SHOULD** write the mapping with a `::class` literal; e.g. `\Psr\Log\LoggerInterface::class => SomeLoggerImplementation::class`.
