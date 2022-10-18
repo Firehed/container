@@ -5,11 +5,10 @@ namespace Firehed\Container;
 
 use Closure;
 use Exception;
-use Psr\Container;
 use ReflectionClass;
 use ReflectionNamedType;
 
-class DevContainer implements Container\ContainerInterface
+class DevContainer implements TypedContainerInterface
 {
     /** @var mixed[] */
     private $definitions;
@@ -23,20 +22,11 @@ class DevContainer implements Container\ContainerInterface
         $this->definitions = $definitions;
     }
 
-    /**
-     * Docblock types for interface adherence
-     * @param string $id
-     */
     public function has($id): bool
     {
         return array_key_exists($id, $this->definitions);
     }
 
-    /**
-     * Docblock types for interface adherence
-     * @param string $id
-     * @return mixed
-     */
     public function get($id)
     {
         if (array_key_exists($id, $this->evaluated)) {

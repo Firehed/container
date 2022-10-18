@@ -29,6 +29,34 @@ This is intended to reduce unpredictable behavior of services in concurrent envi
 - Annotations are not supported.
   In future versions, `@param` annotations _may_ be supported; `@Inject` will never be.
 
+### Design Opinions
+
+Like many autowiring DI containers, this has some opinionated design decisions.
+You may or may not agree, but it's important to document them to help you make an informed choice about whether this library is right for you.
+
+- This is based around having a distinct build/compile stage for your application's deployment process.
+  Implicit autowiring will NOT occur in the production-ready compiled container, which yields performance improvements.
+  Add the autowired class name to any definition file to explicitly wire it (`Foo::class,` is sufficient, see "Automatic autowiring" below).
+
+- Any `$id` that's a valid class string should return an instance of that class (or interface, enum).
+  As of 0.6, this is reflected in the provided type information: `->get($id)` has Generic information for PHPStan where if a `class-string` is detected, get returns that class.
+  This is not (currently) enforced at runtime, but be warned that e.g. `$container->get(LoggerInterface::class);` will be indicated as being a `LoggerInteface` to static analysis tools, and if the definition doesn't do that, you may get conflicts.
+
+- All files should always be included.
+  Do NOT skip files based on the environment.
+  Instead, definitions should be conditional.
+  Example:
+  ```php
+  <?php
+
+  return [
+      MyInterface::class => function ($c) {
+          return $c->get('use_mocks')
+              ? $c->get(MyImplementationMock::class)
+              : $c->get(MyImplementationReal::class);
+      },
+  ];
+  ```
 
 ## Installation
 

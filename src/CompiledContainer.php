@@ -3,9 +3,7 @@ declare(strict_types=1);
 
 namespace Firehed\Container;
 
-use Psr\Container\ContainerInterface;
-
-abstract class CompiledContainer implements ContainerInterface
+abstract class CompiledContainer implements TypedContainerInterface
 {
     /**
      * Tracks what $id keys correspond to factory definitions and must not be
@@ -26,18 +24,11 @@ abstract class CompiledContainer implements ContainerInterface
      */
     protected $mappings = [];
 
-    /**
-     * @param string $id
-     */
     public function has($id): bool
     {
         return array_key_exists($id, $this->mappings);
     }
 
-    /**
-     * @param string $id
-     * @return mixed
-     */
     public function get($id)
     {
         if (!$this->has($id)) {

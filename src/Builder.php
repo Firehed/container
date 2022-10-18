@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Firehed\Container;
 
-use Psr\Container\ContainerInterface;
 use Psr\Container\ContainerExceptionInterface;
 use UnexpectedValueException;
 
@@ -64,7 +63,7 @@ class Builder implements BuilderInterface
         return $output;
     }
 
-    public function build(): ContainerInterface
+    public function build(): TypedContainerInterface
     {
         if ($this->errors !== []) {
             throw $this->errors[0];
