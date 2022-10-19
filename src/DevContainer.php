@@ -5,8 +5,10 @@ namespace Firehed\Container;
 
 use Closure;
 use Exception;
+use Psr\Container\ContainerExceptionInterface;
 use ReflectionClass;
 use ReflectionNamedType;
+use Throwable;
 
 class DevContainer implements TypedContainerInterface
 {
@@ -28,6 +30,27 @@ class DevContainer implements TypedContainerInterface
     }
 
     public function get($id)
+    {
+        try {
+            return $this->doGet($id);
+        } catch (Throwable $e) {
+            if ($e instanceof Exceptions\ValueRetreivalException) {
+                $e->addId($id);
+            }
+            if ($e instanceof ContainerExceptionInterface) {
+                // If it's a known (i.e. internal) exception, rethrow it
+                throw $e;
+            }
+            // Repackage the error into something with a more helpful message
+            throw new Exceptions\ValueRetreivalException($id, $e);
+        }
+    }
+
+    /**
+     * @param string $id
+     * @return mixed
+     */
+    private function doGet($id)
     {
         if (array_key_exists($id, $this->evaluated)) {
             return $this->evaluated[$id];

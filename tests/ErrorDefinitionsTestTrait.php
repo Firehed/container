@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Firehed\Container;
 
+use Psr\Container\ContainerExceptionInterface;
 use SessionHandlerInterface;
 use SessionIdInterface;
 
@@ -83,5 +84,17 @@ trait ErrorDefinitionsTestTrait
         $this->expectException(Exceptions\AmbiguousMapping::class);
         $c = $builder->build();
         $c->get('hello');
+    }
+
+    public function testHandlingInternalError(): void
+    {
+        $builder = $this->getBuilder();
+        $builder->addFile(__DIR__ . '/ErrorDefinitions/ErrorException.php');
+        $this->expectException(ContainerExceptionInterface::class);
+        $this->expectExceptionMessage('api_service');
+        $this->expectExceptionMessage('api_host');
+        $this->expectExceptionMessage('api_url');
+        $c = $builder->build();
+        $c->get('api_service');
     }
 }
