@@ -75,7 +75,7 @@ PHP;
         if (!$type instanceof ReflectionNamedType || $type->isBuiltin()) {
             throw new UntypedValue($param->getName(), $this->class);
             // this would be good for non-builtins???
-            // throw new AutowireNotFound($type->getName(), $param->getName(), $this->class);
+            // throw NotFound::autowireMissing($type->getName(), $this->class, $param->getName());
         }
         /** @var class-string */
         $fqcn = $type->getName();
