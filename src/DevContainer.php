@@ -105,16 +105,16 @@ class DevContainer implements TypedContainerInterface
      * Returns a closure that takes the conatiner as its only argument and
      * returns the instantiated object
      */
-    private function autowire(string $id): Closure
+    private function autowire(string $class): Closure
     {
-        if (!class_exists($id)) {
-            throw new Exceptions\AmbiguousMapping($id);
+        if (!class_exists($class)) {
+            throw new Exceptions\AmbiguousMapping($class);
         }
-        $rc = new ReflectionClass($id);
+        $rc = new ReflectionClass($class);
 
         if (!$rc->hasMethod('__construct')) {
-            return (function () use ($id) {
-                return new $id();
+            return (function () use ($class) {
+                return new $class();
             })->bindTo(null);
         }
 
@@ -132,28 +132,28 @@ class DevContainer implements TypedContainerInterface
                 };
             } else {
                 if (!$param->hasType()) {
-                    throw new Exceptions\UntypedValue($param->getName(), $id);
+                    throw new Exceptions\UntypedValue($param->getName(), $class);
                 }
                 $type = $param->getType();
                 assert($type !== null);
                 assert($type instanceof ReflectionNamedType);
                 if ($type->isBuiltin()) {
-                    throw new Exceptions\UntypedValue($param->getName(), $id);
+                    throw new Exceptions\UntypedValue($param->getName(), $class);
                 }
                 $name = $type->getName();
                 if (!$this->has($name)) {
-                    throw new Exceptions\AutowireNotFound($name, $param->getName(), $id);
+                    throw new Exceptions\AutowireNotFound($name, $param->getName(), $class);
                 }
                 $needed[] = (function ($c) use ($name) {
                     return $c->get($name);
                 })->bindTo(null);
             }
         }
-        return (function ($container) use ($id, $needed) {
+        return (function ($container) use ($class, $needed) {
             $args = array_map(function ($arg) use ($container) {
                 return $arg($container);
             }, $needed);
-            return new $id(...$args);
+            return new $class(...$args);
         })->bindTo(null);
     }
 }
