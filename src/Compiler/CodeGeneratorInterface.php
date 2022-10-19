@@ -18,7 +18,7 @@ interface CodeGeneratorInterface
      * This method must return an array of strings which correspond to $id
      * values (typically FQCNs)
      *
-     * @return string[]
+     * @return class-string[]
      */
     public function getDependencies(): array;
 }

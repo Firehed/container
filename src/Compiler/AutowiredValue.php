@@ -15,7 +15,7 @@ class AutowiredValue implements CodeGeneratorInterface
     /** @var class-string FQCN */
     private $class;
 
-    /** @var string[] */
+    /** @var class-string[] */
     private $dependencies;
 
     /** @param class-string $classToAutowire */
