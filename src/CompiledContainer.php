@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace Firehed\Container;
 
+use Throwable;
+use Psr\Container\ContainerExceptionInterface;
+
 abstract class CompiledContainer implements TypedContainerInterface
 {
     /**
@@ -30,6 +33,27 @@ abstract class CompiledContainer implements TypedContainerInterface
     }
 
     public function get($id)
+    {
+        try {
+            return $this->doGet($id);
+        } catch (Throwable $e) {
+            if ($e instanceof Exceptions\ValueRetreivalException) {
+                $e->addId($id);
+            }
+            if ($e instanceof ContainerExceptionInterface) {
+                // If it's a known (i.e. internal) exception, rethrow it
+                throw $e;
+            }
+            // Repackage the error into something with a more helpful message
+            throw new Exceptions\ValueRetreivalException($id, $e);
+        }
+    }
+
+    /**
+     * @param string $id
+     * @return mixed
+     */
+    private function doGet($id)
     {
         if (!$this->has($id)) {
             throw new Exceptions\NotFound($id);
