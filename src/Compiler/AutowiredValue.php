@@ -8,6 +8,7 @@ use Firehed\Container\Exceptions\UntypedValue;
 use ReflectionClass;
 use ReflectionParameter;
 use ReflectionNamedType;
+use ReflectionType;
 
 class AutowiredValue implements CodeGeneratorInterface
 {
@@ -60,30 +61,25 @@ PHP;
         return $this->dependencies;
     }
 
-    private function isResolvableParam(ReflectionParameter $param): bool
-    {
-        if ($param->isOptional()) {
-            return true;
-        }
-        if ($param->hasType()) {
-            $type = $param->getType();
-            assert($type instanceof ReflectionNamedType);
-            return !$type->isBuiltin();
-        }
-        return false;
-    }
-
     private function getDefaultValue(ReflectionParameter $param): string
     {
-        if (!$this->isResolvableParam($param)) {
-            throw new UntypedValue($param->getName(), $this->class);
-        }
         if ($param->isOptional()) {
             return var_export($param->getDefaultValue(), true);
         }
+        if (!$param->hasType()) {
+            throw new UntypedValue($param->getName(), $this->class);
+        }
         $type = $param->getType();
-        assert($type instanceof ReflectionNamedType);
-        $this->dependencies[] = $type->getName();
+        assert($type instanceof ReflectionType);
+        // TODO: support ReflectionUnionType (#35), ReflectionIntersectionType (#36)?
+        if (!$type instanceof ReflectionNamedType || $type->isBuiltin()) {
+            throw new UntypedValue($param->getName(), $this->class);
+            // this would be good for non-builtins???
+            // throw new AutowireNotFound($type->getName(), $param->getName(), $this->class);
+        }
+        /** @var class-string */
+        $fqcn = $type->getName();
+        $this->dependencies[] = $fqcn;
         return sprintf(
             '$this->get(%s)',
             var_export($type->getName(), true)
