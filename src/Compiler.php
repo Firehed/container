@@ -33,7 +33,7 @@ class Compiler implements BuilderInterface
     /** @var Compiler\CodeGeneratorInterface[] */
     private $definitions = [];
 
-    /** @var array<string, true> */
+    /** @var array<class-string, class-string[]> */
     private $dependencies = [];
 
     /** @var ContainerExceptionInterface[] */
@@ -190,9 +190,9 @@ class Compiler implements BuilderInterface
         }
 
         // makeFunctionBody fills in dependencies
-        foreach ($this->dependencies as $name => $_) {
+        foreach ($this->dependencies as $name => $requirementSources) {
             if (!array_key_exists($name, $mappings)) {
-                throw new Exceptions\NotFound($name);
+                throw Exceptions\NotFound::autowireMissing($name, $requirementSources[0]);
             }
         }
 
@@ -237,7 +237,8 @@ class Compiler implements BuilderInterface
     ): string {
         $body = $definition->generateCode();
         foreach ($definition->getDependencies() as $dependency) {
-            $this->dependencies[$dependency] = true;
+            assert(class_exists($originalName) || interface_exists($originalName) || enum_exists($originalName));
+            $this->dependencies[$dependency][] = $originalName;
         }
         return sprintf(
             "// %s\nprotected function %s() { %s }",

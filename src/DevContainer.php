@@ -5,8 +5,10 @@ namespace Firehed\Container;
 
 use Closure;
 use Exception;
+use Psr\Container\ContainerExceptionInterface;
 use ReflectionClass;
 use ReflectionNamedType;
+use Throwable;
 
 class DevContainer implements TypedContainerInterface
 {
@@ -28,6 +30,27 @@ class DevContainer implements TypedContainerInterface
     }
 
     public function get($id)
+    {
+        try {
+            return $this->doGet($id);
+        } catch (Throwable $e) {
+            if ($e instanceof Exceptions\ValueRetreivalException) {
+                $e->addId($id);
+            }
+            if ($e instanceof ContainerExceptionInterface) {
+                // If it's a known (i.e. internal) exception, rethrow it
+                throw $e;
+            }
+            // Repackage the error into something with a more helpful message
+            throw new Exceptions\ValueRetreivalException($id, $e);
+        }
+    }
+
+    /**
+     * @param string $id
+     * @return mixed
+     */
+    private function doGet($id)
     {
         if (array_key_exists($id, $this->evaluated)) {
             return $this->evaluated[$id];
@@ -105,16 +128,16 @@ class DevContainer implements TypedContainerInterface
      * Returns a closure that takes the conatiner as its only argument and
      * returns the instantiated object
      */
-    private function autowire(string $id): Closure
+    private function autowire(string $class): Closure
     {
-        if (!class_exists($id)) {
-            throw new Exceptions\AmbiguousMapping($id);
+        if (!class_exists($class)) {
+            throw new Exceptions\AmbiguousMapping($class);
         }
-        $rc = new ReflectionClass($id);
+        $rc = new ReflectionClass($class);
 
         if (!$rc->hasMethod('__construct')) {
-            return (function () use ($id) {
-                return new $id();
+            return (function () use ($class) {
+                return new $class();
             })->bindTo(null);
         }
 
@@ -132,28 +155,28 @@ class DevContainer implements TypedContainerInterface
                 };
             } else {
                 if (!$param->hasType()) {
-                    throw new Exceptions\UntypedValue($param->getName(), $id);
+                    throw new Exceptions\UntypedValue($param->getName(), $class);
                 }
                 $type = $param->getType();
                 assert($type !== null);
                 assert($type instanceof ReflectionNamedType);
                 if ($type->isBuiltin()) {
-                    throw new Exceptions\UntypedValue($param->getName(), $id);
+                    throw new Exceptions\UntypedValue($param->getName(), $class);
                 }
                 $name = $type->getName();
                 if (!$this->has($name)) {
-                    throw new Exceptions\NotFound($param->getName());
+                    throw Exceptions\NotFound::autowireMissing($name, $class, $param->getName());
                 }
                 $needed[] = (function ($c) use ($name) {
                     return $c->get($name);
                 })->bindTo(null);
             }
         }
-        return (function ($container) use ($id, $needed) {
+        return (function ($container) use ($class, $needed) {
             $args = array_map(function ($arg) use ($container) {
                 return $arg($container);
             }, $needed);
-            return new $id(...$args);
+            return new $class(...$args);
         })->bindTo(null);
     }
 }
