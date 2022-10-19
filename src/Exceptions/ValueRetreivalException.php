@@ -34,11 +34,13 @@ class ValueRetreivalException extends RuntimeException implements ContainerExcep
             $history = '';
         }
 
+        $prev = $this->getPrevious();
+        assert($prev !== null);
         $this->message = sprintf(
             'Error getting "%s"%s: %s',
             $id,
             $history,
-            $this->getPrevious()->getMessage()
+            $prev->getMessage()
         );
     }
 
