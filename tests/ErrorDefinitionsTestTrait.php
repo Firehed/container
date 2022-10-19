@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Firehed\Container;
 
 use SessionHandlerInterface;
+use SessionIdInterface;
 
 trait ErrorDefinitionsTestTrait
 {
@@ -33,8 +34,8 @@ trait ErrorDefinitionsTestTrait
         $builder->addFile(__DIR__ . '/ErrorDefinitions/RequiredParams.php');
         $this->expectException(Exceptions\NotFound::class);
         // Make sure messages are useful - #20
-        $this->expectExceptionMessage(\SessionIdInterface::class, 'NotFound should contain missing class name');
-        $this->expectExceptionMessage('$id', 'NotFound should contain constructor property name');
+        $this->expectExceptionMessage(SessionIdInterface::class);
+        $this->expectExceptionMessage(Fixtures\SessionHandler::class);
         $c = $builder->build();
         $c->get(Fixtures\SessionHandler::class);
     }
