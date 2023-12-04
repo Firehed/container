@@ -128,6 +128,7 @@ The latter will happen automatically when a key is the fully-qualified name of a
 > [!NOTE]
 > The library output implements a `TypedContainerInterface`, which adds docblock generics readable by tools like PHPStan and Psalm to PSR-11.
 > It assumes you are following the above convention; not doing so could result in misleading output.
+> This has no effect at runtime, and only helps during the development and CI.
 
 ### Examples
 
