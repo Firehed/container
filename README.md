@@ -116,6 +116,10 @@ foreach (glob('config/*.php') as $definitionFile) {
 return $builder->build();
 ```
 
+> [!TIP]
+> If you're following the pattern above (config files in one directory), the `AutoDetect` class can do this for you.
+> See [Auto-detection](#auto-detection), below.
+
 ## Definition API
 
 All files added to the `BuilderInterface` must `return` an `array`.
@@ -334,3 +338,16 @@ return [
     'getenv' => 'whatever_value_is_in_your_current_environment',
 ];
 ```
+
+## Auto-detection
+
+If your software is following common conventions, the container bootstrapping can be greatly simplified:
+
+```php
+$container = \Firehed\Container\AutoDetect::from('config');
+```
+
+It will auto-detect your environment, looking at `ENVIRONMENT` or `ENV` environment variables, in that order.
+If it's any of `local`, `dev`, or `development` (case-insensitive), then it will use the dev container, which is not cached or compiled.
+Any other value will run the compilation process, writing the output to `AutoDetect::$compiledOutputPath = 'vendor/compiledConfig.php'`.
+You may change the output directory by changing that variable (be mindful of `getcwd()`!); the default writes into Composer's `vendor` directory since it's commonly `gitignore`d.

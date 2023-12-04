@@ -9,6 +9,8 @@ use UnexpectedValueException;
 
 class AutoDetect
 {
+    public static string $compiledOutputPath = 'vendor/compiledConfig.php';
+
     private static ?TypedContainerInterface $instance = null;
 
     private function __construct()
@@ -40,7 +42,7 @@ class AutoDetect
         if ($env === 'dev' || $env === 'development' || $env === 'local') {
             $builder = new Builder();
         } else {
-            $builder = new Compiler();
+            $builder = new Compiler(self::$compiledOutputPath);
         }
 
         $files = glob($directory . '/*.php');
