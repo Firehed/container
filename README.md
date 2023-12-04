@@ -79,7 +79,8 @@ The `Compiler` class will generate optimized code and write it to a file once, l
 Reflection for autowiring is only performed at compile-time, so this will run significantly faster than the dev container.
 However, whenever any definition changes (including constructor signatures of autowired classes), the file must be recompiled.
 
-It is **highly recommended** to a) use the `Compiler` implementation in non-dev environments, and b) compile the container during your build process.
+> [!TIP]
+> It is **highly recommended** to a) use the `Compiler` implementation in non-dev environments, and b) compile the container during your build process.
 
 #### Running the compiler
 
@@ -123,6 +124,10 @@ The keys of the array will map to `$id`s that can be checked for existence with 
 
 It is **highly recommended** that class instances use their fully-qualified class name as an array key, and to additionally create a separate interface-to-implementation mapping.
 The latter will happen automatically when a key is the fully-qualified name of an `interface` and the value is a string that maps to a class name.
+
+> [!NOTE]
+> The library output implements a `TypedContainerInterface`, which adds docblock generics readable by tools like PHPStan and Psalm to PSR-11.
+> It assumes you are following the above convention; not doing so could result in misleading output.
 
 ### Examples
 
@@ -180,6 +185,9 @@ Required parameters with value types (scalars, arrays, etc) are not supported an
 
 Optional parameters will always have their default value provided.
 
+> [!IMPORTANT]
+> Classes with any untyped constructor parameters, or those typed with `int/float/bool/array`, **cannot** be autowired.
+
 #### Automatic autowiring
 In the returned definition array, having a bare string value with no key will treat the value as a key to be autowired.
 
@@ -232,6 +240,8 @@ return [
 ];
 ```
 
+The topmost example is recommended for configuring any class that can be autowired.
+
 ### `factory(?closure $body = null)`
 Use `factory` to return a new copy of the class or value every time it is accessed through `get()`
 
@@ -251,11 +261,12 @@ To use this, the following methods exist:
 
 These are roughly equivalent to e.g. `(int) getenv('SOME_ENV_VAR')`, with the exception that `asBool` will only allow values `0`, `1`, `"true"`, and `"false"` (case-insensitively).
 
-**IMPORTANT**: Do not use `getenv` or `$_ENV` to access environment variables!
-If you do so, compiled containers will get the *compile-time* value set, which is almost certainly not the behavior you want.
-Instead, use the `env` wrapper, which will defer the access of the environment variable until the first time it is used.
-
-If *and only if* you want a value compiled in, you must use `getenv` directly.
+> [!WARNING]
+> Do not use `getenv` or `$_ENV` to access environment variables!
+> If you do so, compiled containers will get the *compile-time* value set, which is almost certainly not the behavior you want.
+> Instead, use the `env` wrapper, which will defer the access of the environment variable until the first time it is used.
+>
+> If *and only if* you want a value compiled in, you must use `getenv` directly.
 
 Source definitions like this:
 ```php
