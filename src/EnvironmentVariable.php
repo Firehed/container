@@ -5,12 +5,7 @@ namespace Firehed\Container;
 
 class EnvironmentVariable implements EnvironmentVariableInterface
 {
-    public const CAST_BOOL = 'bool';
-    public const CAST_ENUM = 'enum';
-    public const CAST_FLOAT = 'float';
-    public const CAST_INT = 'int';
-
-    /** @var self::CAST_* */
+    /** @var EnvironmentVariableInterface::CAST_* */
     private $cast = '';
     /** @var ?string */
     private $default;
