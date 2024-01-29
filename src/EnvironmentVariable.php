@@ -5,7 +5,7 @@ namespace Firehed\Container;
 
 class EnvironmentVariable implements EnvironmentVariableInterface
 {
-    /** @var EnvironmentVariableInterface::CAST_* */
+    /** @var EnvironmentVariableInterface::CAST_* | class-string<\BackedEnum> */
     private $cast = '';
     /** @var ?string */
     private $default;
@@ -52,7 +52,9 @@ class EnvironmentVariable implements EnvironmentVariableInterface
 
     public function asEnum(string $class): EnvironmentVariableInterface
     {
-        $this->cast = 'enum';
+        // if (!class_exists($class)) {
+        // }
+        $this->cast = $class;
         return $this;
     }
 

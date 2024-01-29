@@ -97,9 +97,9 @@ class DevContainer implements TypedContainerInterface
             }
             $cast = $value->getCast();
             switch ($cast) {
-                case '':
+                case EnvironmentVariableInterface::CAST_NONE:
                     return $envValue;
-                case 'bool':
+                case EnvironmentVariableInterface::CAST_BOOL:
                     switch (strtolower((string)$envValue)) {
                         case '1': // fallthrough
                         case 'true':
@@ -112,13 +112,17 @@ class DevContainer implements TypedContainerInterface
                             throw new \OutOfBoundsException('Invalid boolean value');
                     }
                     // comment line for phpcs, otherwise irrelevant
-                case 'int':
+                case EnvironmentVariableInterface::CAST_INT:
                     return (int) $envValue;
-                case 'float':
+                case EnvironmentVariableInterface::CAST_FLOAT:
                     return (float) $envValue;
                 default:
-                    throw new \DomainException('Invalid cast ' . $cast);
+                    // if (!class_exists($cast) || !class_im$cast instanceof \BackedEnum) {
+                    //     throw new \DomainException('Invalid cast ' . $cast);
+                    // }
+                    return $cast::from($envValue);
             }
+            // \PHPStan\dumpType($cast);
         }
 
         return $value;

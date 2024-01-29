@@ -8,7 +8,6 @@ use BadMethodCallException;
 interface EnvironmentVariableInterface
 {
     public const CAST_BOOL = 'bool';
-    public const CAST_ENUM = 'enum';
     public const CAST_FLOAT = 'float';
     public const CAST_INT = 'int';
     public const CAST_NONE = '';
@@ -26,9 +25,8 @@ interface EnvironmentVariableInterface
 
     /**
      * @internal
-     * Return the casting type: bool, int, float, or ''
-     *
-     * @return self::CAST_*
+     * Return the casting type: bool, int, float, '', or the class-string of
+     * a BackedEnum.
      */
     public function getCast(): string;
 
