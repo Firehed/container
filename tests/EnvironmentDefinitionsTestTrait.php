@@ -66,7 +66,7 @@ trait EnvironmentDefinitionsTestTrait
     {
         $container = $this->getContainer();
         self::assertTrue($container->has('env_asenum'));
-        self::assertSame(Fixtures\Environment::Testing, $container->get('env_asenum'));
+        self::assertSame(Fixtures\Environment::TESTING, $container->get('env_asenum'));
     }
 
     /**
