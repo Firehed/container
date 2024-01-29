@@ -62,6 +62,13 @@ trait EnvironmentDefinitionsTestTrait
         $this->assertNull($container->get('env_not_set_with_null_default'));
     }
 
+    public function testAsEnum(): void
+    {
+        // $container = $this->getContainer();
+        // self::assertTrue($container->has('env_asenum'));
+        // self::assertSame(Fixtures\Environment::TESTING, $container->get('env_asenum'));
+    }
+
     /**
      * @dataProvider casts
      * @param string $containerKey Access key
@@ -75,6 +82,7 @@ trait EnvironmentDefinitionsTestTrait
         putenv(self::$prefix . 'TRUE=true');
         putenv(self::$prefix . 'FALSE=false');
         putenv(self::$prefix . 'EMPTY=');
+        putenv(self::$prefix . 'ENV=testing');
         $container = $this->getContainer();
         $this->assertTrue($container->has($containerKey));
         $this->assertSame($expected, $container->get($containerKey));
@@ -107,6 +115,7 @@ trait EnvironmentDefinitionsTestTrait
             ['env_asfloat_one', 1.0],
             ['env_asfloat_zero', 0.0],
             ['env_asfloat_notset', 3.14],
+            ['env_asenum', Fixtures\Environment::TESTING],
         ];
     }
 }

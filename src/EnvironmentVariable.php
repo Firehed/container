@@ -3,9 +3,11 @@ declare(strict_types=1);
 
 namespace Firehed\Container;
 
+use InvalidArgumentException;
+
 class EnvironmentVariable implements EnvironmentVariableInterface
 {
-    /** @var string */
+    /** @var EnvironmentVariableInterface::CAST_* | class-string<\BackedEnum> */
     private $cast = '';
     /** @var ?string */
     private $default;
@@ -50,17 +52,25 @@ class EnvironmentVariable implements EnvironmentVariableInterface
         return $this;
     }
 
-
-    public function asInt(): EnvironmentVariableInterface
+    public function asEnum(string $class): EnvironmentVariableInterface
     {
-        $this->cast = 'int';
+        if (!class_exists($class)) {
+            throw new InvalidArgumentException(sprintf('Class for enum cast %s does not exist', $class));
+        }
+        // if !backedenum, fail
+        $this->cast = $class;
         return $this;
     }
-
 
     public function asFloat(): EnvironmentVariableInterface
     {
         $this->cast = 'float';
+        return $this;
+    }
+
+    public function asInt(): EnvironmentVariableInterface
+    {
+        $this->cast = 'int';
         return $this;
     }
 }

@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+use Firehed\Container\Fixtures\Environment;
+
 use function Firehed\Container\env;
 
 $prefix = 'CONTAINER_UNITTEST_';
@@ -36,4 +38,6 @@ return [
     'env_asfloat_one_point_five' => env($prefix . 'ONE_POINT_FIVE')->asFloat(),
     'env_asfloat_zero' => env($prefix . 'ZERO')->asFloat(),
     'env_asfloat_notset' => env($prefix . 'NOT_SET', '3.14')->asFloat(),
+
+    'env_asenum' => env($prefix . 'ENV')->asEnum(Environment::class),
 ];
