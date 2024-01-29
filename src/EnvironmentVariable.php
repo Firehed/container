@@ -50,17 +50,21 @@ class EnvironmentVariable implements EnvironmentVariableInterface
         return $this;
     }
 
-
-    public function asInt(): EnvironmentVariableInterface
+    public function asEnum(string $class): EnvironmentVariableInterface
     {
-        $this->cast = 'int';
+        $this->cast = 'enum';
         return $this;
     }
-
 
     public function asFloat(): EnvironmentVariableInterface
     {
         $this->cast = 'float';
+        return $this;
+    }
+
+    public function asInt(): EnvironmentVariableInterface
+    {
+        $this->cast = 'int';
         return $this;
     }
 }
