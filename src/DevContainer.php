@@ -117,12 +117,8 @@ class DevContainer implements TypedContainerInterface
                 case EnvironmentVariableInterface::CAST_FLOAT:
                     return (float) $envValue;
                 default:
-                    // if (!class_exists($cast) || !class_im$cast instanceof \BackedEnum) {
-                    //     throw new \DomainException('Invalid cast ' . $cast);
-                    // }
                     return $cast::from($envValue);
             }
-            // \PHPStan\dumpType($cast);
         }
 
         return $value;
