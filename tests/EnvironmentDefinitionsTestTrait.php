@@ -64,9 +64,9 @@ trait EnvironmentDefinitionsTestTrait
 
     public function testAsEnum(): void
     {
-        $container = $this->getContainer();
-        self::assertTrue($container->has('env_asenum'));
-        self::assertSame(Fixtures\Environment::TESTING, $container->get('env_asenum'));
+        // $container = $this->getContainer();
+        // self::assertTrue($container->has('env_asenum'));
+        // self::assertSame(Fixtures\Environment::TESTING, $container->get('env_asenum'));
     }
 
     /**
@@ -115,6 +115,7 @@ trait EnvironmentDefinitionsTestTrait
             ['env_asfloat_one', 1.0],
             ['env_asfloat_zero', 0.0],
             ['env_asfloat_notset', 3.14],
+            ['env_asenum', Fixtures\Environment::TESTING],
         ];
     }
 }
