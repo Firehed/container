@@ -62,6 +62,13 @@ trait EnvironmentDefinitionsTestTrait
         $this->assertNull($container->get('env_not_set_with_null_default'));
     }
 
+    public function testAsEnum(): void
+    {
+        $container = $this->getContainer();
+        self::assertTrue($container->has('env_asenum'));
+        self::assertSame(Fixtures\Environment::Testing, $container->get('env_asenum'));
+    }
+
     /**
      * @dataProvider casts
      * @param string $containerKey Access key
@@ -75,6 +82,7 @@ trait EnvironmentDefinitionsTestTrait
         putenv(self::$prefix . 'TRUE=true');
         putenv(self::$prefix . 'FALSE=false');
         putenv(self::$prefix . 'EMPTY=');
+        putenv(self::$prefix . 'ENV=testing');
         $container = $this->getContainer();
         $this->assertTrue($container->has($containerKey));
         $this->assertSame($expected, $container->get($containerKey));
