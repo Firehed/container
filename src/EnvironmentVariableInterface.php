@@ -9,9 +9,14 @@ interface EnvironmentVariableInterface
 {
     public function asBool(): EnvironmentVariableInterface;
 
-    public function asInt(): EnvironmentVariableInterface;
-
     public function asFloat(): EnvironmentVariableInterface;
+
+    /**
+     * @param class-string<\BackedEnum> $class
+     */
+    public function asEnum(string $class): EnvironmentVariableInterface;
+
+    public function asInt(): EnvironmentVariableInterface;
 
     /**
      * @internal
