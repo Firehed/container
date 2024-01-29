@@ -35,12 +35,10 @@ PHP;
     private function castBody(): string
     {
         $cast = $this->env->getCast();
-        if ($cast === '') {
+        if ($cast === EnvironmentVariableInterface::CAST_NONE) {
             return 'return $value;';
-        } elseif ($cast !== 'bool') {
-            return sprintf('return (%s)$value;', $cast);
-        }
-        return <<<PHP
+        } elseif ($cast === EnvironmentVariableInterface::CAST_BOOL) {
+            return <<<PHP
 switch (strtolower(\$value)) {
     case '1':  // fallthrough
     case 'true':
@@ -53,6 +51,14 @@ switch (strtolower(\$value)) {
         throw new \OutOfBoundsException('Invalid boolean value');
 }
 PHP;
+        } elseif ($cast === EnvironmentVariableInterface::CAST_INT) {
+            return sprintf('return (%s)$value;', $cast);
+        } elseif ($cast === EnvironmentVariableInterface::CAST_FLOAT) {
+            return sprintf('return (%s)$value;', $cast);
+        } else {
+            // class-string<BackedEnum>
+            return sprintf('return %s::from($value);', $cast);
+        }
     }
 
     private function getDefaultBody(): string
