@@ -25,7 +25,7 @@ trait ContainerBuilderTestTrait
     public function getContainer(): ContainerInterface
     {
         $builder = $this->getBuilder();
-        foreach ($this->getDefinitionFiles() as $file) {
+        foreach (self::getDefinitionFiles() as $file) {
             $builder->addFile($file);
         }
         return $builder->build();
