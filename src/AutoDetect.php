@@ -15,7 +15,9 @@ class AutoDetect
 
     /** @var ?TypedContainerInterface */
     private static $instance = null;
-    private static string $instanceDirectory;
+
+    /** @var string */
+    private static $instanceDirectory;
 
     private function __construct()
     {
