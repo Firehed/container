@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Firehed\Container;
 
+use InvalidArgumentException;
 use RuntimeException;
 use UnexpectedValueException;
 
@@ -18,6 +19,7 @@ class AutoDetect
     private function __construct()
     {
     }
+
     /**
      * Imports all definitions in the directory provided, and builds into
      * a container.
@@ -29,7 +31,7 @@ class AutoDetect
     public static function from(string $directory): TypedContainerInterface
     {
         if ($directory === '') {
-            throw new UnexpectedValueException('Directory is empty. Did you mean "."?');
+            throw new InvalidArgumentException('Directory is empty. Did you mean "."?');
         }
 
         $env = getenv('ENVIRONMENT');
@@ -61,9 +63,10 @@ class AutoDetect
         return $builder->build();
     }
 
-
     /**
-     * Singleton wrapper for ::from($directory)
+     * Singleton wrapper for ::from($directory). While you should use the
+     * container to manage object instances, it's possible to run into subtle
+     * issues if there are multiple instances of the container itself
      */
     public static function instance(string $directory): TypedContainerInterface
     {
