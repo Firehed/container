@@ -9,6 +9,7 @@ use PhpParser\{
     NodeVisitor\NameResolver,
     NodeVisitorAbstract,
     ParserFactory,
+    PhpVersion,
     PrettyPrinter\Standard,
 };
 use ReflectionFunction;
@@ -52,7 +53,7 @@ class ClosureValue implements CodeGeneratorInterface
         $visitor = new ClosureVisitor($startLine, $endLine);
 
         $parser = (new ParserFactory())
-            ->create(ParserFactory::PREFER_PHP7);
+            ->createForVersion(PhpVersion::fromString('7.0'));
 
         $ast = $parser->parse($code);
         assert($ast !== null);
