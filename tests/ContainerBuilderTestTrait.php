@@ -25,7 +25,7 @@ trait ContainerBuilderTestTrait
     public function getContainer(): ContainerInterface
     {
         $builder = $this->getBuilder();
-        foreach ($this->getDefinitionFiles() as $file) {
+        foreach (self::getDefinitionFiles() as $file) {
             $builder->addFile($file);
         }
         return $builder->build();
@@ -34,7 +34,7 @@ trait ContainerBuilderTestTrait
     abstract protected function getBuilder(): BuilderInterface;
 
     /** @return string[] */
-    private function getDefinitionFiles(): array
+    private static function getDefinitionFiles(): array
     {
         $files = [
             'Environment',
@@ -326,7 +326,7 @@ trait ContainerBuilderTestTrait
     // Data Providers
 
     /** @return mixed[][] */
-    public function scalarLiterals(): array
+    public static function scalarLiterals(): array
     {
         return [
             ['string_literal', 'UnitTest'],
