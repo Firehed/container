@@ -35,10 +35,10 @@ class AutoDetect
         }
 
         $env = getenv('ENVIRONMENT');
-        if ($env === false) {
+        if ($env === false || $env === '') {
             $env = getenv('ENV');
         }
-        if ($env === false) {
+        if ($env === false || $env === '') {
             throw new UnexpectedValueException('Could not find an environment name in ENVIRONMENT or ENV');
         }
 
