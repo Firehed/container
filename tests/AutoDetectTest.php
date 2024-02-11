@@ -60,6 +60,35 @@ class AutoDetectTest extends TestCase
         self::assertNotSame($c, $c2, 'Should not be same instance');
     }
 
+    /**
+     * @dataProvider from
+     * @param class-string<TypedContainerInterface> $expected
+     * @runInSeparateProcess
+     */
+    public function testInstance(string $env, string $expected): void
+    {
+        putenv('ENVIRONMENT=' . $env);
+        $c = AutoDetect::instance('./tests/ValidDefinitions');
+        $c2 = AutoDetect::instance('./tests/ValidDefinitions');
+        self::assertInstanceOf($expected, $c);
+        self::assertSame($c, $c2);
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testInstanceMisuse(): void
+    {
+        putenv('ENVIRONMENT=whatever');
+        AutoDetect::instance('./tests/ValidDefinitions');
+        self::expectException(LogicException::class);
+        self::expectExceptionMessage('Instance must receive the same directory each time');
+        AutoDetect::instance('./tests/ErrorDefinitions');
+    }
+
+    /**
+     * @return array{string, class-string<TypedContainerInterface>}[]
+     */
     public static function from(): array
     {
         return [

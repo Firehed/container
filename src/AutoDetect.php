@@ -15,6 +15,7 @@ class AutoDetect
 
     /** @var ?TypedContainerInterface */
     private static $instance = null;
+    private static string $instanceDirectory;
 
     private function __construct()
     {
@@ -72,6 +73,10 @@ class AutoDetect
     {
         if (self::$instance === null) {
             self::$instance = self::from($directory);
+            self::$instanceDirectory = $directory;
+        } elseif ($directory !== self::$instanceDirectory) {
+            // You're gonna have a bad time.
+            throw new InvalidArgumentException('Instance must receive the same directory each time');
         }
         return self::$instance;
     }
