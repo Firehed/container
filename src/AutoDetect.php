@@ -22,7 +22,7 @@ class AutoDetect
 
     /**
      * Imports all definitions in the directory provided, and builds into
-     * a container.
+     * a container. This path is relative to your current working directory.
      *
      * This will look for common environment naming conventions and use either
      * the dynamic or compiled config builder based on whether a development
