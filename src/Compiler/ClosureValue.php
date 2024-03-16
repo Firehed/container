@@ -7,10 +7,8 @@ use Closure;
 use PhpParser\{
     NodeTraverser,
     NodeVisitor\NameResolver,
-    NodeVisitorAbstract,
-    ParserFactory,
-    PhpVersion,
-    PrettyPrinter\Standard,
+    // NodeVisitorAbstract,
+    // PrettyPrinter\Standard,
 };
 use ReflectionFunction;
 use UnexpectedValueException;
@@ -52,8 +50,7 @@ class ClosureValue implements CodeGeneratorInterface
 
         $visitor = new ClosureVisitor($startLine, $endLine);
 
-        $parser = (new ParserFactory())
-            ->createForVersion(PhpVersion::fromString('7.0'));
+        $parser = ParserLoader::getParser();
 
         $ast = $parser->parse($code);
         assert($ast !== null);

@@ -222,8 +222,7 @@ class Compiler implements BuilderInterface
 
     private function prettyPrint(string $code): string
     {
-        $parser = (new ParserFactory())
-            ->createForVersion(PhpVersion::fromString('7.0'));
+        $parser = Compiler\ParserLoader::getParser();
         $ast = $parser->parse($code);
 
         $printer = new Standard(['shortArraySyntax' => true]);
