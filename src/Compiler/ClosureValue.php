@@ -7,8 +7,6 @@ use Closure;
 use PhpParser\{
     NodeTraverser,
     NodeVisitor\NameResolver,
-    // NodeVisitorAbstract,
-    // PrettyPrinter\Standard,
 };
 use ReflectionFunction;
 use UnexpectedValueException;
