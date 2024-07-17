@@ -45,10 +45,8 @@ trait ContainerBuilderTestTrait
             'Closures',
             'NoParams',
             'ScalarParams',
+            'ShortClosures',
         ];
-        if (version_compare(PHP_VERSION, '7.4.0', '>=')) {
-            $files[] = 'ShortClosures';
-        }
         if (version_compare(PHP_VERSION, '8.1.0-dev', '>=')) {
             $files[] = 'Enums';
         }
@@ -213,9 +211,6 @@ trait ContainerBuilderTestTrait
 
     public function testShortClosureThatUsesContainer(): void
     {
-        if (version_compare(PHP_VERSION, '7.4.0', '<')) {
-            self::markTestSkipped('Short closures only testable in 7.4 or later');
-        }
         $container = $this->getContainer();
         assert($container->has('valueForShortClosure'));
         $expected = $container->get('valueForShortClosure');
