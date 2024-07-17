@@ -11,8 +11,6 @@ use Psr\Container\NotFoundExceptionInterface;
 use SessionHandlerInterface;
 use SessionIdInterface;
 
-use function version_compare;
-
 /**
  * This is a test trait to help ensure all processes end up with the same
  * results. These are primarily integration tests, not unit tests.
@@ -45,13 +43,9 @@ trait ContainerBuilderTestTrait
             'Closures',
             'NoParams',
             'ScalarParams',
+            'ShortClosures',
+            'Enums',
         ];
-        if (version_compare(PHP_VERSION, '7.4.0', '>=')) {
-            $files[] = 'ShortClosures';
-        }
-        if (version_compare(PHP_VERSION, '8.1.0-dev', '>=')) {
-            $files[] = 'Enums';
-        }
         return array_map(function ($name): string {
             return sprintf('%s/ValidDefinitions/%s.php', __DIR__, $name);
         }, $files);
@@ -213,9 +207,6 @@ trait ContainerBuilderTestTrait
 
     public function testShortClosureThatUsesContainer(): void
     {
-        if (version_compare(PHP_VERSION, '7.4.0', '<')) {
-            self::markTestSkipped('Short closures only testable in 7.4 or later');
-        }
         $container = $this->getContainer();
         assert($container->has('valueForShortClosure'));
         $expected = $container->get('valueForShortClosure');
@@ -229,9 +220,6 @@ trait ContainerBuilderTestTrait
 
     public function testDynamicEnum(): void
     {
-        if (version_compare(PHP_VERSION, '8.1.0-dev', '<')) {
-            self::markTestSkipped('Enums only testable in 8.1 or later');
-        }
         $container = $this->getContainer();
         assert($container->has(Fixtures\Environment::class));
         $expected = Fixtures\Environment::TESTING;
@@ -241,9 +229,6 @@ trait ContainerBuilderTestTrait
 
     public function testHardcodedEnum(): void
     {
-        if (version_compare(PHP_VERSION, '8.1.0-dev', '<')) {
-            self::markTestSkipped('Enums only testable in 8.1 or later');
-        }
         $container = $this->getContainer();
         assert($container->has('enum_hardcoded'));
         $expected = Fixtures\Environment::STAGING;
