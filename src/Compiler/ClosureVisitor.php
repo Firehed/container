@@ -18,12 +18,9 @@ use PhpParser\{
  */
 class ClosureVisitor extends NodeVisitorAbstract
 {
-    /** @var int */
-    private $startLine;
-    /** @var int */
-    private $endLine;
-    /** @var string */
-    private $code = '';
+    private int $startLine;
+    private int $endLine;
+    private string $code = '';
 
     public function __construct(int $startLine, int $endLine)
     {

@@ -13,19 +13,19 @@ abstract class CompiledContainer implements TypedContainerInterface
      * cached
      * @var array<string, true>
      */
-    protected $factories = [];
+    protected array $factories = [];
 
     /**
      * Holds computed values from non-factory definitions
      * @var array<string, mixed>
      */
-    private $values = [];
+    private array $values = [];
 
     /**
      * Maps $id keys to the internal function
      * @var array<string, string>
      */
-    protected $mappings = [];
+    protected array $mappings = [];
 
     public function has($id): bool
     {

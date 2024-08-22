@@ -14,8 +14,7 @@ class CompilerTest extends \PHPUnit\Framework\TestCase
 {
     use ContainerBuilderTestTrait;
 
-    /** @var string */
-    private $file;
+    private string $file;
 
     public function setUp(): void
     {

@@ -10,14 +10,11 @@ use UnexpectedValueException;
 
 class AutoDetect
 {
-    /** @var string */
-    public static $compiledOutputPath = 'vendor/compiledConfig.php';
+    public static string $compiledOutputPath = 'vendor/compiledConfig.php';
 
-    /** @var ?TypedContainerInterface */
-    private static $instance = null;
+    private static ?TypedContainerInterface $instance = null;
 
-    /** @var string */
-    private static $instanceDirectory;
+    private static string $instanceDirectory;
 
     private function __construct()
     {

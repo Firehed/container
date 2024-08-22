@@ -5,12 +5,7 @@ namespace Firehed\Container\Fixtures;
 
 class ConstructorUntyped
 {
-    /** @var mixed */
-    private $var;
-
-    /** @param mixed $var */
-    public function __construct($var)
+    public function __construct(private mixed $var)
     {
-        $this->var = $var;
     }
 }

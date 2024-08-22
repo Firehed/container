@@ -5,14 +5,13 @@ namespace Firehed\Container;
 
 class EnvironmentVariable implements EnvironmentVariableInterface
 {
-    /** @var string */
-    private $cast = '';
-    /** @var ?string */
-    private $default;
-    /** @var bool */
-    private $hasDefault;
-    /** @var string */
-    private $name;
+    private string $cast = '';
+
+    private ?string $default;
+
+    private bool $hasDefault;
+
+    private string $name;
 
     public function __construct(string $name, ?string $default = null)
     {

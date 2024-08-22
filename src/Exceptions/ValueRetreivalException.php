@@ -13,7 +13,7 @@ class ValueRetreivalException extends RuntimeException implements ContainerExcep
     /**
      * @var string[]
      */
-    private $idHistory;
+    private array $idHistory;
 
     public function __construct(string $id, Throwable $prev)
     {
