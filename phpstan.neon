@@ -7,3 +7,6 @@ parameters:
         - '#^Dynamic call to static method PHPUnit\\Framework\\Assert::assert#'
         - '#^Property .* is never read, only written.$#'
     level: max
+    paths:
+        - src
+        - tests
