@@ -9,7 +9,7 @@ namespace Firehed\Container\Compiler;
 class ProxyValue implements CodeGeneratorInterface
 {
     /** @var class-string */
-    private $class;
+    private string $class;
 
     /**
      * @param class-string $interfaceName

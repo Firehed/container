@@ -12,16 +12,13 @@ use function sprintf;
 class EnvironmentVariable implements EnvironmentVariableInterface
 {
     /** @var EnvironmentVariableInterface::CAST_* | class-string<\BackedEnum> */
-    private $cast = EnvironmentVariableInterface::CAST_NONE;
-    private ?string $default;
-    private bool $hasDefault;
-    private string $name;
+    private string $cast = EnvironmentVariableInterface::CAST_NONE;
 
-    public function __construct(string $name, ?string $default = null)
+    private bool $hasDefault;
+
+    public function __construct(private string $name, private ?string $default = null)
     {
-        $this->name = $name;
         $this->hasDefault = func_num_args() === 2;
-        $this->default = $default;
     }
 
     public function getName(): string

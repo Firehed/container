@@ -8,10 +8,7 @@ use Psr\Container\ContainerExceptionInterface;
 trait EnvironmentDefinitionsTestTrait
 {
     // Want const, traits can't have them
-    /**
-     * @var string
-     */
-    private static $prefix = 'CONTAINER_UNITTEST_';
+    private static string $prefix = 'CONTAINER_UNITTEST_';
 
     /**
      * This test demonstrates a counterexample/compile-time value

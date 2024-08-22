@@ -18,12 +18,8 @@ class ClosureValue implements CodeGeneratorInterface
     // for now.
     use NoDependenciesTrait;
 
-    /** @var Closure */
-    private $closure;
-
-    public function __construct(Closure $closure)
+    public function __construct(private Closure $closure)
     {
-        $this->closure = $closure;
     }
 
     /**

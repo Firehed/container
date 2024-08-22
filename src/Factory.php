@@ -7,17 +7,15 @@ use Closure;
 
 class Factory implements FactoryInterface
 {
-    /** @var ?Closure */
-    private $def;
-
-    public function __construct(?Closure $def)
+    public function __construct(private ?Closure $def)
     {
-        $this->def = $def;
     }
+
     public function hasDefinition(): bool
     {
         return $this->def !== null;
     }
+
     public function getDefinition(): Closure
     {
         assert($this->def !== null);

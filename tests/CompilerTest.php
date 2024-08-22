@@ -14,8 +14,7 @@ class CompilerTest extends \PHPUnit\Framework\TestCase
 {
     use ContainerBuilderTestTrait;
 
-    /** @var string */
-    private $file;
+    private string $file;
 
     public function setUp(): void
     {
@@ -38,6 +37,7 @@ class CompilerTest extends \PHPUnit\Framework\TestCase
         {
             /**
              * @inheritdoc
+             * @param string|\Stringable $message
              * @param mixed[] $context
              */
             public function log($level, string|\Stringable $message, array $context = []): void

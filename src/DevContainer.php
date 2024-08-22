@@ -13,15 +13,11 @@ use Throwable;
 class DevContainer implements TypedContainerInterface
 {
     /** @var mixed[] */
-    private $definitions;
-
-    /** @var mixed[] */
     private $evaluated = [];
 
     /** @param mixed[] $definitions */
-    public function __construct(array $definitions)
+    public function __construct(private array $definitions)
     {
-        $this->definitions = $definitions;
     }
 
     public function has($id): bool

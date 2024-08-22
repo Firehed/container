@@ -5,12 +5,8 @@ namespace Firehed\Container\Fixtures;
 
 class OptionalScalarParam
 {
-    /** @var ?string */
-    private $param;
-
-    public function __construct(string $param = null)
+    public function __construct(private ?string $param = null)
     {
-        $this->param = $param;
     }
 
     public function getParam(): ?string
