@@ -38,6 +38,7 @@ class CompilerTest extends \PHPUnit\Framework\TestCase
         {
             /**
              * @inheritdoc
+             * @param string|\Stringable $message
              * @param mixed[] $context
              */
             public function log($level, $message, array $context = []): void
