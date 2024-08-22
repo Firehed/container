@@ -5,6 +5,10 @@ namespace Firehed\Container;
 
 use InvalidArgumentException;
 
+use function enum_exists;
+use function func_num_args;
+use function sprintf;
+
 class EnvironmentVariable implements EnvironmentVariableInterface
 {
     /** @var EnvironmentVariableInterface::CAST_* | class-string<\BackedEnum> */
@@ -54,7 +58,7 @@ class EnvironmentVariable implements EnvironmentVariableInterface
 
     public function asEnum(string $class): EnvironmentVariableInterface
     {
-        if (!class_exists($class)) {
+        if (!enum_exists($class)) {
             throw new InvalidArgumentException(sprintf('Class for enum cast %s does not exist', $class));
         }
         // if !backedenum, fail
