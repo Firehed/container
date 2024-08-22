@@ -1,7 +1,9 @@
 # Container
 A PSR-11 compliant Dependency Inversion Container
 
-[![Build Status](https://github.com/Firehed/container/workflows/Test/badge.svg?branch=main)](https://github.com/Firehed/container/actions?query=workflow%3ATest+branch%3Amain)
+[![Test](https://github.com/Firehed/container/actions/workflows/test.yml/badge.svg)](https://github.com/Firehed/container/actions/workflows/test.yml)
+[![Static analysis](https://github.com/Firehed/container/actions/workflows/static-analysis.yml/badge.svg)](https://github.com/Firehed/container/actions/workflows/static-analysis.yml)
+[![Lint](https://github.com/Firehed/container/actions/workflows/lint.yml/badge.svg)](https://github.com/Firehed/container/actions/workflows/lint.yml)
 [![Packagist](https://img.shields.io/packagist/v/firehed/container.svg)](https://packagist.org/packages/firehed/container)
 
 ## Why another container implementation?
