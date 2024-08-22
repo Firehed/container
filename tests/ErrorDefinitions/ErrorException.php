@@ -14,8 +14,10 @@ return [
         // contained a different value.
         $url = '/relativePath';
         $parts = parse_url($url);
-        // @phpstan-ignore-next-line (intentional error)
-        return $parts['host'];
+        // Simulate array offset ($parts['host']) being converted to
+        // ErrorException. Newer PHPUnit sometimes swallows error->exception
+        // conversion, so we're explicitly throwing it.
+        throw new ErrorException('Undefined array offset..', 0, E_WARNING);
     },
 
     'api_url' => function ($c) {

@@ -89,7 +89,7 @@ trait EnvironmentDefinitionsTestTrait
     }
 
     /** @return string[][] */
-    public function envVarsThatAreSet(): array
+    public static function envVarsThatAreSet(): array
     {
         return [
             ['env_set'],
@@ -99,7 +99,7 @@ trait EnvironmentDefinitionsTestTrait
     }
 
     /** @return mixed[][] */
-    public function casts(): array
+    public static function casts(): array
     {
         return [
             ['env_asbool_one', true],

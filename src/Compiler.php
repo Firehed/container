@@ -5,6 +5,7 @@ namespace Firehed\Container;
 
 use Closure;
 use PhpParser\ParserFactory;
+use PhpParser\PhpVersion;
 use PhpParser\PrettyPrinter\Standard;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Log\LoggerInterface;
@@ -221,8 +222,7 @@ class Compiler implements BuilderInterface
 
     private function prettyPrint(string $code): string
     {
-        $parser = (new ParserFactory())
-            ->create(ParserFactory::PREFER_PHP7);
+        $parser = Compiler\ParserLoader::getParser();
         $ast = $parser->parse($code);
 
         $printer = new Standard(['shortArraySyntax' => true]);
