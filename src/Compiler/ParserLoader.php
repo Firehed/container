@@ -17,7 +17,7 @@ class ParserLoader
         $factory = new ParserFactory();
         if (method_exists($factory, 'createForVersion')) { // @phpstan-ignore-line
             // v5
-            return $factory->createForVersion(PhpVersion::fromString('7.0'));
+            return $factory->createForVersion(PhpVersion::fromString('8.1'));
         } else {
             // v4
             assert(method_exists($factory, 'create'));
