@@ -352,6 +352,13 @@ return [
         }
         return (float)$value;
     },
+    'some_enum' => function () {
+        $value = getenv('SOME_ENUM');
+        if ($value === false) {
+            throw new Firehed\Container\Exceptions\EnvironmentVariableNotSet('SOME_ENUM');
+        }
+        return MyEnum::from($value);
+    },
 
     // Counterexample!
     'getenv' => 'whatever_value_is_in_your_current_environment',
