@@ -8,12 +8,8 @@ use SessionIdInterface;
 
 class SessionHandler implements SessionIdInterface, SessionHandlerInterface
 {
-    /** @var SessionIdInterface */
-    private $id;
-
-    public function __construct(SessionIdInterface $id)
+    public function __construct(private SessionIdInterface $id)
     {
-        $this->id = $id;
     }
 
     public function close(): bool

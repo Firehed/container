@@ -5,10 +5,7 @@ namespace Firehed\Container\Fixtures;
 
 class ConstructorScalar
 {
-    /** @var string */
-    private $string;
-    public function __construct(string $string)
+    public function __construct(private string $string)
     {
-        $this->string = $string;
     }
 }
