@@ -29,4 +29,10 @@ return [
     'somethingUsingAliasedName' => function ($c) {
         return $c->get(EI::class);
     },
+
+    'somethingWithMatch' => fn ($c) => match ($c->get('string_literal')) {
+        'UnitTest' => 'foobar',
+        'other' => 'bar',
+        default => 'baz',
+    },
 ];
