@@ -295,6 +295,13 @@ trait ContainerBuilderTestTrait
         $container->get('key_that_does_not_exist');
     }
 
+    public function testClosureUsingMatch(): void
+    {
+        $container = $this->getContainer();
+        $value = $container->get('somethingWithMatch');
+        self::assertIsString($value);
+    }
+
     /**
      * @covers \Firehed\Container\Compiler\ClosureValue
      * @covers \Firehed\Container\Compiler\ClosureVisitor
