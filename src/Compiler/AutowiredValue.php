@@ -12,17 +12,13 @@ use ReflectionType;
 
 class AutowiredValue implements CodeGeneratorInterface
 {
-    /** @var class-string FQCN */
-    private string $class;
-
     /** @var class-string[] */
     private $dependencies;
 
     /** @param class-string $classToAutowire */
-    public function __construct(string $classToAutowire)
+    public function __construct(private string $classToAutowire)
     {
         assert(class_exists($classToAutowire));
-        $this->class = $classToAutowire;
     }
 
     public function generateCode(): string
@@ -31,7 +27,7 @@ class AutowiredValue implements CodeGeneratorInterface
         // runtimeexception to be thrown
         $this->dependencies = [];
 
-        $rc = new ReflectionClass($this->class);
+        $rc = new ReflectionClass($this->classToAutowire);
         $args = [];
         if ($rc->hasMethod('__construct')) {
             $argClasses = [];
@@ -46,7 +42,7 @@ class AutowiredValue implements CodeGeneratorInterface
         $argInfo = implode(', ', $args);
 
         $code = <<<PHP
-    return new {$this->class}(
+    return new {$this->classToAutowire}(
         $argInfo
     );
 PHP;
@@ -67,15 +63,15 @@ PHP;
             return var_export($param->getDefaultValue(), true);
         }
         if (!$param->hasType()) {
-            throw new UntypedValue($param->getName(), $this->class);
+            throw new UntypedValue($param->getName(), $this->classToAutowire);
         }
         $type = $param->getType();
         assert($type instanceof ReflectionType);
         // TODO: support ReflectionUnionType (#35), ReflectionIntersectionType (#36)?
         if (!$type instanceof ReflectionNamedType || $type->isBuiltin()) {
-            throw new UntypedValue($param->getName(), $this->class);
+            throw new UntypedValue($param->getName(), $this->classToAutowire);
             // this would be good for non-builtins???
-            // throw NotFound::autowireMissing($type->getName(), $this->class, $param->getName());
+            // throw NotFound::autowireMissing($type->getName(), $this->classToAutowire, $param->getName());
         }
         /** @var class-string */
         $fqcn = $type->getName();
