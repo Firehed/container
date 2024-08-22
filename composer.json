@@ -24,8 +24,7 @@
     ],
     "autoload": {
       "files": [
-        "src/functions.php",
-        "src/polyfill.php"
+        "src/functions.php"
       ],
       "psr-4": {
         "Firehed\\Container\\": "src"
