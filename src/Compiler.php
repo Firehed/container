@@ -201,10 +201,10 @@ class Compiler implements BuilderInterface
         $tpl .= "class {$this->className}\n";
         $tpl .= "extends \\Firehed\\Container\\CompiledContainer\n";
         $tpl .= "{\n";
-        $tpl .= '    protected $factories = ';
+        $tpl .= '    protected array $factories = ';
         $tpl .= var_export($this->factories, true);
         $tpl .= ";\n";
-        $tpl .= '    protected $mappings = ';
+        $tpl .= '    protected array $mappings = ';
         $tpl .= var_export($mappings, true);
         $tpl .= ";\n";
 
