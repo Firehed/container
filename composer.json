@@ -24,8 +24,7 @@
     ],
     "autoload": {
       "files": [
-        "src/functions.php",
-        "src/polyfill.php"
+        "src/functions.php"
       ],
       "psr-4": {
         "Firehed\\Container\\": "src"
@@ -58,9 +57,9 @@
             "@phpstan",
             "@phpcs"
         ],
-        "autofix": "phpcbf src tests",
+        "autofix": "phpcbf",
         "phpunit": "phpunit",
-        "phpstan": "phpstan analyse src tests",
-        "phpcs": "phpcs src tests"
+        "phpstan": "phpstan analyse",
+        "phpcs": "phpcs"
     }
 }
