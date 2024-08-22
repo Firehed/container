@@ -12,6 +12,7 @@ env:
 
 jobs:
   phpcs:
+    name: PHPCS
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
@@ -19,18 +20,23 @@ jobs:
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
+        with:
+          tools: cs2pr
+
+      - name: Get Composer Cache Directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
       - name: Cache Composer packages
-        id: composer-cache
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
-          path: vendor
-          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.json') }}
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: |
-            ${{ runner.os }}-php-
+            ${{ runner.os }}-composer-
 
       - name: Install dependencies
-        run: composer install
+        run: composer update
           --no-ansi
           --no-interaction
           --no-progress
@@ -38,4 +44,16 @@ jobs:
           --prefer-dist
 
       - name: PHPCS
-        run: composer phpcs
+        run: vendor/bin/phpcs
+          --report=checkstyle
+          | cs2pr
+
+  validate:
+    name: Composer validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Run validate
+        run: composer validate
