@@ -297,9 +297,9 @@ trait ContainerBuilderTestTrait
 
     public function testClosureUsingMatch(): void
     {
-        $c = $this->getContainer();
-        $r = $c->get('somethingWithMatch');
-        var_dump($r);
+        $container = $this->getContainer();
+        $value = $container->get('somethingWithMatch');
+        self::assertIsString($value);
     }
 
     /**
