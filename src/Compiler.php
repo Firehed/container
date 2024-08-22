@@ -29,28 +29,25 @@ use function realpath;
 class Compiler implements BuilderInterface
 {
     /** @var class-string<TypedContainerInterface> */
-    private $className;
+    private string $className;
 
     /** @var Compiler\CodeGeneratorInterface[] */
-    private $definitions = [];
+    private array $definitions = [];
 
     /** @var array<class-string, class-string[]> */
-    private $dependencies = [];
+    private array $dependencies = [];
 
     /** @var ContainerExceptionInterface[] */
-    private $errors = [];
+    private array $errors = [];
 
-    /** @var bool */
-    private $exists;
+    private bool $exists;
 
     /** @var array<string, true> */
-    private $factories = [];
+    private array $factories = [];
 
-    /** @var LoggerInterface */
-    private $logger;
+    private LoggerInterface $logger;
 
-    /** @var string */
-    private $path;
+    private string $path;
 
     public function __construct(string $path = 'cc.php', ?LoggerInterface $logger = null)
     {
@@ -72,6 +69,7 @@ class Compiler implements BuilderInterface
         }
         $this->tryToMakePathWritable($path);
         $this->path = $path;
+        $this->exists = false;
     }
 
     public function addFile(string $file): void
