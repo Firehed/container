@@ -13,7 +13,7 @@ use ReflectionType;
 class AutowiredValue implements CodeGeneratorInterface
 {
     /** @var class-string FQCN */
-    private $class;
+    private string $class;
 
     /** @var class-string[] */
     private $dependencies;
