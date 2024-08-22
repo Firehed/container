@@ -3,21 +3,22 @@ declare(strict_types=1);
 
 namespace Firehed\Container;
 
+use InvalidArgumentException;
+
+use function enum_exists;
+use function func_num_args;
+use function sprintf;
+
 class EnvironmentVariable implements EnvironmentVariableInterface
 {
-    private string $cast = '';
-
-    private ?string $default;
+    /** @var EnvironmentVariableInterface::CAST_* | class-string<\BackedEnum> */
+    private string $cast = EnvironmentVariableInterface::CAST_NONE;
 
     private bool $hasDefault;
 
-    private string $name;
-
-    public function __construct(string $name, ?string $default = null)
+    public function __construct(private string $name, private ?string $default = null)
     {
-        $this->name = $name;
         $this->hasDefault = func_num_args() === 2;
-        $this->default = $default;
     }
 
     public function getName(): string
@@ -45,21 +46,29 @@ class EnvironmentVariable implements EnvironmentVariableInterface
 
     public function asBool(): EnvironmentVariableInterface
     {
-        $this->cast = 'bool';
+        $this->cast = EnvironmentVariableInterface::CAST_BOOL;
         return $this;
     }
 
-
-    public function asInt(): EnvironmentVariableInterface
+    public function asEnum(string $class): EnvironmentVariableInterface
     {
-        $this->cast = 'int';
+        if (!enum_exists($class)) {
+            throw new InvalidArgumentException(sprintf('Class for enum cast %s does not exist', $class));
+        }
+        // if !backedenum, fail
+        $this->cast = $class;
         return $this;
     }
-
 
     public function asFloat(): EnvironmentVariableInterface
     {
-        $this->cast = 'float';
+        $this->cast = EnvironmentVariableInterface::CAST_FLOAT;
+        return $this;
+    }
+
+    public function asInt(): EnvironmentVariableInterface
+    {
+        $this->cast = EnvironmentVariableInterface::CAST_INT;
         return $this;
     }
 }

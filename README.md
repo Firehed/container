@@ -265,8 +265,12 @@ To use this, the following methods exist:
 - `asBool`
 - `asInt`
 - `asFloat`
+- `asEnum`
 
 These are roughly equivalent to e.g. `(int) getenv('SOME_ENV_VAR')`, with the exception that `asBool` will only allow values `0`, `1`, `"true"`, and `"false"` (case-insensitively).
+
+`asEnum` takes a class-string to a **string-backed** enum that you have defined, and will use `::from($envValue)` to hydrate from the environment value.
+This does not attempt to locally normalize values, so the envvar value MUST match the backing value exactly.
 
 > [!WARNING]
 > Do not use `getenv` or `$_ENV` to access environment variables!
@@ -287,6 +291,7 @@ return [
     'some_bool' => env('SOME_BOOL')->asBool(),
     'some_int' => env('SOME_INT')->asInt(),
     'some_float' => env('SOME_FLOAT')->asFloat(),
+    'some_enum' => env('SOME_ENUM')->asEnum(MyEnum::class),
 
     // Counterexample!
     'getenv' => getenv('VALUE_AT_COMPILE_TIME'),
