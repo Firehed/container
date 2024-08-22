@@ -11,12 +11,8 @@ class EnvironmentVariableValue implements CodeGeneratorInterface
 {
     use NoDependenciesTrait;
 
-    /** @var EnvironmentVariableInterface */
-    private $env;
-
-    public function __construct(EnvironmentVariableInterface $env)
+    public function __construct(private EnvironmentVariableInterface $env)
     {
-        $this->env = $env;
     }
 
     public function generateCode(): string
