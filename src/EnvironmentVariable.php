@@ -12,13 +12,10 @@ use function sprintf;
 class EnvironmentVariable implements EnvironmentVariableInterface
 {
     /** @var EnvironmentVariableInterface::CAST_* | class-string<\BackedEnum> */
-    private $cast = '';
-    /** @var ?string */
-    private $default;
-    /** @var bool */
-    private $hasDefault;
-    /** @var string */
-    private $name;
+    private $cast = EnvironmentVariableInterface::CAST_NONE;
+    private ?string $default;
+    private bool $hasDefault;
+    private string $name;
 
     public function __construct(string $name, ?string $default = null)
     {
@@ -52,7 +49,7 @@ class EnvironmentVariable implements EnvironmentVariableInterface
 
     public function asBool(): EnvironmentVariableInterface
     {
-        $this->cast = 'bool';
+        $this->cast = EnvironmentVariableInterface::CAST_BOOL;
         return $this;
     }
 
@@ -68,13 +65,13 @@ class EnvironmentVariable implements EnvironmentVariableInterface
 
     public function asFloat(): EnvironmentVariableInterface
     {
-        $this->cast = 'float';
+        $this->cast = EnvironmentVariableInterface::CAST_FLOAT;
         return $this;
     }
 
     public function asInt(): EnvironmentVariableInterface
     {
-        $this->cast = 'int';
+        $this->cast = EnvironmentVariableInterface::CAST_INT;
         return $this;
     }
 }
