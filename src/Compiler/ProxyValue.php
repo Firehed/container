@@ -12,10 +12,9 @@ class ProxyValue implements CodeGeneratorInterface
     private string $class;
 
     /**
-     * @param class-string $interfaceName
      * @param class-string $classToAutowire
      */
-    public function __construct(string $interfaceName, string $classToAutowire)
+    public function __construct(string $classToAutowire)
     {
         assert(class_exists($classToAutowire));
         // TODO: Warn if class doesn't implement interface?
