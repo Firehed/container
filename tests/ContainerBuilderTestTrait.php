@@ -6,6 +6,7 @@ namespace Firehed\Container;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
+use Firehed\Container\Exceptions\IncorrectlyTypedValue;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use SessionHandlerInterface;
@@ -261,21 +262,25 @@ trait ContainerBuilderTestTrait
 
     public function testGetBoolErrors(): void
     {
+        self::expectException(IncorrectlyTypedValue::class);
         $this->getContainer()->getBool('int_literal');
     }
 
     public function testGetFloatErrors(): void
     {
+        self::expectException(IncorrectlyTypedValue::class);
         $this->getContainer()->getFloat('string_literal');
     }
 
     public function testGetIntErrors(): void
     {
+        self::expectException(IncorrectlyTypedValue::class);
         $this->getContainer()->getInt('string_literal');
     }
 
     public function testGetStringErrors(): void
     {
+        self::expectException(IncorrectlyTypedValue::class);
         $this->getContainer()->getString('int_literal');
     }
 
