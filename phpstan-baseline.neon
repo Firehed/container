@@ -13,12 +13,6 @@ parameters:
 			path: src/Compiler/ParserLoader.php
 
 		-
-			message: '#^Constructor of class Firehed\\Container\\Compiler\\ProxyValue has an unused parameter \$interfaceName\.$#'
-			identifier: constructor.unusedParameter
-			count: 1
-			path: src/Compiler/ProxyValue.php
-
-		-
 			message: '#^Binary operation "\." between ''https\://'' and mixed results in an error\.$#'
 			identifier: binaryOp.invalid
 			count: 1
