@@ -12,6 +12,8 @@ use Throwable;
 
 class DevContainer implements TypedContainerInterface
 {
+    use TypedContainerTrait;
+
     /** @var mixed[] */
     private $evaluated = [];
 
