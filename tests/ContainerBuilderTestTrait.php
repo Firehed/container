@@ -249,6 +249,36 @@ trait ContainerBuilderTestTrait
         $this->assertSame($expectedValue, $value, 'get should return the value');
     }
 
+    public function testTypedScalarLiteralSuccesses(): void
+    {
+        $c = $this->getContainer();
+        // Success paths
+        $this->assertSame('UnitTest', $c->getString('string_literal'));
+        $this->assertSame(42, $c->getInt('int_literal'));
+        $this->assertSame(123.45, $c->getFloat('float_literal'));
+        $this->assertSame(true, $c->getBool('bool_literal'));
+    }
+
+    public function testGetBoolErrors(): void
+    {
+        $this->getContainer()->getBool('int_literal');
+    }
+
+    public function testGetFloatErrors(): void
+    {
+        $this->getContainer()->getFloat('string_literal');
+    }
+
+    public function testGetIntErrors(): void
+    {
+        $this->getContainer()->getInt('string_literal');
+    }
+
+    public function testGetStringErrors(): void
+    {
+        $this->getContainer()->getString('int_literal');
+    }
+
     /**
      * DefaultScalarParam::class => autowire()
      */
