@@ -6,6 +6,7 @@ namespace Firehed\Container;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
+use Firehed\Container\Exceptions\IncorrectlyTypedValue;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use SessionHandlerInterface;
@@ -20,7 +21,7 @@ trait ContainerBuilderTestTrait
     use EnvironmentDefinitionsTestTrait;
     use ErrorDefinitionsTestTrait;
 
-    public function getContainer(): ContainerInterface
+    public function getContainer(): TypedContainerInterface
     {
         $builder = $this->getBuilder();
         foreach (self::getDefinitionFiles() as $file) {
@@ -247,6 +248,40 @@ trait ContainerBuilderTestTrait
         $this->assertTrue($container->has($key), 'has should be true');
         $value = $container->get($key);
         $this->assertSame($expectedValue, $value, 'get should return the value');
+    }
+
+    public function testTypedScalarLiteralSuccesses(): void
+    {
+        $c = $this->getContainer();
+        // Success paths
+        $this->assertSame('UnitTest', $c->getString('string_literal'));
+        $this->assertSame(42, $c->getInt('int_literal'));
+        $this->assertSame(123.45, $c->getFloat('float_literal'));
+        $this->assertSame(true, $c->getBool('bool_literal'));
+    }
+
+    public function testGetBoolErrors(): void
+    {
+        self::expectException(IncorrectlyTypedValue::class);
+        $this->getContainer()->getBool('int_literal');
+    }
+
+    public function testGetFloatErrors(): void
+    {
+        self::expectException(IncorrectlyTypedValue::class);
+        $this->getContainer()->getFloat('string_literal');
+    }
+
+    public function testGetIntErrors(): void
+    {
+        self::expectException(IncorrectlyTypedValue::class);
+        $this->getContainer()->getInt('string_literal');
+    }
+
+    public function testGetStringErrors(): void
+    {
+        self::expectException(IncorrectlyTypedValue::class);
+        $this->getContainer()->getString('int_literal');
     }
 
     /**

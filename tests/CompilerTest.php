@@ -17,6 +17,7 @@ use Psr\Log\AbstractLogger;
  * @covers Firehed\Container\Compiler\ParserLoader
  * @covers Firehed\Container\Compiler\ProxyValue
  * @covers Firehed\Container\CompiledContainer
+ * @covers Firehed\Container\Exceptions\IncorrectlyTypedValue
  */
 class CompilerTest extends \PHPUnit\Framework\TestCase
 {

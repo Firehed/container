@@ -10,3 +10,4 @@ parameters:
     paths:
         - src
         - tests
+    treatPhpDocTypesAsCertain: false

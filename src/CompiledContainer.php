@@ -8,6 +8,8 @@ use Psr\Container\ContainerExceptionInterface;
 
 abstract class CompiledContainer implements TypedContainerInterface
 {
+    use TypedContainerTrait;
+
     /**
      * Tracks what $id keys correspond to factory definitions and must not be
      * cached
