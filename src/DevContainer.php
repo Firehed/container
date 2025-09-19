@@ -168,7 +168,7 @@ class DevContainer implements TypedContainerInterface
                 })->bindTo(null);
             }
         }
-        return (function ($container) use ($class, $needed) {
+        return (function (TypedContainerInterface $container) use ($class, $needed) {
             $args = array_map(function ($arg) use ($container) {
                 return $arg($container);
             }, $needed);
