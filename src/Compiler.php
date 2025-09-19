@@ -93,6 +93,7 @@ class Compiler implements BuilderInterface
                 $key = $value;
                 $value = autowire();
             }
+            assert(is_string($key));
             $this->add($key, $value);
         }
     }
@@ -159,6 +160,7 @@ class Compiler implements BuilderInterface
                 || $value instanceof UnitEnum,
                 'Literal values must be scalars or arrays of scalars'
             );
+            // @phpstan-ignore-next-line
             $this->definitions[$key] = new Compiler\LiteralValue($value);
         }
     }
@@ -224,7 +226,7 @@ class Compiler implements BuilderInterface
         $ast = $parser->parse($code);
 
         $printer = new Standard(['shortArraySyntax' => true]);
-        assert($ast != null);
+        assert($ast !== null);
         return $printer->prettyPrintFile($ast);
     }
 
