@@ -12,15 +12,3 @@ parameters:
 			count: 1
 			path: src/Compiler/ParserLoader.php
 
-		-
-			message: '#^Binary operation "\." between ''https\://'' and mixed results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 1
-			path: tests/ErrorDefinitions/ErrorException.php
-
-		-
-			message: '#^Parameter \#1 \$value of static method Firehed\\Container\\Fixtures\\Environment\:\:from\(\) expects int\|string, mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: tests/ValidDefinitions/Enums.php
-
