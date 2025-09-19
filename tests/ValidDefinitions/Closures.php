@@ -1,8 +1,11 @@
 <?php
 declare(strict_types=1);
 
-use Firehed\Container\Fixtures;
-use Firehed\Container\Fixtures\EmptyInterface as EI;
+use Firehed\Container\{
+    Fixtures,
+    Fixtures\EmptyInterface as EI,
+    TypedContainerInterface,
+};
 
 return [
     // Simple closure definitions
@@ -16,7 +19,7 @@ return [
 
     'literalValueForComplex' => 42,
 
-    'complexDefinition' => function ($container) {
+    'complexDefinition' => function (TypedContainerInterface $container) {
         return $container->get('literalValueForComplex');
     },
 
@@ -26,11 +29,11 @@ return [
         };
     },
 
-    'somethingUsingAliasedName' => function ($c) {
+    'somethingUsingAliasedName' => function (TypedContainerInterface $c) {
         return $c->get(EI::class);
     },
 
-    'somethingWithMatch' => fn ($c) => match ($c->get('string_literal')) {
+    'somethingWithMatch' => fn (TypedContainerInterface $c) => match ($c->get('string_literal')) {
         'UnitTest' => 'foobar',
         'other' => 'bar',
         default => 'baz',
