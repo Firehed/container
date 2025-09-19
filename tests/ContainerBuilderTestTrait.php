@@ -21,7 +21,7 @@ trait ContainerBuilderTestTrait
     use EnvironmentDefinitionsTestTrait;
     use ErrorDefinitionsTestTrait;
 
-    public function getContainer(): ContainerInterface
+    public function getContainer(): TypedContainerInterface
     {
         $builder = $this->getBuilder();
         foreach (self::getDefinitionFiles() as $file) {
