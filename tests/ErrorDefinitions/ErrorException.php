@@ -23,7 +23,7 @@ return [
     },
 
     'api_url' => function (TypedContainerInterface $c) {
-        return 'https://' . $c->get('api_host');
+        return 'https://' . $c->getString('api_host');
     },
 
     'api_service' => function (TypedContainerInterface $c) {

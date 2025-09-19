@@ -11,7 +11,7 @@ return [
     'enum_env' => 'testing',
 
     // Dynamic value
-    Environment::class => fn (TypedContainerInterface $c) => Environment::from($c->get('enum_env')),
+    Environment::class => fn (TypedContainerInterface $c) => Environment::from($c->getString('enum_env')),
 
     // Hard-coded value
     'enum_hardcoded' => Environment::STAGING,
