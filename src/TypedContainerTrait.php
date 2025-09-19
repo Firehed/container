@@ -6,6 +6,11 @@ namespace Firehed\Container;
 
 use Firehed\Container\Exceptions\IncorrectlyTypedValue;
 
+use function is_bool;
+use function is_float;
+use function is_int;
+use function is_string;
+
 trait TypedContainerTrait
 {
     public function getBool(string $id): bool
