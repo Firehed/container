@@ -147,7 +147,7 @@ class Compiler implements BuilderInterface
                 ]);
                 // Never cache proxied values in case they point to a factory
                 $this->factories[$key] = true;
-                $this->definitions[$key] = new Compiler\ProxyValue($key, $value);
+                $this->definitions[$key] = new Compiler\ProxyValue($value);
             } else {
                 $this->errors[] = new Exceptions\InvalidClassMapping($key, $value);
                     // SomeInterface::class => nonClassString
