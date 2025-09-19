@@ -165,12 +165,12 @@ class DevContainer implements TypedContainerInterface
                 if (!$this->has($name)) {
                     throw Exceptions\NotFound::autowireMissing($name, $class, $param->getName());
                 }
-                $needed[] = (function ($c) use ($name) {
+                $needed[] = (function (TypedContainerInterface $c) use ($name) {
                     return $c->get($name);
                 })->bindTo(null);
             }
         }
-        return (function ($container) use ($class, $needed) {
+        return (function (TypedContainerInterface $container) use ($class, $needed) {
             $args = array_map(function ($arg) use ($container) {
                 return $arg($container);
             }, $needed);
