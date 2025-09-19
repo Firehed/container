@@ -30,8 +30,8 @@ class AutoDetectTest extends TestCase
 
     public function testNoEnv(): void
     {
-        assert(getenv('ENVIRONMENT') == false);
-        assert(getenv('ENV') == false);
+        assert(getenv('ENVIRONMENT') == false); // @phpstan-ignore equal.notAllowed
+        assert(getenv('ENV') == false); // @phpstan-ignore equal.notAllowed
         self::expectException(RuntimeException::class);
         self::expectExceptionMessage('Could not find an environment');
         AutoDetect::from('./tests/ValidDefinitions/OldPhpSafe');
@@ -39,8 +39,8 @@ class AutoDetectTest extends TestCase
 
     public function testDirectoryWithNoFiles(): void
     {
-        assert(getenv('ENVIRONMENT') == false);
-        assert(getenv('ENV') == false);
+        assert(getenv('ENVIRONMENT') == false); // @phpstan-ignore equal.notAllowed
+        assert(getenv('ENV') == false); // @phpstan-ignore equal.notAllowed
         putenv('ENV=development');
         self::expectException(RuntimeException::class);
         self::expectExceptionMessage('No config files');
