@@ -52,7 +52,7 @@ class Builder implements BuilderInterface
                 // This is a factory so that if the value being proxied is
                 // a factory, the behavior passes through. If it isn't, the
                 // downstream will still cache as expected
-                $value = factory(function ($c) use ($value) {
+                $value = factory(function (TypedContainerInterface $c) use ($value) {
                     return $c->get($value);
                 });
             }
