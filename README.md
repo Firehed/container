@@ -65,7 +65,7 @@ return [
 > ensures that the cached container will not need to fall back to reflection at
 > runtime in non-development environments.
 
-All `.php` files in `config` will be included, _non-recursively_.
+All `.php` files in `config/` will be included, _non-recursively_.
 This allows you to organize your config/wiring according to your own needs and preferences.
 
 Definitions are always evaluated lazily - nothing will be read/instantiated until `$container->get()` is called for it.
@@ -105,6 +105,8 @@ You may change the output directory by changing that variable (be mindful of `ge
 > If you need different behavior, `AutoDetect::from($configDirectory)` produces a new instance on each call.
 
 ## Manual Setup
+
+If you need more control over which definition files are included than above, you can use the container builders directly.
 
 The primary interface to the container is through the `BuilderInterface`.
 
@@ -164,7 +166,7 @@ All files added to the `BuilderInterface` must `return` an `array`.
 The keys of the array will map to `$id`s that can be checked for existence with `has($id)`, and the values of the array will be returned when those keys are provided to `get($id)`.
 
 > [!NOTE]
-> The library output implements a `TypedContainerInterface`, which adds docblock generics readable by tools like PHPStan and Psalm to PSR-11.
+> The library output implements a `TypedContainerInterface`, which adds docblock generics readable by tools like PHPStan and Psalm to PSR-11's `ContainerInterface`.
 > It assumes you are following the above convention; not doing so could result in misleading output.
 > This has no effect at runtime, and only helps during the development and CI.
 
@@ -335,6 +337,8 @@ If a class does not support autowiring or you'd prefer not to use it, provide a 
 
 use Firehed\Container\TypedContainerInterface;
 
+use function Firehed\Container\env;
+
 return [
     'FILE_PATH' => env('FILE_PATH'),
     ClassUsingPath::class => function (TypedContainerInterface $c) {
@@ -466,6 +470,19 @@ $dt2 = $container->get(DateTime::class);
 assert($dt1 !== $dt2, 'Factories return a new instance on each get() call');
 ```
 
+### Type-safe values
+In addition to inferring class types, `TypedContainerInterface`, it adds type-safe accessors for scalar values: `getBool($id)`, `getFloat($id)`, `getInt($id)`, and `getString($id)`.
+
+These are primarily intended to add type safety to definitions which can be verified through static analysis (e.g. PHPStan and Psalm), but can be used in whatever way you see fit.
+Doing so outside of definitions can decrease code portability.
+
+Unlike the environnemt variable casting helpers, these _will not_ cast values from another type, but will throw an exception if there is a mismatch.
+
+## Error Handling
+
+All exceptions thrown by this library follow PSR-11 conventions and implement `\Psr\Container\ContainerExceptionInterface`.
+
+In the majority case no handling should be needed (errors indicate either a configuration or deployment issue, which aren't generally handled at runtime).
 
 # Background
 
