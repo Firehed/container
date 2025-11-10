@@ -163,15 +163,75 @@ return $container; // Or use inline, as you see fit.
 All files added to the `BuilderInterface` must `return` an `array`.
 The keys of the array will map to `$id`s that can be checked for existence with `has($id)`, and the values of the array will be returned when those keys are provided to `get($id)`.
 
-
 > [!NOTE]
 > The library output implements a `TypedContainerInterface`, which adds docblock generics readable by tools like PHPStan and Psalm to PSR-11.
 > It assumes you are following the above convention; not doing so could result in misleading output.
 > This has no effect at runtime, and only helps during the development and CI.
 
+Values are memoized upon first use, so subsequent calls to `get($id)` with the same value will return the _same instance_.
+If you need to bypass this, use `factory()`, explained later.
+
 ### Examples
 
 The most concise examples are all part of the unit tests: [`tests/ValidDefinitions`](tests/ValidDefinitions).
+
+### Environment Variables
+
+To read environment variables at runtime, use the `Firehed\Container\env` function.
+The first argument is the name (case-sensitive) of the environment variable.
+The second argument is an optional default value, as a string, to use if not found in the environment.
+
+```php
+<?php
+use function Firehed\Container\env;
+return [
+    // Required, will throw if not set
+    'ENV_VAR_1' => env('ENV_VAR_1'),
+    // Optional, will return `default_value` if not set
+    'ENV_VAR_2' => env('ENV_VAR_2', 'default_value'),
+    // Optional, will return `null` if not set.
+    'ENV_VAR_3' => env('ENV_VAR_3', null),
+
+    // Counterexample - DO NOT do this!
+    'getenv' => getenv('VALUE_AT_COMPILE_TIME'),
+];
+```
+
+If a default value is not provided and no value cam be read
+
+> [!CAUTION]
+> DO NOT use `getenv` or `$_ENV` to access environment variables!
+> If you do so, compiled containers will get the *compile-time* value set, which is almost certainly _not_ the behavior you want.
+> Instead, use the `env` wrapper, which will defer the access of the environment variable until the first time it is used.
+>
+> If *and only if* you want a value compiled in, you must use `getenv` directly.
+
+#### Env casting
+
+`env` embeds a tiny DSL, allowing you to get the values set in the environment as an int, float, or bool rather than the native string read from the environment.
+To use this, the following methods exist:
+
+- `asBool` (handles `'1'`, `'0'`, `'true'`, `'false'`, and `''` (empty string = false), other values rejected)
+- `asInt`
+- `asFloat`
+- `asEnum`
+
+These are roughly equivalent to e.g. `(int) getenv('SOME_ENV_VAR')`, with the exception that `asBool` will only allow values `0`, `1`, `"true"`, and `"false"` (case-insensitively).
+
+`asEnum` takes a class-string to a **string-backed** enum that you have defined, and will use `::from($envValue)` to hydrate from the environment value.
+This does not attempt to locally normalize values, so the envvar value MUST match the backing value exactly.
+
+```php
+<?php
+use function Firehed\Container\env;
+return [
+    'some_bool' => env('SOME_BOOL')->asBool(),
+    'some_int' => env('SOME_INT')->asInt(),
+    'some_float' => env('SOME_FLOAT')->asFloat(),
+    'some_enum' => env('SOME_ENUM')->asEnum(MyEnum::class),
+];
+```
+
 
 ### Class Autowiring
 
@@ -394,32 +454,7 @@ These are roughly equivalent to e.g. `(int) getenv('SOME_ENV_VAR')`, with the ex
 `asEnum` takes a class-string to a **string-backed** enum that you have defined, and will use `::from($envValue)` to hydrate from the environment value.
 This does not attempt to locally normalize values, so the envvar value MUST match the backing value exactly.
 
-> [!WARNING]
-> Do not use `getenv` or `$_ENV` to access environment variables!
-> If you do so, compiled containers will get the *compile-time* value set, which is almost certainly not the behavior you want.
-> Instead, use the `env` wrapper, which will defer the access of the environment variable until the first time it is used.
->
-> If *and only if* you want a value compiled in, you must use `getenv` directly.
-
 Source definitions like this:
-```php
-<?php
-use function Firehed\Container\env;
-return [
-    'some_key' => env('SOME_ENV_VAR'),
-    'some_key_with_default' => env('SOME_ENV_VAR', 'default_value'),
-    'some_key_with_null_default' => env('SOME_ENV_VAR', null),
-
-    'some_bool' => env('SOME_BOOL')->asBool(),
-    'some_int' => env('SOME_INT')->asInt(),
-    'some_float' => env('SOME_FLOAT')->asFloat(),
-    'some_enum' => env('SOME_ENUM')->asEnum(MyEnum::class),
-
-    // Counterexample!
-    'getenv' => getenv('VALUE_AT_COMPILE_TIME'),
-];
-```
-
 will compile to code similar to this:
 ```php
 <?php
