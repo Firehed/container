@@ -59,6 +59,8 @@ return [
 ];
 ```
 
+For more info, see [Definition API](#definition-api), below.
+
 > [!IMPORTANT]
 > While the container supports (and is designed around) class autowiring, all
 > classes to be wired must still be listed in the config definition. This
@@ -102,7 +104,7 @@ You may change the output directory by changing that variable (be mindful of `ge
 >
 > This works well for most modern applications, as well as for transitioning older applications using a `$config = require 'config.php';` approach.
 > 
-> If you need different behavior, `AutoDetect::from($configDirectory)` produces a new instance on each call.
+> If you need different behavior (such as for pure-PHP servers where each request should not share state), `AutoDetect::from($configDirectory)` produces a new instance on each call.
 
 ## Manual Setup
 
@@ -161,6 +163,15 @@ return $container; // Or use inline, as you see fit.
 ```
 
 ## Definition API
+
+Table of Contents:
+
+> [Environment Variables](#environment-variables)
+> [Autowired classes](#class-autowiring)
+> [Manually-wired classes](#manual-wiring)
+> [Interface mapping and aliases](#aliases-and-mapping-interfaces-to-implementations)
+> [Scalars](#scalars-and-other-simple-values)
+> [Factories](#factories)
 
 All files added to the `BuilderInterface` must `return` an `array`.
 The keys of the array will map to `$id`s that can be checked for existence with `has($id)`, and the values of the array will be returned when those keys are provided to `get($id)`.
