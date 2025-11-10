@@ -464,6 +464,7 @@ assert($c1 === $c2, 'Non-factories return the same instance');
 $dt1 = $container->get(DateTime::class);
 $dt2 = $container->get(DateTime::class);
 assert($dt1 !== $dt2, 'Factories return a new instance on each get() call');
+```
 
 
 # Background
