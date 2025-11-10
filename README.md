@@ -166,12 +166,12 @@ return $container; // Or use inline, as you see fit.
 
 Table of Contents:
 
-> [Environment Variables](#environment-variables)
-> [Autowired classes](#class-autowiring)
-> [Manually-wired classes](#manual-wiring)
-> [Interface mapping and aliases](#aliases-and-mapping-interfaces-to-implementations)
-> [Scalars](#scalars-and-other-simple-values)
-> [Factories](#factories)
+- [Environment Variables](#environment-variables)
+- [Autowired classes](#class-autowiring)
+- [Manually-wired classes](#manual-wiring)
+- [Interface mapping and aliases](#aliases-and-mapping-interfaces-to-implementations)
+- [Scalars](#scalars-and-other-simple-values)
+- [Factories](#factories)
 
 All files added to the `BuilderInterface` must `return` an `array`.
 The keys of the array will map to `$id`s that can be checked for existence with `has($id)`, and the values of the array will be returned when those keys are provided to `get($id)`.
