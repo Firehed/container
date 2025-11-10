@@ -495,12 +495,6 @@ All exceptions thrown by this library follow PSR-11 conventions and implement `\
 
 In the majority case no handling should be needed (errors indicate either a configuration or deployment issue, which aren't generally handled at runtime).
 
-# Special Thanks
-
-Thank you to [SnapAuth](https://www.snapauth.app?utm_source=github&utm_campaign=library&utm_content=container) for their support of this library.
-SnapAuth makes it easy to use passkeys in your web and native apps, which drastically improves security and effectively eliminates phishing attacks.
-SnapAuth has a modern PHP SDK, so you'll feel right at home!
-
 # Background
 
 ## Why another container implementation?
@@ -556,5 +550,11 @@ You may or may not agree, but it's important to document them to help you make a
       },
   ];
   ```
+
+# Special Thanks
+
+Thank you to [SnapAuth](https://www.snapauth.app?utm_source=github&utm_campaign=library&utm_content=container) for their support of this library.
+SnapAuth makes it easy to use passkeys in your web and native apps, which drastically improves security and effectively eliminates phishing attacks.
+SnapAuth has a modern PHP SDK, so you'll feel right at home!
 
 
