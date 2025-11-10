@@ -197,7 +197,23 @@ return [
 ];
 ```
 
-If a default value is not provided and no value cam be read
+If a default value is not provided and no value is in the environment, an attempt to read will throw an exception.
+
+`env()` calls are approximately equivalent to this:
+
+```php
+<?php
+return [
+    'ENV_VAR_1' => function () {
+        $value = getenv('ENV_VAR_1');
+        if ($value === false) {
+            throw new Firehed\Container\Exceptions\EnvironmentVariableNotSet('ENV_VAR_1');
+        }
+        // For cast values, casting occurs here and can produce additional errors.
+        return $value;
+    },
+];
+```
 
 > [!CAUTION]
 > DO NOT use `getenv` or `$_ENV` to access environment variables!
@@ -373,11 +389,7 @@ return [
 ];
 ```
 
-
-
-
-
-### Simple values
+### Scalars and other simple values
 
 If a scalar, array, or Enum is provided as a value, that value will be returned unmodified.
 
@@ -385,24 +397,29 @@ If a scalar, array, or Enum is provided as a value, that value will be returned 
 When doing so, you **SHOULD** write the mapping with a `::class` literal; e.g. `\Psr\Log\LoggerInterface::class => SomeLoggerImplementation::class`.
 This approach (as compared to strings) not only provides additional clarity when reading the file, but allows static analysis tools to detect some errors.
 
-Objects **may not** be directly provided as a value and **must** be provided as a closure; see below.
+Objects MAY NOT be directly provided as a value and MUST be provided as a closure; see below.
 This is because the compiler cannot create an actual object instance, and thus would only work in development mode.
 
 ### Closures
 
 If a closure is provided as a value, that closure will be executed when `get()` is called and the value it returns will be returned.
+This is how the above defintions work.
+
 The container will be provided as the first and only parameter to the closure, so definitions may depend on other services.
+
 For services that do not have dependencies, the closure may be defined as a function that takes no parameters (a "thunk"), though at execution time the container will still be passed in (and subsequently ignored).
 Do not use the `use()` syntax to access other container definitions.
 
 Since computed values are cached (except when wrapped with `factory`, see below), the closure will only be executed once regardless of how many times `get()` is called.
 
-Any definition that should return an instance of an object **must** be defined by a closure, or using one of the helpers described below.
+Any definition that should return an instance of an object MUST be defined by a closure, or using one of the helpers described below.
 Directly instantiating the class in the definition file is invalid.
 
 ```php
 <?php
+
 use Psr\Container\ContainerInterface;
+
 return [
     // This will provide a single connection to your database, deferring the
     // connection until either directly accessed or a service with PDO as a
@@ -420,107 +437,36 @@ return [
 ];
 ```
 
-### `autowire(?string $classToAutowire = null)`
-Using `autowire` will use reflection to attempt to determine the specified class's dependencies, recursively resolve them, and return a shared instance of that object.
-
-Required parameters **must** have a typehint in order to be resolved.
-That typehint may be to either a class or an interface; in both cases, that dependency must also be defined (but can also be autowired).
-Required parameters with value types (scalars, arrays, etc) are not supported and must be manually wired.
-
-Optional parameters will always have their default value provided.
-
-> [!IMPORTANT]
-> Classes with any untyped constructor parameters, or those typed with `int/float/bool/array`, **cannot** be autowired.
-### `factory(?closure $body = null)`
-Use `factory` to return a new copy of the class or value every time it is accessed through `get()`
+### Factories
+Use the `Firehed\Container\factory` function to return a new copy of the class or value every time it is accessed through `get()`.
 
 If a paramater is not provided to the definition, the key will be used to autowire a definition.
 If a closure is provided, that closure will be executed instead.
 
-### `env(string $variableName, ?string $default = null)`
-Use `env` to embed environment variables in your container.
-Like other non-factory values, these will be cached for the lifetime of the script.
-
-`env` embeds a tiny DSL, allowing you to get the values set in the environment as an int, float, or bool rather than the native string read from the environment.
-To use this, the following methods exist:
-
-- `asBool`
-- `asInt`
-- `asFloat`
-- `asEnum`
-
-These are roughly equivalent to e.g. `(int) getenv('SOME_ENV_VAR')`, with the exception that `asBool` will only allow values `0`, `1`, `"true"`, and `"false"` (case-insensitively).
-
-`asEnum` takes a class-string to a **string-backed** enum that you have defined, and will use `::from($envValue)` to hydrate from the environment value.
-This does not attempt to locally normalize values, so the envvar value MUST match the backing value exactly.
-
-Source definitions like this:
-will compile to code similar to this:
 ```php
 <?php
+
+use function Firehed\Container\factory;
+
 return [
-    'some_key' => function () {
-        $value = getenv('SOME_ENV_VAR');
-        if ($value === false) {
-            throw new Firehed\Container\Exceptions\EnvironmentVariableNotSet('SOME_ENV_VAR');
-        }
-        return $value;
-    },
-    'some_key_with_default' => function () {
-        $value = getenv('SOME_ENV_VAR');
-        if ($value === false) {
-            return 'default_value';
-        }
-        return $value;
-    },
-    'some_key_with_null_default' => function () {
-        $value = getenv('SOME_ENV_VAR');
-        if ($value === false) {
-            return null;
-        }
-        return $value;
-    },
-
-    'some_bool' => function () {
-        $value = getenv('SOME_ENV_VAR');
-        if ($value === false) {
-            throw new Firehed\Container\Exceptions\EnvironmentVariableNotSet('SOME_ENV_VAR');
-        }
-        $value = strtolower($value);
-        if ($value === '1' || $value === 'true') {
-            return true;
-        } elseif ($value === '0' || $value === 'false') {
-            return false;
-        } else {
-            throw new OutOfBoundsException('Invalid boolean value');
-        }
-    },
-    'some_int' => function () {
-        $value = getenv('SOME_INT');
-        if ($value === false) {
-            throw new Firehed\Container\Exceptions\EnvironmentVariableNotSet('SOME_INT');
-        }
-        return (int)$value;
-    },
-    'some_float' => function () {
-        $value = getenv('SOME_FLOAT');
-        if ($value === false) {
-            throw new Firehed\Container\Exceptions\EnvironmentVariableNotSet('SOME_FLOAT');
-        }
-        return (float)$value;
-    },
-    'some_enum' => function () {
-        $value = getenv('SOME_ENUM');
-        if ($value === false) {
-            throw new Firehed\Container\Exceptions\EnvironmentVariableNotSet('SOME_ENUM');
-        }
-        return MyEnum::from($value);
-    },
-
-    // Counterexample!
-    'getenv' => 'whatever_value_is_in_your_current_environment',
+    MyClass::class, // Autowired per above
+    DateTime::class => factory(fn() => new DateTime()),
 ];
 ```
+
+In code later using the container:
+```php
+<?php
+
+$c1 = $container->get(MyClass::class);
+$c2 = $container->get(MyClass::class);
+assert($c1 === $c2, 'Non-factories return the same instance');
+$dt1 = $container->get(DateTime::class);
+$dt2 = $container->get(DateTime::class);
+assert($dt1 !== $dt2, 'Factories return a new instance on each get() call');
+
+
+# Background
 
 ## Why another container implementation?
 
