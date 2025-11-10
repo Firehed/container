@@ -25,7 +25,7 @@ $container = \Firehed\Container\AutoDetect::instance('config');
 
 Configure your app/services:
 
-```
+```php
 <?php
 // config/someDefinitionFile.php
 
