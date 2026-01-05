@@ -20,6 +20,7 @@ trait ContainerBuilderTestTrait
 {
     use EnvironmentDefinitionsTestTrait;
     use ErrorDefinitionsTestTrait;
+    use InlineDefinitionsTestTrait;
 
     public function getContainer(): TypedContainerInterface
     {
