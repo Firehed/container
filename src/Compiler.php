@@ -85,6 +85,11 @@ class Compiler implements BuilderInterface
                 $file
             ));
         }
+        $this->addDefinitions($defs);
+    }
+
+    public function addDefinitions(array $defs): void
+    {
         foreach ($defs as $key => $value) {
             if (is_int($key)) {
                 $this->logger->debug('Treating bare value {value} as autowired', [
