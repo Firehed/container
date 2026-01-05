@@ -23,6 +23,11 @@ class Builder implements BuilderInterface
                 $path
             ));
         }
+        $this->addDefinitions($defs);
+    }
+
+    public function addDefinitions(array $defs): void
+    {
         $this->defs = array_merge($this->parseDefs($defs), $this->defs);
     }
 
