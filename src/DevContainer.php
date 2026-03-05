@@ -156,7 +156,6 @@ class DevContainer implements TypedContainerInterface
                     throw new Exceptions\UntypedValue($param->getName(), $class);
                 }
                 $type = $param->getType();
-                assert($type !== null);
                 assert($type instanceof ReflectionNamedType);
                 if ($type->isBuiltin()) {
                     throw new Exceptions\UntypedValue($param->getName(), $class);
