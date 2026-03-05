@@ -8,8 +8,13 @@ use InvalidArgumentException;
 use RuntimeException;
 use UnexpectedValueException;
 
-class AutoDetect
+final class AutoDetect
 {
+    public const ENVIRONMENT_NAMES = [
+        'ENVIRONMENT',
+        'ENV',
+    ];
+
     public static string $compiledOutputPath = 'vendor/compiledConfig.php';
 
     private static ?TypedContainerInterface $instance = null;
@@ -27,17 +32,22 @@ class AutoDetect
      * This will look for common environment naming conventions and use either
      * the dynamic or compiled config builder based on whether a development
      * environment is detected.
+     *
+     * @param non-empty-array<literal-string> $envNames
      */
-    public static function from(string $directory): TypedContainerInterface
+    public static function from(string $directory, array $envNames = self::ENVIRONMENT_NAMES): TypedContainerInterface
     {
         if ($directory === '') {
             throw new InvalidArgumentException('Directory is empty. Did you mean "."?');
         }
 
-        $env = getenv('ENVIRONMENT');
-        if ($env === false || $env === '') {
-            $env = getenv('ENV');
+        foreach ($envNames as $envName) {
+            $env = getenv($envName);
+            if ($env !== false && $env !== '') {
+                break;
+            }
         }
+
         if ($env === false || $env === '') {
             throw new UnexpectedValueException('Could not find an environment name in ENVIRONMENT or ENV');
         }
@@ -67,11 +77,13 @@ class AutoDetect
      * Singleton wrapper for ::from($directory). While you should use the
      * container to manage object instances, it's possible to run into subtle
      * issues if there are multiple instances of the container itself
+     *
+     * @param non-empty-array<literal-string> $envNames
      */
-    public static function instance(string $directory): TypedContainerInterface
+    public static function instance(string $directory, array $envNames = self::ENVIRONMENT_NAMES): TypedContainerInterface
     {
         if (self::$instance === null) {
-            self::$instance = self::from($directory);
+            self::$instance = self::from($directory, $envNames);
             self::$instanceDirectory = $directory;
         } elseif ($directory !== self::$instanceDirectory) {
             // You're gonna have a bad time.
