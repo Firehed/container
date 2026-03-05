@@ -47,6 +47,7 @@ final class AutoDetect
                 break;
             }
         }
+        assert(isset($env)); // PHPStan needs this
 
         if ($env === false || $env === '') {
             throw new UnexpectedValueException('Could not find an environment name in ENVIRONMENT or ENV');
@@ -80,8 +81,10 @@ final class AutoDetect
      *
      * @param non-empty-array<literal-string> $envNames
      */
-    public static function instance(string $directory, array $envNames = self::ENVIRONMENT_NAMES): TypedContainerInterface
-    {
+    public static function instance(
+        string $directory,
+        array $envNames = self::ENVIRONMENT_NAMES,
+    ): TypedContainerInterface {
         if (self::$instance === null) {
             self::$instance = self::from($directory, $envNames);
             self::$instanceDirectory = $directory;
