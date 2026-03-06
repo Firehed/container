@@ -218,9 +218,12 @@ If a default value is not provided and no value is in the environment, an attemp
 <?php
 return [
     'ENV_VAR_1' => function () {
-        $value = getenv('ENV_VAR_1');
-        if ($value === false) {
+        if (!array_key_exists('ENV_VAR_1', $_ENV)) {
             throw new Firehed\Container\Exceptions\EnvironmentVariableNotSet('ENV_VAR_1');
+        }
+        $value = $_ENV['ENV_VAR_1'];
+        if (!is_string($value)) {
+            throw new TypeError('$_ENV contained a non-string value for key ENV_VAR_1');
         }
         // For cast values, casting occurs here and can produce additional errors.
         return $value;
