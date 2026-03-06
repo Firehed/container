@@ -43,4 +43,7 @@ return [
     'env_asfloat_notset' => env($prefix . 'NOT_SET', '3.14')->asFloat(),
 
     'env_asenum' => env($prefix . 'ENV')->asEnum(Environment::class),
+
+    // Non-string value test
+    'env_nonstring' => env($prefix . 'NONSTRING'),
 ];

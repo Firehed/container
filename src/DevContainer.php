@@ -9,6 +9,7 @@ use Psr\Container\ContainerExceptionInterface;
 use ReflectionClass;
 use ReflectionNamedType;
 use Throwable;
+use TypeError;
 
 class DevContainer implements TypedContainerInterface
 {
@@ -85,8 +86,15 @@ class DevContainer implements TypedContainerInterface
 
         if ($value instanceof EnvironmentVariableInterface) {
             $varName = $value->getName();
-            $envValue = getenv($varName);
-            if ($envValue === false) {
+            if (array_key_exists($varName, $_ENV)) {
+                $envValue = $_ENV[$varName];
+                if (!is_string($envValue)) {
+                    throw new TypeError(sprintf(
+                        '$_ENV contained a non-string value for key %s',
+                        $varName,
+                    ));
+                }
+            } else {
                 if ($value->hasDefault()) {
                     $envValue = $value->getDefault();
                 } else {

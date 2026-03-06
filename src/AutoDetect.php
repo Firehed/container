@@ -41,16 +41,19 @@ final class AutoDetect
             throw new InvalidArgumentException('Directory is empty. Did you mean "."?');
         }
 
+        $env = null;
         foreach ($envNames as $envName) {
-            $env = getenv($envName);
-            if ($env !== false && $env !== '') {
+            $env = $_ENV[$envName] ?? '';
+            if ($env !== '') {
                 break;
             }
         }
-        assert(isset($env)); // PHPStan needs this
 
-        if ($env === false || $env === '') {
-            throw new UnexpectedValueException('Could not find an environment name in ENVIRONMENT or ENV');
+        if (!is_string($env) || $env === '') {
+            throw new UnexpectedValueException(sprintf(
+                'Could not detect environment name. Seached envvars: %s',
+                implode(', ', $envNames),
+            ));
         }
 
         $env = strtolower($env);
