@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Firehed\Container;
 
-use Firehed\Container\Exceptions\ValueRetreivalException;
+use Firehed\Container\Exceptions\ValueRetrievalException;
 use Psr\Container\ContainerExceptionInterface;
 
 trait EnvironmentDefinitionsTestTrait
@@ -90,7 +90,7 @@ trait EnvironmentDefinitionsTestTrait
     {
         $_ENV[self::$prefix . 'NONSTRING'] = 123;
         $container = $this->getContainer();
-        $this->expectException(ValueRetreivalException::class);
+        $this->expectException(ValueRetrievalException::class);
         $container->get('env_nonstring');
     }
 

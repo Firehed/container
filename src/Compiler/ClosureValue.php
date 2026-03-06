@@ -13,7 +13,7 @@ use UnexpectedValueException;
 
 class ClosureValue implements CodeGeneratorInterface
 {
-    // This is not strictly accurate yet, but a correct implememntation
+    // This is not strictly accurate yet, but a correct implementation
     // requires pretty deep AST analysis. This should be treated as a known bug
     // for now.
     use NoDependenciesTrait;
@@ -73,7 +73,7 @@ class ClosureValue implements CodeGeneratorInterface
         // An improved version will
         //   a) Use only the body of the closure
         //   b) Replace $arg1 with $this
-        // But gettting there will take a fair bit of AST hacking.
+        // But getting there will take a fair bit of AST hacking.
         return sprintf(
             'return (%s)($this);',
             $code

@@ -29,7 +29,7 @@ trait ErrorDefinitionsTestTrait
         $c->get(Fixtures\ConstructorUntyped::class);
     }
 
-    public function testConstructorWithUndefiendTypedArgErrors(): void
+    public function testConstructorWithUndefinedTypedArgErrors(): void
     {
         $builder = $this->getBuilder();
         $builder->addFile(__DIR__ . '/ErrorDefinitions/RequiredParams.php');

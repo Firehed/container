@@ -82,7 +82,7 @@ trait ContainerBuilderTestTrait
     /**
      * SomeImplementation::class,
      */
-    public function testImplcitAutowiredDefinition(): void
+    public function testImplicitAutowiredDefinition(): void
     {
         $container = $this->getContainer();
         $this->assertGetSingleton(
@@ -110,7 +110,7 @@ trait ContainerBuilderTestTrait
      * SomeImplementation::class => autowire()
      * where SomeImplementation has >=1 constructor arguments
      */
-    public function testAutowiredDefinitionWithConstuctorArg(): void
+    public function testAutowiredDefinitionWithConstructorArg(): void
     {
         $container = $this->getContainer();
         $this->assertGetSingleton(
@@ -149,7 +149,7 @@ trait ContainerBuilderTestTrait
     }
 
     /**
-     * SomeInterface::class => SomeImplementation::clas;
+     * SomeInterface::class => SomeImplementation::class;
      * SomeImplementation::class => factory(...)
      */
     public function testMultipleCallsToInterfaceMappedToFactoryDefinitionWithBody(): void
@@ -193,7 +193,7 @@ trait ContainerBuilderTestTrait
      *   return useContainerValue($container);
      * }
      */
-    public function testClosureThatUsesConatiner(): void
+    public function testClosureThatUsesContainer(): void
     {
         $container = $this->getContainer();
         assert($container->has('literalValueForComplex'));

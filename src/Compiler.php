@@ -55,7 +55,7 @@ class Compiler implements BuilderInterface
         // @phpstan-ignore-next-line This class will be generated
         $this->className = 'CC_' . md5($path);
 
-        // If the conatiner has already been built, do nothing else.
+        // If the container has already been built, do nothing else.
         if (file_exists($path)) {
             $this->exists = true;
             $this->path = $path;
