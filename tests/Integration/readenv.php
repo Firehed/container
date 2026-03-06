@@ -9,6 +9,9 @@ use Psr\Container\ContainerExceptionInterface;
 chdir(__DIR__);
 require __DIR__ . '/../../vendor/autoload.php';
 
+// Hide deprecation warnings in "low" CI
+ini_set('display_errors', 'off');
+
 if ($argc < 2) {
     throw new Exception('Argument required');
 };
