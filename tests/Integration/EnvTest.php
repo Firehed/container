@@ -167,10 +167,13 @@ enum DotenvMode: string
     case UnsafeMutable = 'unsafe_mutable';
     case UnsafeImmutable = 'unsafe_immutable';
 }
+
 enum VariablesOrder: string
 {
-    case IncludeEnv = 'EGP';
-    case ExcludeEnv = 'GP';
+    case EnvOnly = 'EGP';
+    case EnvAndServer = 'EGPS';
+    case ServerOnly = 'GPS';
+    case Neither = 'GP';
 }
 
 enum Env: string
