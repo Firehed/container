@@ -29,6 +29,10 @@ abstract class CompiledContainer implements TypedContainerInterface
      */
     protected array $mappings = [];
 
+    public function __construct(protected EnvReader $envReader)
+    {
+    }
+
     /** @return array{ids: list<string>} */
     public function __debugInfo(): array
     {

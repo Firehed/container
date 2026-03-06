@@ -19,7 +19,7 @@ class DevContainer implements TypedContainerInterface
     private $evaluated = [];
 
     /** @param mixed[] $definitions */
-    public function __construct(private array $definitions)
+    public function __construct(private array $definitions, private EnvReader $envReader)
     {
     }
 
@@ -94,15 +94,8 @@ class DevContainer implements TypedContainerInterface
 
         if ($value instanceof EnvironmentVariableInterface) {
             $varName = $value->getName();
-            if (array_key_exists($varName, $_ENV)) {
-                $envValue = $_ENV[$varName];
-                if (!is_string($envValue)) {
-                    throw new TypeError(sprintf(
-                        '$_ENV contained a non-string value for key %s',
-                        $varName,
-                    ));
-                }
-            } else {
+            $envValue = $this->envReader->read($varName);
+            if ($envValue === null) {
                 if ($value->hasDefault()) {
                     $envValue = $value->getDefault();
                 } else {
