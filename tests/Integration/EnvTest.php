@@ -16,6 +16,13 @@ class EnvTest extends TestCase
 
     public static function envMatrix(): array
     {
+        $out = [];
+        foreach (DotenvMode::cases() as $dotenv) {
+            foreach (VariablesOrder::cases() as $var) {
+                $out[] = [$dotenv, $var];
+            }
+        }
+        return $out;
     }
 
     #[DataProvider('envMatrix')]
