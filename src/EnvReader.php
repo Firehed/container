@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace Firehed\Container;
 
-readonly class EnvReader
+class EnvReader
 {
     /**
      * @var array<string, string>
      */
-    private array $getenv;
+    private readonly array $getenv;
 
     /**
      * @param array<string, string> $env Typically $_ENV
      */
-    public function __construct(private array $env)
+    public function __construct(private readonly array $env)
     {
         $this->getenv = getenv();
     }
