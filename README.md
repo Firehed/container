@@ -458,7 +458,7 @@ return [
 ### Factories
 Use the `Firehed\Container\factory` function to return a new copy of the class or value every time it is accessed through `get()`.
 
-If a paramater is not provided to the definition, the key will be used to autowire a definition.
+If a parameter is not provided to the definition, the key will be used to autowire a definition.
 If a closure is provided, that closure will be executed instead.
 
 ```php
@@ -504,7 +504,7 @@ In the majority case no handling should be needed (errors indicate either a conf
 
 The primary motivation for creating this was to have a container implementation that's optimized for containerized deployment in a long-running process (like ReactPHP and PHP-PM).
 
-The usage and API is is highly inspired by PHP-DI, but adds functionality to support factories at definition-time (rather than exclusively at access-time with `make`).
+The usage and API is highly inspired by PHP-DI, but adds functionality to support factories at definition-time (rather than exclusively at access-time with `make`).
 This is intended to reduce unpredictable behavior of services in concurrent environments while strictly adhering to the PSR container specification.
 
 ### Differences from PHP-DI
@@ -532,11 +532,11 @@ You may or may not agree, but it's important to document them to help you make a
 
 - This is based around having a distinct build/compile stage for your application's deployment process.
   Implicit autowiring will NOT occur in the production-ready compiled container, which yields performance improvements.
-  Add the autowired class name to any definition file to explicitly wire it (`Foo::class,` is sufficient, see "Automatic autowiring" below).
+  Add the autowired class name to any definition file to explicitly wire it (`Foo::class,` is sufficient, see "Class Autowiring" above).
 
 - Any `$id` that's a valid class string should return an instance of that class (or interface, enum).
   As of 0.6, this is reflected in the provided type information: `->get($id)` has Generic information for PHPStan where if a `class-string` is detected, get returns that class.
-  This is not (currently) enforced at runtime, but be warned that e.g. `$container->get(LoggerInterface::class);` will be indicated as being a `LoggerInteface` to static analysis tools, and if the definition doesn't do that, you may get conflicts.
+  This is not (currently) enforced at runtime, but be warned that e.g. `$container->get(LoggerInterface::class);` will be indicated as being a `LoggerInterface` to static analysis tools, and if the definition doesn't do that, you may get conflicts.
 
 - All files should always be included.
   Do NOT skip files based on the environment.
