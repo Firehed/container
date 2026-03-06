@@ -141,7 +141,7 @@ require 'vendor/autoload.php';
 // If using a tool like dotenv, apply it here
 /*
 if (file_exists(__DIR__.'/.env')) {
-    Dotenv\Dotenv::create(__DIR__)->load();
+    Dotenv\Dotenv::createImmutable(__DIR__)->load();
 }
  */
 
@@ -210,7 +210,20 @@ return [
 ];
 ```
 
+Environment variables will be read from `$_ENV`, and then fall back to `getenv()` if not set.
+This maximizes compatibility with most server configs and env-loading libraries, and aims to give you the "least surprise" value if conflicts exist.
 If a default value is not provided and no value is in the environment, an attempt to read will throw an exception.
+
+> [!TIP]
+> In _very specific, uncommon_ circumstances, `env()` may provide a different value than you expect.
+> The only known case is:
+>
+> 1) You use `vlucas/phpdotenv` in `createImmutable()` mode prior to configuring the container (this is recommended)
+> 2) `php.ini` has `variables_order` set where both `E` and `S` are omitted (this is a rare, non-default setting)
+> 3) You have a value defined both in a `.env` file AND the actual environment
+>
+> You'll get the `.env` value rather than native env, despite "immutable" mode.
+> This is a limitation of the dotenv library, not the container.
 
 `env()` calls are approximately equivalent to this:
 
@@ -218,10 +231,10 @@ If a default value is not provided and no value is in the environment, an attemp
 <?php
 return [
     'ENV_VAR_1' => function () {
-        if (!array_key_exists('ENV_VAR_1', $_ENV)) {
+        if (!array_key_exists('ENV_VAR_1', $_ENV) && getenv('ENV_VAR_1') === false) {
             throw new Firehed\Container\Exceptions\EnvironmentVariableNotSet('ENV_VAR_1');
         }
-        $value = $_ENV['ENV_VAR_1'];
+        $value = $_ENV['ENV_VAR_1'] ?? geteenv('ENV_VAR_1');
         if (!is_string($value)) {
             throw new TypeError('$_ENV contained a non-string value for key ENV_VAR_1');
         }
@@ -232,11 +245,11 @@ return [
 ```
 
 > [!CAUTION]
-> DO NOT use `getenv` or `$_ENV` to access environment variables!
+> DO NOT use `getenv` or `$_ENV` to access environment variables in config definitions!
 > If you do so, compiled containers will get the *compile-time* value set, which is almost certainly _not_ the behavior you want.
 > Instead, use the `env` wrapper, which will defer the access of the environment variable until the first time it is used.
 >
-> If *and only if* you want a value compiled in, you must use `getenv` directly.
+> If *and only if* you want a value compiled in, you must use `$_ENV`/`getenv` directly.
 
 #### Env casting
 
