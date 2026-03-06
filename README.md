@@ -100,7 +100,7 @@ Any other value will run the compilation process, writing the output to `AutoDet
 You may change the output directory by changing that variable (be mindful of `getcwd()`!); the default writes into Composer's `vendor` directory since it's commonly `gitignore`d.
 
 > [!NOTE]
-> As the API implies, this returns a singleton instance of the conatiner.
+> As the API implies, this returns a singleton instance of the container.
 >
 > This works well for most modern applications, as well as for transitioning older applications using a `$config = require 'config.php';` approach.
 > 
@@ -264,7 +264,7 @@ return [
 
 ### Class Autowiring
 
-One of the primary mechnaics of this library is class autowiring.
+One of the primary mechanics of this library is class autowiring.
 
 Autowiring allows the container to determine the dependencies of a class (using reflection) and automatically provide configured values when accessed.
 This drastically reduces the amount of config definition code, along with reduced config churn as definitions change over time.
@@ -327,7 +327,7 @@ The topmost example is recommended for configuring any class that can be autowir
 > [!WARNING]
 > Dependency autowiring requires use of fully-qualified class names (FQCNs) as keys for object types (classes, interfaces, enums).
 > 
-> While you _may_ add additional aliases, you _must_ add defintions with FQCNs for autowiring to recognize that dependencies are available.
+> While you _may_ add additional aliases, you _must_ add definitions with FQCNs for autowiring to recognize that dependencies are available.
 >
 > e.g.
 > ```php
@@ -418,7 +418,7 @@ This is because the compiler cannot create an actual object instance, and thus w
 ### Closures
 
 If a closure is provided as a value, that closure will be executed when `get()` is called and the value it returns will be returned.
-This is how the above defintions work.
+This is how the above definitions work.
 
 The container will be provided as the first and only parameter to the closure, so definitions may depend on other services.
 
@@ -487,7 +487,7 @@ In addition to inferring class types, `TypedContainerInterface`, it adds type-sa
 These are primarily intended to add type safety to definitions which can be verified through static analysis (e.g. PHPStan and Psalm), but can be used in whatever way you see fit.
 Doing so outside of definitions can decrease code portability.
 
-Unlike the environnemt variable casting helpers, these _will not_ cast values from another type, but will throw an exception if there is a mismatch.
+Unlike the environment variable casting helpers, these _will not_ cast values from another type, but will throw an exception if there is a mismatch.
 
 ## Error Handling
 
@@ -513,7 +513,7 @@ This is intended to reduce unpredictable behavior of services in concurrent envi
   In PHP-DI, `factory` is just alternate syntax for defining a service through a closure.
 
 - When an interface is mapped to an implementation, the default behavior is to return the configured implementation.
-  In PHP-DI, `SomeInterface::class => autowire(SomeImplementation::class)` does NOT point to an explcitly-configured `SomeImplementation`
+  In PHP-DI, `SomeInterface::class => autowire(SomeImplementation::class)` does NOT point to an explicitly-configured `SomeImplementation`
 
 - A shorthand syntax for interface-to-implementation has been added
 
