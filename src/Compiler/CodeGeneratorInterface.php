@@ -6,7 +6,7 @@ namespace Firehed\Container\Compiler;
 interface CodeGeneratorInterface
 {
     /**
-     * Must return PHP code that evalutes to something like this:
+     * Must return PHP code that evaluates to something like this:
      *
      *     return 'some_value';
      *

@@ -41,7 +41,7 @@ class DevContainer implements TypedContainerInterface
         try {
             return $this->doGet($id);
         } catch (Throwable $e) {
-            if ($e instanceof Exceptions\ValueRetreivalException) {
+            if ($e instanceof Exceptions\ValueRetrievalException) {
                 $e->addId($id);
             }
             if ($e instanceof ContainerExceptionInterface) {
@@ -49,7 +49,7 @@ class DevContainer implements TypedContainerInterface
                 throw $e;
             }
             // Repackage the error into something with a more helpful message
-            throw new Exceptions\ValueRetreivalException($id, $e);
+            throw new Exceptions\ValueRetrievalException($id, $e);
         }
     }
 
@@ -139,7 +139,7 @@ class DevContainer implements TypedContainerInterface
     }
 
     /**
-     * Returns a closure that takes the conatiner as its only argument and
+     * Returns a closure that takes the container as its only argument and
      * returns the instantiated object
      */
     private function autowire(string $class): Closure

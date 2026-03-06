@@ -100,7 +100,7 @@ Any other value will run the compilation process, writing the output to `AutoDet
 You may change the output directory by changing that variable (be mindful of `getcwd()`!); the default writes into Composer's `vendor` directory since it's commonly `gitignore`d.
 
 > [!NOTE]
-> As the API implies, this returns a singleton instance of the conatiner.
+> As the API implies, this returns a singleton instance of the container.
 >
 > This works well for most modern applications, as well as for transitioning older applications using a `$config = require 'config.php';` approach.
 > 
@@ -327,7 +327,7 @@ The topmost example is recommended for configuring any class that can be autowir
 > [!WARNING]
 > Dependency autowiring requires use of fully-qualified class names (FQCNs) as keys for object types (classes, interfaces, enums).
 > 
-> While you _may_ add additional aliases, you _must_ add defintions with FQCNs for autowiring to recognize that dependencies are available.
+> While you _may_ add additional aliases, you _must_ add definitions with FQCNs for autowiring to recognize that dependencies are available.
 >
 > e.g.
 > ```php
@@ -418,7 +418,7 @@ This is because the compiler cannot create an actual object instance, and thus w
 ### Closures
 
 If a closure is provided as a value, that closure will be executed when `get()` is called and the value it returns will be returned.
-This is how the above defintions work.
+This is how the above definitions work.
 
 The container will be provided as the first and only parameter to the closure, so definitions may depend on other services.
 
@@ -455,7 +455,7 @@ return [
 ### Factories
 Use the `Firehed\Container\factory` function to return a new copy of the class or value every time it is accessed through `get()`.
 
-If a paramater is not provided to the definition, the key will be used to autowire a definition.
+If a parameter is not provided to the definition, the key will be used to autowire a definition.
 If a closure is provided, that closure will be executed instead.
 
 ```php
@@ -513,7 +513,7 @@ This is intended to reduce unpredictable behavior of services in concurrent envi
   In PHP-DI, `factory` is just alternate syntax for defining a service through a closure.
 
 - When an interface is mapped to an implementation, the default behavior is to return the configured implementation.
-  In PHP-DI, `SomeInterface::class => autowire(SomeImplementation::class)` does NOT point to an explcitly-configured `SomeImplementation`
+  In PHP-DI, `SomeInterface::class => autowire(SomeImplementation::class)` does NOT point to an explicitly-configured `SomeImplementation`
 
 - A shorthand syntax for interface-to-implementation has been added
 
@@ -533,7 +533,7 @@ You may or may not agree, but it's important to document them to help you make a
 
 - Any `$id` that's a valid class string should return an instance of that class (or interface, enum).
   As of 0.6, this is reflected in the provided type information: `->get($id)` has Generic information for PHPStan where if a `class-string` is detected, get returns that class.
-  This is not (currently) enforced at runtime, but be warned that e.g. `$container->get(LoggerInterface::class);` will be indicated as being a `LoggerInteface` to static analysis tools, and if the definition doesn't do that, you may get conflicts.
+  This is not (currently) enforced at runtime, but be warned that e.g. `$container->get(LoggerInterface::class);` will be indicated as being a `LoggerInterface` to static analysis tools, and if the definition doesn't do that, you may get conflicts.
 
 - All files should always be included.
   Do NOT skip files based on the environment.

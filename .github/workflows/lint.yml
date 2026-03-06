@@ -57,3 +57,13 @@ jobs:
 
       - name: Run validate
         run: composer validate
+
+  typos:
+    name: Spell check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v6
+
+      - name: Check spelling
+        uses: crate-ci/typos@v1
