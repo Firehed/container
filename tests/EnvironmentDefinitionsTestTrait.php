@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Firehed\Container;
 
+use Firehed\Container\Exceptions\ValueRetreivalException;
 use Psr\Container\ContainerExceptionInterface;
 
 trait EnvironmentDefinitionsTestTrait
@@ -83,6 +84,14 @@ trait EnvironmentDefinitionsTestTrait
         $_ENV[self::$prefix . 'EMPTY'] = '';
         $container = $this->getContainer();
         $this->assertSame('', $container->get('env_empty'));
+    }
+
+    public function testNonStringEnvVarThrowsTypeError(): void
+    {
+        $_ENV[self::$prefix . 'NONSTRING'] = 123;
+        $container = $this->getContainer();
+        $this->expectException(ValueRetreivalException::class);
+        $container->get('env_nonstring');
     }
 
     /** @return string[][] */
