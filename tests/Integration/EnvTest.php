@@ -10,6 +10,9 @@ use PHPUnit\Framework\Attributes\Medium;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @phpstan-type Matrix array<string, array{DotenvMode, Env, Override, VariablesOrder}>
+ */
 #[CoversNothing]
 #[Medium]
 class EnvTest extends TestCase
@@ -23,7 +26,11 @@ class EnvTest extends TestCase
         }
     }
 
-    // Mode=none, all fail
+    /**
+     * No dotenv load, only native env works at all
+     *
+     * @return Matrix
+     */
     public static function noDotenvMatrix(): array
     {
         $out = [];
@@ -55,7 +62,11 @@ class EnvTest extends TestCase
         }
     }
 
-    // Mode is mutable: dotenv value always wins
+    /**
+     * Mode is mutable: dotenv value always wins
+     *
+     * @return Matrix
+     */
     public static function mutableMatrix(): array
     {
         $out = [];
@@ -87,7 +98,11 @@ class EnvTest extends TestCase
     }
 
 
-    // Mode is immutable: override value wins
+    /**
+     * Mode is immutable: override value wins
+     *
+     * @return Matrix
+     */
     public static function immutableMatrix(): array
     {
         $out = [];
@@ -128,6 +143,9 @@ class EnvTest extends TestCase
         self::assertSame($expected, $outputText);
     }
 
+    /**
+     * @param Matrix $out
+     */
     private static function buildCase(
         DotenvMode $dotenv,
         Env $env,
