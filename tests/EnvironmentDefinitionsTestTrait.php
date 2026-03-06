@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Firehed\Container;
 
-use Firehed\Container\Exceptions\ValueRetreivalException;
+use Firehed\Container\Exceptions\ValueRetrievalException;
 use Psr\Container\ContainerExceptionInterface;
 
 trait EnvironmentDefinitionsTestTrait
