@@ -90,7 +90,7 @@ trait EnvironmentDefinitionsTestTrait
     {
         $_ENV[self::$prefix . 'NONSTRING'] = 123;
         $container = $this->getContainer();
-        $this->expectException(ValueRetreivalException::class);
+        $this->expectException(ValueRetrievalException::class);
         $container->get('env_nonstring');
     }
 

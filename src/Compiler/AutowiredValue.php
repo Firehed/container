@@ -23,7 +23,7 @@ class AutowiredValue implements CodeGeneratorInterface
 
     public function generateCode(): string
     {
-        // This is initialized here rather than in the defintion to allow the
+        // This is initialized here rather than in the definition to allow the
         // runtimeexception to be thrown
         $this->dependencies = [];
 

@@ -8,7 +8,7 @@ use Psr\Container\ContainerExceptionInterface;
 use RuntimeException;
 use Throwable;
 
-class ValueRetreivalException extends RuntimeException implements ContainerExceptionInterface
+class ValueRetrievalException extends RuntimeException implements ContainerExceptionInterface
 {
     /**
      * @var string[]

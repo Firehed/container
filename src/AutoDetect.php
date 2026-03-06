@@ -51,7 +51,7 @@ final class AutoDetect
 
         if (!is_string($env) || $env === '') {
             throw new UnexpectedValueException(sprintf(
-                'Could not detect environment name. Seached envvars: %s',
+                'Could not detect environment name. Searched envvars: %s',
                 implode(', ', $envNames),
             ));
         }

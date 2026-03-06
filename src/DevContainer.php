@@ -139,7 +139,7 @@ class DevContainer implements TypedContainerInterface
     }
 
     /**
-     * Returns a closure that takes the conatiner as its only argument and
+     * Returns a closure that takes the container as its only argument and
      * returns the instantiated object
      */
     private function autowire(string $class): Closure
