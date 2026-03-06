@@ -78,6 +78,13 @@ trait EnvironmentDefinitionsTestTrait
         $this->assertSame($expected, $container->get($containerKey));
     }
 
+    public function testEmptyValueBehavior(): void
+    {
+        putenv(self::$prefix . 'EMPTY=');
+        $container = $this->getContainer();
+        $this->assertSame('', $container->get('env_empty'));
+    }
+
     /** @return string[][] */
     public static function envVarsThatAreSet(): array
     {

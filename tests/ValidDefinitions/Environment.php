@@ -20,6 +20,9 @@ return [
     'env_not_set_with_default' => env('CONTAINER_UNITTEST_NOT_SET', 'default'),
     'env_not_set_with_null_default' => env('CONTAINER_UNITTEST_NOT_SET', null),
 
+    // Set but empty
+    'env_empty' => env($prefix . 'EMPTY'),
+
     // Casting: boolean
     'env_asbool_one' => env($prefix . 'ONE')->asBool(),
     'env_asbool_true' => env($prefix . 'TRUE')->asBool(),
