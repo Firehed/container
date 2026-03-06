@@ -350,6 +350,16 @@ trait ContainerBuilderTestTrait
         $this->assertInstanceOf(Fixtures\EmptyInterface::class, $i1);
     }
 
+    public function testDebugInfoShowsIdList(): void
+    {
+        $container = $this->getContainer();
+        $output = print_r($container, true);
+
+        self::assertStringContainsString('[ids]', $output);
+        self::assertStringContainsString(Fixtures\SessionId::class, $output);
+        self::assertStringContainsString('string_literal', $output);
+    }
+
     // Data Providers
 
     /** @return mixed[][] */
