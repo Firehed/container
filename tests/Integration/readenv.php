@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Dotenv\Dotenv;
 use Firehed\Container\AutoDetect;
+use Psr\Container\ContainerExceptionInterface;
 
 chdir(__DIR__);
 require __DIR__ . '/../../vendor/autoload.php';
@@ -22,6 +23,17 @@ if ($mode !== 'none') {
     $dotenv->load();
 }
 
-$container = AutoDetect::from('config');
+try {
+    $container = AutoDetect::from('config');
+} catch (Throwable $e) {
+    echo $e;
+    exit(1);
+}
 
-echo $container->get('FOO');
+try {
+    $foo = $container->get('FOO');
+} catch (ContainerExceptionInterface) {
+    exit(2);
+}
+
+echo $foo;

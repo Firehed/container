@@ -6,23 +6,55 @@ namespace Firehed\Container\Integration;
 
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Small;
+use PHPUnit\Framework\Attributes\Medium;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[CoversNothing]
-#[Small]
+#[MediumSmall]
 class EnvTest extends TestCase
 {
-
-    public static function envMatrix(): array
+    // Mode=none, all fail
+    public static function noDotenvMatrix(): array
     {
         $out = [];
-        foreach (DotenvMode::cases() as $dotenv) {
+        foreach (Env::cases() as $env) {
+            foreach (Override::cases() as $override) {
+                foreach (VariablesOrder::cases() as $var) {
+                    self::buildCase(DotenvMode::None, $env, $override, $var, $out);
+                }
+            }
+        }
+        return $out;
+    }
+
+    #[DataProvider('noDotenvMatrix')]
+    public function testNoDotenv(
+        DotenvMode $dotenv,
+        Env $env,
+        Override $override,
+        VariablesOrder $order,
+    ): void {
+        $cmd = self::buildCommand($dotenv, $env, $override, $order);
+        exec($cmd, $output, $code);
+
+        if ($override === Override::None) {
+            self::assertSame(2, $code);
+        } else {
+            self::assertSame(0, $code);
+            self::assertSame('shell', implode("\n", $output));
+        }
+    }
+
+    // Mode is mutable: dotenv value always wins
+    public static function mutableMatrix(): array
+    {
+        $out = [];
+        foreach ([DotenvMode::Mutable, DotenvMode::UnsafeMutable] as $dotenv) {
             foreach (Env::cases() as $env) {
                 foreach (Override::cases() as $override) {
                     foreach (VariablesOrder::cases() as $var) {
-                        $out[] = [$dotenv, $env, $override, $var];
+                        self::buildCase($dotenv, $env, $override, $var, $out);
                     }
                 }
             }
@@ -30,15 +62,83 @@ class EnvTest extends TestCase
         return $out;
     }
 
-    #[DataProvider('envMatrix')]
-    public function testEnvReading(
+    #[DataProvider('mutableMatrix')]
+    public function testMutableReading(
         DotenvMode $dotenv,
         Env $env,
         Override $override,
         VariablesOrder $order,
     ): void {
+        $cmd = self::buildCommand($dotenv, $env, $override, $order);
+        exec($cmd, $output, $code);
 
-        $cmd = sprintf(
+        $outputText = implode("\n", $output);
+        self::assertSame(0, $code, 'Command exited with error: ' . $outputText);
+        self::assertSame('dotenv', $outputText);
+    }
+
+
+    // Mode is immutable: override value wins
+    public static function immutableMatrix(): array
+    {
+        $out = [];
+        foreach ([DotenvMode::Immutable, DotenvMode::UnsafeImmutable] as $dotenv) {
+            foreach (Env::cases() as $env) {
+                foreach (Override::cases() as $override) {
+                    foreach (VariablesOrder::cases() as $var) {
+                        self::buildCase($dotenv, $env, $override, $var, $out);
+                    }
+                }
+            }
+        }
+        return $out;
+    }
+
+    #[DataProvider('immutableMatrix')]
+    public function testImmutableReading(
+        DotenvMode $dotenv,
+        Env $env,
+        Override $override,
+        VariablesOrder $order,
+    ): void {
+        $cmd = self::buildCommand($dotenv, $env, $override, $order);
+        exec($cmd, $output, $code);
+
+        $outputText = implode("\n", $output);
+        self::assertSame(0, $code, 'Command exited with error: ' . $outputText);
+
+        if ($override === Override::None) {
+            self::assertSame('dotenv', $outputText);
+        } else {
+            self::assertSame('shell', $outputText);
+        }
+    }
+
+    private static function buildCase(
+        DotenvMode $dotenv,
+        Env $env,
+        Override $override,
+        VariablesOrder $order,
+        array &$out,
+    ): void {
+        $key = sprintf(
+            '%s %s %s %s',
+            $dotenv->value,
+            $env->value,
+            $override->value,
+            $order->value,
+        );
+        $out[$key] = [$dotenv, $env, $override, $order];
+    }
+
+
+    private static function buildCommand(
+        DotenvMode $dotenv,
+        Env $env,
+        Override $override,
+        VariablesOrder $order,
+    ): string {
+        return sprintf(
             'ENV=%s %s php -d variables_order=%s %s %s 2>&1',
             $env->value,
             $override->value,
@@ -46,22 +146,6 @@ class EnvTest extends TestCase
             escapeshellarg(__DIR__ . '/readenv.php'),
             $dotenv->value,
         );
-        // echo "$cmd\n";
-        exec($cmd, $output, $code);
-
-        $outputText = implode("\n", $output);
-        // echo $outputText;
-        self::assertSame(0, $code, 'Command exited with error');
-        // var_dump($outputText);
-
-        if ($override === Override::None) {
-            self::assertSame('dotenv', $outputText);
-        } else {
-            self::assertSame('shell', $outputText);
-        }
-
-        // run with `php -d $order->value`
-        // inspect output
     }
 
 }
