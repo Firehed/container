@@ -76,7 +76,7 @@ All values, except for those defined through `factory()`, will be memoized.
 Functionally, this results in a singleton for object types managed by the container.
 
 Want more control over config file inclusion?
-See `Usage` below.
+See `Manual Setup` below.
 
 # Documentation and Detailed Examples
 
@@ -245,7 +245,7 @@ To use this, the following methods exist:
 - `asFloat`
 - `asEnum`
 
-These are roughly equivalent to e.g. `(int) getenv('SOME_ENV_VAR')`, with the exception that `asBool` will only allow values `0`, `1`, `"true"`, and `"false"` (case-insensitively).
+These are roughly equivalent to e.g. `(int) getenv('SOME_ENV_VAR')`, with the exception that `asBool` will only allow values `0`, `1`, `"true"`, `"false"`, and `""` (empty string, treated as false), case-insensitively.
 
 `asEnum` takes a class-string to a **string-backed** enum that you have defined, and will use `::from($envValue)` to hydrate from the environment value.
 This does not attempt to locally normalize values, so the envvar value MUST match the backing value exactly.
