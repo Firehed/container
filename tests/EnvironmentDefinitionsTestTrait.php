@@ -30,7 +30,7 @@ trait EnvironmentDefinitionsTestTrait
     public function testWrappedEnv(string $key): void
     {
         $unittestEnvVar = md5((string)random_int(0, PHP_INT_MAX));
-        putenv("CONTAINER_UNITTEST_SET=$unittestEnvVar");
+        $_ENV['CONTAINER_UNITTEST_SET'] = $unittestEnvVar;
         $container = $this->getContainer();
         $this->assertTrue($container->has($key), 'has should be true');
         $value = $container->get($key);
@@ -66,13 +66,13 @@ trait EnvironmentDefinitionsTestTrait
      */
     public function testCastingBehavior(string $containerKey, $expected): void
     {
-        putenv(self::$prefix . 'ONE_POINT_FIVE=1.5');
-        putenv(self::$prefix . 'ONE=1');
-        putenv(self::$prefix . 'ZERO=0');
-        putenv(self::$prefix . 'TRUE=true');
-        putenv(self::$prefix . 'FALSE=false');
-        putenv(self::$prefix . 'EMPTY=');
-        putenv(self::$prefix . 'ENV=testing');
+        $_ENV[self::$prefix . 'ONE_POINT_FIVE'] = '1.5';
+        $_ENV[self::$prefix . 'ONE'] = '1';
+        $_ENV[self::$prefix . 'ZERO'] = '0';
+        $_ENV[self::$prefix . 'TRUE'] = 'true';
+        $_ENV[self::$prefix . 'FALSE'] = 'false';
+        $_ENV[self::$prefix . 'EMPTY'] = '';
+        $_ENV[self::$prefix . 'ENV'] = 'testing';
         $container = $this->getContainer();
         $this->assertTrue($container->has($containerKey));
         $this->assertSame($expected, $container->get($containerKey));
@@ -80,7 +80,7 @@ trait EnvironmentDefinitionsTestTrait
 
     public function testEmptyValueBehavior(): void
     {
-        putenv(self::$prefix . 'EMPTY=');
+        $_ENV[self::$prefix . 'EMPTY'] = '';
         $container = $this->getContainer();
         $this->assertSame('', $container->get('env_empty'));
     }
