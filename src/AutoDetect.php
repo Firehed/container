@@ -41,10 +41,11 @@ final class AutoDetect
             throw new InvalidArgumentException('Directory is empty. Did you mean "."?');
         }
 
+        $reader = new EnvReader($_ENV);
         $env = null;
         foreach ($envNames as $envName) {
-            $env = $_ENV[$envName] ?? '';
-            if ($env !== '') {
+            $env = $reader->read($envName);
+            if ($env !== null && $env !== '') {
                 break;
             }
         }
