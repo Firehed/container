@@ -482,7 +482,7 @@ assert($dt1 !== $dt2, 'Factories return a new instance on each get() call');
 ```
 
 ### Type-safe values
-In addition to inferring class types, `TypedContainerInterface`, it adds type-safe accessors for scalar values: `getBool($id)`, `getFloat($id)`, `getInt($id)`, and `getString($id)`.
+`TypedContainerInterface` also adds type-safe accessors for scalar values: `getBool($id)`, `getFloat($id)`, `getInt($id)`, and `getString($id)`.
 
 These are primarily intended to add type safety to definitions which can be verified through static analysis (e.g. PHPStan and Psalm), but can be used in whatever way you see fit.
 Doing so outside of definitions can decrease code portability.
