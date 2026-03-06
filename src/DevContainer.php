@@ -31,7 +31,6 @@ class DevContainer implements TypedContainerInterface
         return ['ids' => $ids];
     }
 
-
     public function has($id): bool
     {
         return array_key_exists($id, $this->definitions);
