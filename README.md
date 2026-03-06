@@ -396,10 +396,10 @@ return [
     MyClass::class,
     MyMockClass::class,
     MyInterface::class => function ($c) {
-        if ($c->get('isDevMode') {
+        if ($c->get('isDevMode')) {
             return $c->get(MyMockClass::class);
         }
-        return $c->get(MyClass::class),
+        return $c->get(MyClass::class);
     },
 ];
 ```
