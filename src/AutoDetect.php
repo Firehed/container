@@ -43,8 +43,8 @@ final class AutoDetect
 
         $env = null;
         foreach ($envNames as $envName) {
-            $env = $_ENV[$envName] ?? null;
-            if ($env !== null) {
+            $env = $_ENV[$envName] ?? '';
+            if ($env !== '') {
                 break;
             }
         }
