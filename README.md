@@ -76,7 +76,7 @@ All values, except for those defined through `factory()`, will be memoized.
 Functionally, this results in a singleton for object types managed by the container.
 
 Want more control over config file inclusion?
-See `Usage` below.
+See `Manual Setup` below.
 
 # Documentation and Detailed Examples
 
@@ -218,9 +218,12 @@ If a default value is not provided and no value is in the environment, an attemp
 <?php
 return [
     'ENV_VAR_1' => function () {
-        $value = getenv('ENV_VAR_1');
-        if ($value === false) {
+        if (!array_key_exists('ENV_VAR_1', $_ENV)) {
             throw new Firehed\Container\Exceptions\EnvironmentVariableNotSet('ENV_VAR_1');
+        }
+        $value = $_ENV['ENV_VAR_1'];
+        if (!is_string($value)) {
+            throw new TypeError('$_ENV contained a non-string value for key ENV_VAR_1');
         }
         // For cast values, casting occurs here and can produce additional errors.
         return $value;
@@ -245,7 +248,7 @@ To use this, the following methods exist:
 - `asFloat`
 - `asEnum`
 
-These are roughly equivalent to e.g. `(int) getenv('SOME_ENV_VAR')`, with the exception that `asBool` will only allow values `0`, `1`, `"true"`, and `"false"` (case-insensitively).
+These are roughly equivalent to e.g. `(int) getenv('SOME_ENV_VAR')`, with the exception that `asBool` will only allow values `0`, `1`, `"true"`, `"false"`, and `""` (empty string, treated as false), case-insensitively.
 
 `asEnum` takes a class-string to a **string-backed** enum that you have defined, and will use `::from($envValue)` to hydrate from the environment value.
 This does not attempt to locally normalize values, so the envvar value MUST match the backing value exactly.
@@ -264,7 +267,7 @@ return [
 
 ### Class Autowiring
 
-One of the primary mechnaics of this library is class autowiring.
+One of the primary mechanics of this library is class autowiring.
 
 Autowiring allows the container to determine the dependencies of a class (using reflection) and automatically provide configured values when accessed.
 This drastically reduces the amount of config definition code, along with reduced config churn as definitions change over time.
@@ -396,10 +399,10 @@ return [
     MyClass::class,
     MyMockClass::class,
     MyInterface::class => function ($c) {
-        if ($c->get('isDevMode') {
+        if ($c->get('isDevMode')) {
             return $c->get(MyMockClass::class);
         }
-        return $c->get(MyClass::class),
+        return $c->get(MyClass::class);
     },
 ];
 ```
@@ -482,12 +485,12 @@ assert($dt1 !== $dt2, 'Factories return a new instance on each get() call');
 ```
 
 ### Type-safe values
-In addition to inferring class types, `TypedContainerInterface`, it adds type-safe accessors for scalar values: `getBool($id)`, `getFloat($id)`, `getInt($id)`, and `getString($id)`.
+`TypedContainerInterface` also adds type-safe accessors for scalar values: `getBool($id)`, `getFloat($id)`, `getInt($id)`, and `getString($id)`.
 
 These are primarily intended to add type safety to definitions which can be verified through static analysis (e.g. PHPStan and Psalm), but can be used in whatever way you see fit.
 Doing so outside of definitions can decrease code portability.
 
-Unlike the environnemt variable casting helpers, these _will not_ cast values from another type, but will throw an exception if there is a mismatch.
+Unlike the environment variable casting helpers, these _will not_ cast values from another type, but will throw an exception if there is a mismatch.
 
 ## Error Handling
 
@@ -501,7 +504,7 @@ In the majority case no handling should be needed (errors indicate either a conf
 
 The primary motivation for creating this was to have a container implementation that's optimized for containerized deployment in a long-running process (like ReactPHP and PHP-PM).
 
-The usage and API is is highly inspired by PHP-DI, but adds functionality to support factories at definition-time (rather than exclusively at access-time with `make`).
+The usage and API is highly inspired by PHP-DI, but adds functionality to support factories at definition-time (rather than exclusively at access-time with `make`).
 This is intended to reduce unpredictable behavior of services in concurrent environments while strictly adhering to the PSR container specification.
 
 ### Differences from PHP-DI
@@ -529,7 +532,7 @@ You may or may not agree, but it's important to document them to help you make a
 
 - This is based around having a distinct build/compile stage for your application's deployment process.
   Implicit autowiring will NOT occur in the production-ready compiled container, which yields performance improvements.
-  Add the autowired class name to any definition file to explicitly wire it (`Foo::class,` is sufficient, see "Automatic autowiring" below).
+  Add the autowired class name to any definition file to explicitly wire it (`Foo::class,` is sufficient, see "Class Autowiring" above).
 
 - Any `$id` that's a valid class string should return an instance of that class (or interface, enum).
   As of 0.6, this is reflected in the provided type information: `->get($id)` has Generic information for PHPStan where if a `class-string` is detected, get returns that class.
