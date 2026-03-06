@@ -8,7 +8,19 @@ use Firehed\Container\AutoDetect;
 chdir(__DIR__);
 require __DIR__ . '/../../vendor/autoload.php';
 
-// load based on $dotenv
+if ($argc < 2) {
+    throw new Exception('Argument required');
+};
+$mode = $argv[1];
+if ($mode !== 'none') {
+    $dotenv = match ($mode) {
+        'mutable' => Dotenv::createMutable(__DIR__),
+        'immutable' => Dotenv::createImmutable(__DIR__),
+        'unsafe_mutable' => Dotenv::createUnsafeMutable(__DIR__),
+        'unsafe_immutable' => Dotenv::createUnsafeImmutable(__DIR__),
+    };
+    $dotenv->load();
+}
 
 $container = AutoDetect::from('config');
 // var_dump(get_debug_type($container));
