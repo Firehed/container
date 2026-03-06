@@ -11,9 +11,18 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[CoversNothing]
-#[MediumSmall]
+#[Medium]
 class EnvTest extends TestCase
 {
+    public function tearDown(): void
+    {
+        // Destroy compiled container file
+        $file = __DIR__ . '/vendor/compiledConfig.php';
+        if (file_exists($file)) {
+            unlink($file);
+        }
+    }
+
     // Mode=none, all fail
     public static function noDotenvMatrix(): array
     {
