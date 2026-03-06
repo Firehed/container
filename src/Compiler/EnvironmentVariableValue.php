@@ -20,7 +20,7 @@ class EnvironmentVariableValue implements CodeGeneratorInterface
         $envVarName = $this->env->getName();
         $cast = $this->env->getCast();
         return <<<PHP
-\$value = getenv('$envVarName');
+\$value = \$_ENV['$envVarName'] ?? false;
 if (\$value === false) {
     {$this->getDefaultBody()}
 }

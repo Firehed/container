@@ -85,7 +85,7 @@ class DevContainer implements TypedContainerInterface
 
         if ($value instanceof EnvironmentVariableInterface) {
             $varName = $value->getName();
-            $envValue = getenv($varName);
+            $envValue = $_ENV[$varName] ?? false;
             if ($envValue === false) {
                 if ($value->hasDefault()) {
                     $envValue = $value->getDefault();
