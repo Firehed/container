@@ -29,6 +29,14 @@ abstract class CompiledContainer implements TypedContainerInterface
      */
     protected array $mappings = [];
 
+    /** @return array{ids: list<string>} */
+    public function __debugInfo(): array
+    {
+        $ids = array_keys($this->mappings);
+        sort($ids);
+        return ['ids' => $ids];
+    }
+
     public function has($id): bool
     {
         return array_key_exists($id, $this->mappings);

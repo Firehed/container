@@ -23,6 +23,14 @@ class DevContainer implements TypedContainerInterface
     {
     }
 
+    /** @return array{ids: list<string>} */
+    public function __debugInfo(): array
+    {
+        $ids = array_keys($this->definitions);
+        sort($ids);
+        return ['ids' => $ids];
+    }
+
     public function has($id): bool
     {
         return array_key_exists($id, $this->definitions);
