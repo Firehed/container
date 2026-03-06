@@ -23,6 +23,5 @@ if ($mode !== 'none') {
 }
 
 $container = AutoDetect::from('config');
-// var_dump(get_debug_type($container));
 
 echo $container->get('FOO');
