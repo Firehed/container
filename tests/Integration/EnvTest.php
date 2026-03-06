@@ -116,11 +116,16 @@ class EnvTest extends TestCase
         $outputText = implode("\n", $output);
         self::assertSame(0, $code, 'Command exited with error: ' . $outputText);
 
-        if ($override === Override::None) {
-            self::assertSame('dotenv', $outputText);
-        } else {
-            self::assertSame('shell', $outputText);
+        $expected = 'dotenv';
+        if ($override === Override::Shell) {
+            $expected = 'shell';
+            // Edge case: phpdotenv won't recognize there's a value already set
+            // if variables_order excludes E and S, so immutability fails.
+            if ($order === VariablesOrder::Neither && $dotenv === DotenvMode::Immutable) {
+                $expected = 'dotenv';
+            }
         }
+        self::assertSame($expected, $outputText);
     }
 
     private static function buildCase(
