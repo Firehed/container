@@ -161,34 +161,4 @@ class EnvTest extends TestCase
             $dotenv->value,
         );
     }
-
-}
-
-enum DotenvMode: string
-{
-    case None = 'none';
-    case Immutable = 'immutable';
-    case Mutable = 'mutable';
-    case UnsafeMutable = 'unsafe_mutable';
-    case UnsafeImmutable = 'unsafe_immutable';
-}
-
-enum VariablesOrder: string
-{
-    case EnvOnly = 'EGP';
-    case EnvAndServer = 'EGPS';
-    case ServerOnly = 'GPS';
-    case Neither = 'GP';
-}
-
-enum Env: string
-{
-    case Dev = 'dev';
-    case Other = 'compiled';
-}
-
-enum Override: string
-{
-    case None = '';
-    case Shell = 'FOO=shell';
 }
