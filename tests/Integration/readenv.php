@@ -10,7 +10,8 @@ chdir(__DIR__);
 require __DIR__ . '/../../vendor/autoload.php';
 
 // Hide deprecation warnings in "low" CI
-ini_set('display_errors', 'off');
+ini_set('display_errors', '0');
+error_reporting(E_ALL & ~E_DEPRECATED);
 
 if ($argc < 2) {
     throw new Exception('Argument required');
