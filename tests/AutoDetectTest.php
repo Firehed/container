@@ -17,8 +17,8 @@ class AutoDetectTest extends TestCase
 {
     public function setUp(): void
     {
-        putenv('ENV=');
-        putenv('ENVIRONMENT=');
+        $_ENV['ENV'] = '';
+        $_ENV['ENVIRONMENT'] = '';
     }
 
     public function testEmptyDirectoryIsError(): void
@@ -30,18 +30,18 @@ class AutoDetectTest extends TestCase
 
     public function testNoEnv(): void
     {
-        assert(getenv('ENVIRONMENT') == false); // @phpstan-ignore equal.notAllowed
-        assert(getenv('ENV') == false); // @phpstan-ignore equal.notAllowed
+        assert($_ENV['ENVIRONMENT'] === '');
+        assert($_ENV['ENV'] === '');
         self::expectException(RuntimeException::class);
-        self::expectExceptionMessage('Could not find an environment');
+        self::expectExceptionMessage('Could not detect environment name');
         AutoDetect::from('./tests/ValidDefinitions/OldPhpSafe');
     }
 
     public function testDirectoryWithNoFiles(): void
     {
-        assert(getenv('ENVIRONMENT') == false); // @phpstan-ignore equal.notAllowed
-        assert(getenv('ENV') == false); // @phpstan-ignore equal.notAllowed
-        putenv('ENV=development');
+        assert($_ENV['ENVIRONMENT'] === '');
+        assert($_ENV['ENV'] === '');
+        $_ENV['ENV'] = 'development';
         self::expectException(RuntimeException::class);
         self::expectExceptionMessage('No config files');
         AutoDetect::from('./github');
@@ -53,7 +53,7 @@ class AutoDetectTest extends TestCase
      */
     public function testOk(string $env, string $expected): void
     {
-        putenv('ENVIRONMENT=' . $env);
+        $_ENV['ENVIRONMENT'] = $env;
         $c = AutoDetect::from('./tests/ValidDefinitions/OldPhpSafe');
         self::assertInstanceOf($expected, $c);
         $c2 = AutoDetect::from('./tests/ValidDefinitions/OldPhpSafe');
@@ -67,7 +67,7 @@ class AutoDetectTest extends TestCase
      */
     public function testInstance(string $env, string $expected): void
     {
-        putenv('ENVIRONMENT=' . $env);
+        $_ENV['ENVIRONMENT'] = $env;
         $c = AutoDetect::instance('./tests/ValidDefinitions/OldPhpSafe');
         $c2 = AutoDetect::instance('./tests/ValidDefinitions/OldPhpSafe');
         self::assertInstanceOf($expected, $c);
@@ -79,7 +79,7 @@ class AutoDetectTest extends TestCase
      */
     public function testInstanceMisuse(): void
     {
-        putenv('ENVIRONMENT=whatever');
+        $_ENV['ENVIRONMENT'] = 'whatever';
         AutoDetect::instance('./tests/ValidDefinitions/OldPhpSafe');
         self::expectException(LogicException::class);
         self::expectExceptionMessage('Instance must receive the same directory each time');
