@@ -32,7 +32,8 @@ try {
 
 try {
     $foo = $container->get('FOO');
-} catch (ContainerExceptionInterface) {
+} catch (ContainerExceptionInterface $e) {
+    echo $e;
     exit(2);
 }
 
