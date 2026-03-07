@@ -18,6 +18,7 @@ if ($argc < 2) {
 };
 $mode = $argv[1];
 if ($mode !== 'none') {
+    // @phpstan-ignore match.unhandled (UnhandledMatchError is desired for invalid input)
     $dotenv = match ($mode) {
         'mutable' => Dotenv::createMutable(__DIR__),
         'immutable' => Dotenv::createImmutable(__DIR__),
@@ -41,4 +42,5 @@ try {
     exit(2);
 }
 
+assert(is_string($foo));
 echo $foo;
