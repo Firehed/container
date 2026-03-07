@@ -13,6 +13,7 @@ require __DIR__ . '/../../vendor/autoload.php';
 ini_set('display_errors', '0');
 error_reporting(E_ALL & ~E_DEPRECATED);
 
+assert(isset($argc) && isset($argv));
 if ($argc < 2) {
     throw new Exception('Argument required');
 };
