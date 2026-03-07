@@ -20,12 +20,8 @@ class EnvironmentVariableValue implements CodeGeneratorInterface
         $envVarName = $this->env->getName();
         $cast = $this->env->getCast();
         return <<<PHP
-if (array_key_exists('$envVarName', \$_ENV)) {
-    \$value = \$_ENV['$envVarName'];
-    if (!is_string(\$value)) {
-        throw new \TypeError('\$_ENV contained a non-string value for key $envVarName');
-    }
-} else {
+\$value = \$this->envReader->read('$envVarName');
+if (\$value === null) {
     {$this->getDefaultBody()}
 }
 {$this->castBody()}

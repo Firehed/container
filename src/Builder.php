@@ -68,7 +68,7 @@ class Builder implements BuilderInterface
         if ($this->errors !== []) {
             throw $this->errors[0];
         }
-        $container = new DevContainer($this->defs);
+        $container = new DevContainer($this->defs, new EnvReader($_ENV));
 
         return $container;
     }

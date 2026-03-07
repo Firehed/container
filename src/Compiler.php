@@ -169,7 +169,7 @@ class Compiler implements BuilderInterface
     {
         $this->compile();
         require_once $this->path;
-        return new $this->className();
+        return new $this->className(new EnvReader($_ENV));
     }
 
     private function compile(): void
