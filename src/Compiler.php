@@ -31,7 +31,7 @@ class Compiler implements BuilderInterface
     /** @var class-string<TypedContainerInterface> */
     private string $className;
 
-    /** @var array<string, Compiler\CodeGeneratorInterface|DefinitionInterface> */
+    /** @var array<string, Compiler\CodeGeneratorInterface> */
     private array $definitions = [];
 
     /** @var array<class-string, class-string[]> */
@@ -235,11 +235,9 @@ class Compiler implements BuilderInterface
     private function makeFunctionBody(
         string $originalName,
         string $functionName,
-        Compiler\CodeGeneratorInterface|DefinitionInterface $definition
+        Compiler\CodeGeneratorInterface $definition
     ): string {
-        $body = $definition instanceof DefinitionInterface
-            ? $definition->generateCode($originalName)
-            : $definition->generateCode();
+        $body = $definition->generateCode();
         foreach ($definition->getDependencies() as $dependency) {
             assert(class_exists($originalName) || interface_exists($originalName) || enum_exists($originalName));
             $this->dependencies[$dependency][] = $originalName;
