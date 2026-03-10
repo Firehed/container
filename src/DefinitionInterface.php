@@ -12,6 +12,8 @@ namespace Firehed\Container;
  *
  * Third-party libraries can implement this interface to provide custom
  * value resolution strategies (e.g., fetching secrets from a vault).
+ *
+ * @internal for now, this will become public later
  */
 interface DefinitionInterface extends Compiler\CodeGeneratorInterface
 {
