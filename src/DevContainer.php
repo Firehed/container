@@ -100,40 +100,12 @@ class DevContainer implements TypedContainerInterface
             return $this->autowire($id)($this);
         }
 
-        if ($value instanceof EnvironmentVariableInterface) {
-            $varName = $value->getName();
-            $envValue = $this->envReader->read($varName);
-            if ($envValue === null) {
-                if ($value->hasDefault()) {
-                    $envValue = $value->getDefault();
-                } else {
-                    throw new Exceptions\EnvironmentVariableNotSet($varName);
-                }
+        if ($value instanceof DefinitionInterface) {
+            $result = $value->resolve($id, $this, $this->envReader);
+            if ($value->isCacheable()) {
+                $this->evaluated[$id] = $result;
             }
-            $cast = $value->getCast();
-            switch ($cast) {
-                case EnvironmentVariableInterface::CAST_NONE:
-                    return $envValue;
-                case EnvironmentVariableInterface::CAST_BOOL:
-                    switch (strtolower((string)$envValue)) {
-                        case '1': // fallthrough
-                        case 'true':
-                            return true;
-                        case '': // fallthrough
-                        case '0': // fallthrough
-                        case 'false':
-                            return false;
-                        default:
-                            throw new \OutOfBoundsException('Invalid boolean value');
-                    }
-                    // comment line for phpcs, otherwise irrelevant
-                case EnvironmentVariableInterface::CAST_INT:
-                    return (int) $envValue;
-                case EnvironmentVariableInterface::CAST_FLOAT:
-                    return (float) $envValue;
-                default:
-                    return $cast::from($envValue);
-            }
+            return $result;
         }
 
         return $value;

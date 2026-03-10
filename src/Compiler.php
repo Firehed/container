@@ -138,9 +138,6 @@ class Compiler implements BuilderInterface
         } elseif ($value instanceof Closure) {
             // someName => fn ($container) => new Something(...)
             $this->definitions[$key] = new Compiler\ClosureValue($value);
-        } elseif ($value instanceof EnvironmentVariableInterface) {
-            // someName => env('SOME_NAME')
-            $this->definitions[$key] = new Compiler\EnvironmentVariableValue($value);
         } elseif (interface_exists($key)) {
             assert(is_string($value), 'Values without keys must be strings that correspond to autowirable classes');
             if (class_exists($value)) {
@@ -238,9 +235,11 @@ class Compiler implements BuilderInterface
     private function makeFunctionBody(
         string $originalName,
         string $functionName,
-        Compiler\CodeGeneratorInterface $definition
+        Compiler\CodeGeneratorInterface|DefinitionInterface $definition
     ): string {
-        $body = $definition->generateCode();
+        $body = $definition instanceof DefinitionInterface
+            ? $definition->generateCode($originalName)
+            : $definition->generateCode();
         foreach ($definition->getDependencies() as $dependency) {
             assert(class_exists($originalName) || interface_exists($originalName) || enum_exists($originalName));
             $this->dependencies[$dependency][] = $originalName;
