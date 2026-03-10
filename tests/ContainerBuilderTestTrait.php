@@ -18,6 +18,7 @@ use SessionIdInterface;
  */
 trait ContainerBuilderTestTrait
 {
+    use CustomDefinitionTestTrait;
     use EnvironmentDefinitionsTestTrait;
     use ErrorDefinitionsTestTrait;
 
@@ -36,6 +37,7 @@ trait ContainerBuilderTestTrait
     private static function getDefinitionFiles(): array
     {
         $files = [
+            'CustomDefinitions',
             'Environment',
             'CaseSensitive',
             'RequiredParams',
