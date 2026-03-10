@@ -74,7 +74,7 @@ class EnvironmentVariable implements EnvironmentVariableInterface, DefinitionInt
 
     // DefinitionInterface implementation
 
-    public function generateCode(string $key): string
+    public function generateCode(): string
     {
         return <<<PHP
 \$value = \$this->envReader->read('{$this->name}');
@@ -130,7 +130,7 @@ PHP;
         return [];
     }
 
-    public function resolve(string $key, TypedContainerInterface $container, EnvReader $envReader): mixed
+    public function resolve(TypedContainerInterface $container, EnvReader $envReader): mixed
     {
         $envValue = $envReader->read($this->name);
         if ($envValue === null) {

@@ -46,7 +46,7 @@ class EnvironmentVariableTest extends TestCase
             ->willReturn('bar');
 
         $env = new EnvironmentVariable('FOO');
-        $result = $env->resolve('key', $this->container, $this->envReader);
+        $result = $env->resolve($this->container, $this->envReader);
         $this->assertSame('bar', $result);
     }
 
@@ -57,7 +57,7 @@ class EnvironmentVariableTest extends TestCase
             ->willReturn(null);
 
         $env = new EnvironmentVariable('FOO', 'default_value');
-        $result = $env->resolve('key', $this->container, $this->envReader);
+        $result = $env->resolve($this->container, $this->envReader);
         $this->assertSame('default_value', $result);
     }
 
@@ -68,7 +68,7 @@ class EnvironmentVariableTest extends TestCase
             ->willReturn(null);
 
         $env = new EnvironmentVariable('FOO', null);
-        $result = $env->resolve('key', $this->container, $this->envReader);
+        $result = $env->resolve($this->container, $this->envReader);
         $this->assertNull($result);
     }
 
@@ -80,7 +80,7 @@ class EnvironmentVariableTest extends TestCase
 
         $env = new EnvironmentVariable('FOO');
         $this->expectException(Exceptions\EnvironmentVariableNotSet::class);
-        $env->resolve('key', $this->container, $this->envReader);
+        $env->resolve($this->container, $this->envReader);
     }
 
     #[DataProvider('castingProvider')]
@@ -95,7 +95,7 @@ class EnvironmentVariableTest extends TestCase
 
         $env = new EnvironmentVariable('FOO');
         $env->$castMethod();
-        $result = $env->resolve('key', $this->container, $this->envReader);
+        $result = $env->resolve($this->container, $this->envReader);
         $this->assertSame($expected, $result);
     }
 
@@ -125,35 +125,35 @@ class EnvironmentVariableTest extends TestCase
 
         $env = new EnvironmentVariable('ENV');
         $env->asEnum(Fixtures\Environment::class);
-        $result = $env->resolve('key', $this->container, $this->envReader);
+        $result = $env->resolve($this->container, $this->envReader);
         $this->assertSame(Fixtures\Environment::TESTING, $result);
     }
 
     public function testGenerateCodeContainsEnvReaderCall(): void
     {
         $env = new EnvironmentVariable('MY_VAR');
-        $code = $env->generateCode('key');
+        $code = $env->generateCode();
         $this->assertStringContainsString("\$this->envReader->read('MY_VAR')", $code);
     }
 
     public function testGenerateCodeContainsReturnStatement(): void
     {
         $env = new EnvironmentVariable('MY_VAR');
-        $code = $env->generateCode('key');
+        $code = $env->generateCode();
         $this->assertStringContainsString('return', $code);
     }
 
     public function testGenerateCodeWithDefaultContainsDefault(): void
     {
         $env = new EnvironmentVariable('MY_VAR', 'fallback');
-        $code = $env->generateCode('key');
+        $code = $env->generateCode();
         $this->assertStringContainsString('fallback', $code);
     }
 
     public function testGenerateCodeWithoutDefaultContainsException(): void
     {
         $env = new EnvironmentVariable('MY_VAR');
-        $code = $env->generateCode('key');
+        $code = $env->generateCode();
         $this->assertStringContainsString('EnvironmentVariableNotSet', $code);
     }
 }
