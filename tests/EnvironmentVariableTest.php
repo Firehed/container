@@ -83,37 +83,65 @@ class EnvironmentVariableTest extends TestCase
         $env->resolve($this->container, $this->envReader);
     }
 
-    #[DataProvider('castingProvider')]
-    public function testResolveWithCasting(
-        string $envValue,
-        string $castMethod,
-        mixed $expected,
-    ): void {
-        $this->envReader->method('read')
-            ->with('FOO')
-            ->willReturn($envValue);
+    #[DataProvider('boolCastingProvider')]
+    public function testResolveWithBoolCasting(string $envValue, bool $expected): void
+    {
+        $this->envReader->method('read')->with('FOO')->willReturn($envValue);
 
         $env = new EnvironmentVariable('FOO');
-        $env->$castMethod();
-        $result = $env->resolve($this->container, $this->envReader);
-        $this->assertSame($expected, $result);
+        $env->asBool();
+        $this->assertSame($expected, $env->resolve($this->container, $this->envReader));
     }
 
-    /** @return array<string, array{string, string, mixed}> */
-    public static function castingProvider(): array
+    /** @return array<string, array{string, bool}> */
+    public static function boolCastingProvider(): array
     {
         return [
-            'bool true' => ['true', 'asBool', true],
-            'bool 1' => ['1', 'asBool', true],
-            'bool false' => ['false', 'asBool', false],
-            'bool 0' => ['0', 'asBool', false],
-            'bool empty' => ['', 'asBool', false],
-            'int positive' => ['42', 'asInt', 42],
-            'int zero' => ['0', 'asInt', 0],
-            'int negative' => ['-5', 'asInt', -5],
-            'float positive' => ['3.14', 'asFloat', 3.14],
-            'float zero' => ['0.0', 'asFloat', 0.0],
-            'float negative' => ['-2.5', 'asFloat', -2.5],
+            'string true' => ['true', true],
+            'string 1' => ['1', true],
+            'string false' => ['false', false],
+            'string 0' => ['0', false],
+            'empty string' => ['', false],
+        ];
+    }
+
+    #[DataProvider('intCastingProvider')]
+    public function testResolveWithIntCasting(string $envValue, int $expected): void
+    {
+        $this->envReader->method('read')->with('FOO')->willReturn($envValue);
+
+        $env = new EnvironmentVariable('FOO');
+        $env->asInt();
+        $this->assertSame($expected, $env->resolve($this->container, $this->envReader));
+    }
+
+    /** @return array<string, array{string, int}> */
+    public static function intCastingProvider(): array
+    {
+        return [
+            'positive' => ['42', 42],
+            'zero' => ['0', 0],
+            'negative' => ['-5', -5],
+        ];
+    }
+
+    #[DataProvider('floatCastingProvider')]
+    public function testResolveWithFloatCasting(string $envValue, float $expected): void
+    {
+        $this->envReader->method('read')->with('FOO')->willReturn($envValue);
+
+        $env = new EnvironmentVariable('FOO');
+        $env->asFloat();
+        $this->assertSame($expected, $env->resolve($this->container, $this->envReader));
+    }
+
+    /** @return array<string, array{string, float}> */
+    public static function floatCastingProvider(): array
+    {
+        return [
+            'positive' => ['3.14', 3.14],
+            'zero' => ['0.0', 0.0],
+            'negative' => ['-2.5', -2.5],
         ];
     }
 
