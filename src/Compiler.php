@@ -31,7 +31,7 @@ class Compiler implements BuilderInterface
     /** @var class-string<TypedContainerInterface> */
     private string $className;
 
-    /** @var Compiler\CodeGeneratorInterface[] */
+    /** @var array<string, Compiler\CodeGeneratorInterface|DefinitionInterface> */
     private array $definitions = [];
 
     /** @var array<class-string, class-string[]> */
@@ -104,7 +104,12 @@ class Compiler implements BuilderInterface
     private function add(string $key, $value): void
     {
         $this->logger->debug('Adding definition for "{key}"', ['key' => $key]);
-        if ($value instanceof FactoryInterface) {
+        if ($value instanceof DefinitionInterface) {
+            if (!$value->isCacheable()) {
+                $this->factories[$key] = true;
+            }
+            $this->definitions[$key] = $value;
+        } elseif ($value instanceof FactoryInterface) {
             $this->factories[$key] = true;
             if ($value->hasDefinition()) {
                 // Something::class => factory(fn ($container) => new Something(...))

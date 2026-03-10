@@ -69,6 +69,14 @@ class DevContainer implements TypedContainerInterface
 
         $def = $this->definitions[$id];
 
+        if ($def instanceof DefinitionInterface) {
+            $result = $def->resolve($this, $this->envReader);
+            if ($def->isCacheable()) {
+                $this->evaluated[$id] = $result;
+            }
+            return $result;
+        }
+
         if ($def instanceof AutowireInterface) {
             $classToAutowire = $def->getWiredClass() ?? $id;
             $value = $this->autowire($classToAutowire);
