@@ -29,6 +29,8 @@ class ConfigGeneratorTest extends TestCase
         self::assertNotContains(Fixtures\ConstructorUntyped::class, $classes);
         self::assertNotContains(Fixtures\EmptyInterface::class, $classes);
         self::assertNotContains(Fixtures\Environment::class, $classes);
+        // Closure cannot be autowired
+        self::assertNotContains(Fixtures\RequiresClosure::class, $classes);
     }
 
     public function testExcludeRemovesClasses(): void

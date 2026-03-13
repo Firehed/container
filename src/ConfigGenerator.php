@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Firehed\Container;
 
-use Composer\ClassMapGenerator\ClassMapGenerator as ComposerClassMapGenerator;
+use Closure;
+use Composer\ClassMapGenerator\ClassMapGenerator;
+use Generator;
 use ReflectionClass;
 use ReflectionNamedType;
 use RuntimeException;
@@ -14,20 +16,30 @@ use RuntimeException;
  */
 class ConfigGenerator
 {
-    private ComposerClassMapGenerator $scanner;
+    /**
+     * Types that cannot meaningfully be autowired from a container.
+     * These are internal PHP types that are not instantiable or are
+     * created through special language constructs.
+     */
+    private const NON_AUTOWIRABLE_TYPES = [
+        Closure::class,
+        Generator::class,
+    ];
+
+    private ClassMapGenerator $scanner;
 
     /** @var list<class-string> */
     private array $excludedClasses = [];
 
     public function __construct()
     {
-        if (!class_exists(ComposerClassMapGenerator::class)) {
+        if (!class_exists(ClassMapGenerator::class)) {
             throw new RuntimeException(
                 'The config generator requires composer/class-map-generator. ' .
                 'Install it with: composer require composer/class-map-generator'
             );
         }
-        $this->scanner = new ComposerClassMapGenerator();
+        $this->scanner = new ClassMapGenerator();
     }
 
     /**
@@ -161,6 +173,11 @@ class ConfigGenerator
 
             // Must not be a builtin type
             if ($type->isBuiltin()) {
+                return false;
+            }
+
+            // Filter out types that can't be in a container
+            if (in_array($type->getName(), self::NON_AUTOWIRABLE_TYPES, true)) {
                 return false;
             }
         }
