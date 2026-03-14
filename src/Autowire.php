@@ -113,17 +113,13 @@ class Autowire
             return false;
         }
 
+        // No constructor = eligible
         if (!$rc->hasMethod('__construct')) {
             return true;
         }
 
-        $constructor = $rc->getMethod('__construct');
-
-        if (!$constructor->isPublic()) {
-            return false;
-        }
-
-        foreach ($constructor->getParameters() as $param) {
+        // Non-public constructors are already excluded by isInstantiable() above
+        foreach ($rc->getMethod('__construct')->getParameters() as $param) {
             if (!self::isParameterAutowirable($param)) {
                 return false;
             }

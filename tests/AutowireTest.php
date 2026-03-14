@@ -53,6 +53,21 @@ class AutowireTest extends TestCase
         self::assertFalse(Autowire::isEligible(Fixtures\RequiresClosure::class));
     }
 
+    public function testClassWithNoTypeHintIsNotEligible(): void
+    {
+        self::assertFalse(Autowire::isEligible(Fixtures\NoTypeHint::class));
+    }
+
+    public function testClassWithUnionTypeParamIsNotEligible(): void
+    {
+        self::assertFalse(Autowire::isEligible(Fixtures\UnionTypeParam::class));
+    }
+
+    public function testClassWithPrivateConstructorIsNotEligible(): void
+    {
+        self::assertFalse(Autowire::isEligible(Fixtures\PrivateConstructor::class));
+    }
+
     public function testOptionalParameterIsAutowirable(): void
     {
         $param = $this->getConstructorParam(Fixtures\OptionalScalarParam::class, 'param');
@@ -83,6 +98,18 @@ class AutowireTest extends TestCase
         self::assertFalse(Autowire::isParameterAutowirable($param));
     }
 
+    public function testNoTypeHintParameterIsNotAutowirable(): void
+    {
+        $param = $this->getConstructorParam(Fixtures\NoTypeHint::class, 'value');
+        self::assertFalse(Autowire::isParameterAutowirable($param));
+    }
+
+    public function testUnionTypeParameterIsNotAutowirable(): void
+    {
+        $param = $this->getConstructorParam(Fixtures\UnionTypeParam::class, 'id');
+        self::assertFalse(Autowire::isParameterAutowirable($param));
+    }
+
     public function testGetRequiredDependencyTypeReturnsTypeName(): void
     {
         $param = $this->getConstructorParam(Fixtures\SessionHandler::class, 'id');
@@ -109,6 +136,20 @@ class AutowireTest extends TestCase
         $param = $this->getConstructorParam(Fixtures\RequiresClosure::class, 'callback');
         $this->expectException(Exceptions\UntypedValue::class);
         Autowire::getRequiredDependencyType($param, Fixtures\RequiresClosure::class);
+    }
+
+    public function testGetRequiredDependencyTypeThrowsForNoTypeHint(): void
+    {
+        $param = $this->getConstructorParam(Fixtures\NoTypeHint::class, 'value');
+        $this->expectException(Exceptions\UntypedValue::class);
+        Autowire::getRequiredDependencyType($param, Fixtures\NoTypeHint::class);
+    }
+
+    public function testGetRequiredDependencyTypeThrowsForUnionType(): void
+    {
+        $param = $this->getConstructorParam(Fixtures\UnionTypeParam::class, 'id');
+        $this->expectException(Exceptions\UntypedValue::class);
+        Autowire::getRequiredDependencyType($param, Fixtures\UnionTypeParam::class);
     }
 
     /**
