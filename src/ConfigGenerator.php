@@ -4,11 +4,7 @@ declare(strict_types=1);
 
 namespace Firehed\Container;
 
-use Closure;
 use Composer\ClassMapGenerator\ClassMapGenerator;
-use Generator;
-use ReflectionClass;
-use ReflectionNamedType;
 use RuntimeException;
 
 /**
@@ -16,16 +12,6 @@ use RuntimeException;
  */
 class ConfigGenerator
 {
-    /**
-     * Types that cannot meaningfully be autowired from a container.
-     * These are internal PHP types that are not instantiable or are
-     * created through special language constructs.
-     */
-    private const NON_AUTOWIRABLE_TYPES = [
-        Closure::class,
-        Generator::class,
-    ];
-
     private ClassMapGenerator $scanner;
 
     /** @var list<class-string> */
@@ -102,7 +88,7 @@ class ConfigGenerator
             if (in_array($className, $this->excludedClasses, true)) {
                 continue;
             }
-            if ($this->isAutowireEligible($className)) {
+            if (Autowire::isEligible($className)) {
                 $eligible[] = $className;
             }
         }
@@ -126,62 +112,5 @@ class ConfigGenerator
         $lines[] = "";
 
         return implode("\n", $lines);
-    }
-
-    /**
-     * @param class-string $className
-     */
-    private function isAutowireEligible(string $className): bool
-    {
-        $rc = new ReflectionClass($className);
-
-        // Skip abstract classes, interfaces, traits, enums
-        if ($rc->isAbstract() || $rc->isInterface() || $rc->isTrait() || $rc->isEnum()) {
-            return false;
-        }
-
-        // No constructor = eligible
-        if (!$rc->hasMethod('__construct')) {
-            return true;
-        }
-
-        $constructor = $rc->getMethod('__construct');
-
-        // Private/protected constructor = not eligible
-        if (!$constructor->isPublic()) {
-            return false;
-        }
-
-        // Check each parameter
-        foreach ($constructor->getParameters() as $param) {
-            // Optional parameters are always fine
-            if ($param->isOptional()) {
-                continue;
-            }
-
-            // Required parameter must be typed
-            if (!$param->hasType()) {
-                return false;
-            }
-
-            $type = $param->getType();
-
-            // Must be a named type (not union/intersection for now)
-            if (!$type instanceof ReflectionNamedType) {
-                return false;
-            }
-
-            // Must not be a builtin type
-            if ($type->isBuiltin()) {
-                return false;
-            }
-
-            // Filter out types that can't be in a container
-            if (in_array($type->getName(), self::NON_AUTOWIRABLE_TYPES, true)) {
-                return false;
-            }
-        }
-
-        return true;
     }
 }
