@@ -20,10 +20,13 @@ class ConfigGenerator
     public function __construct()
     {
         if (!class_exists(ClassMapGenerator::class)) {
+            // Unreachable in testing since it's a dev-dependency
+            // @codeCoverageIgnoreStart
             throw new RuntimeException(
                 'The config generator requires composer/class-map-generator. ' .
                 'Install it with: composer require composer/class-map-generator'
             );
+            // @codeCoverageIgnoreEnd
         }
         $this->scanner = new ClassMapGenerator();
     }
