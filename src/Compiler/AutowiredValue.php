@@ -4,11 +4,9 @@ declare(strict_types=1);
 namespace Firehed\Container\Compiler;
 
 use BadMethodCallException;
-use Firehed\Container\Exceptions\UntypedValue;
+use Firehed\Container\Autowire;
 use ReflectionClass;
 use ReflectionParameter;
-use ReflectionNamedType;
-use ReflectionType;
 
 class AutowiredValue implements CodeGeneratorInterface
 {
@@ -62,23 +60,11 @@ PHP;
         if ($param->isOptional()) {
             return var_export($param->getDefaultValue(), true);
         }
-        if (!$param->hasType()) {
-            throw new UntypedValue($param->getName(), $this->classToAutowire);
-        }
-        $type = $param->getType();
-        assert($type instanceof ReflectionType);
-        // TODO: support ReflectionUnionType (#35), ReflectionIntersectionType (#36)?
-        if (!$type instanceof ReflectionNamedType || $type->isBuiltin()) {
-            throw new UntypedValue($param->getName(), $this->classToAutowire);
-            // this would be good for non-builtins???
-            // throw NotFound::autowireMissing($type->getName(), $this->classToAutowire, $param->getName());
-        }
-        /** @var class-string */
-        $fqcn = $type->getName();
+        $fqcn = Autowire::getRequiredDependencyType($param, $this->classToAutowire);
         $this->dependencies[] = $fqcn;
         return sprintf(
             '$this->get(%s)',
-            var_export($type->getName(), true)
+            var_export($fqcn, true)
         );
     }
 }
