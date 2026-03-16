@@ -94,6 +94,16 @@ try {
 
     $output = $generator->generate();
 
+    // Report any errors that occurred while checking classes
+    $errors = $generator->getErrors();
+    if ($errors !== []) {
+        fwrite(STDERR, sprintf("Warning: %d class(es) could not be checked:\n\n", count($errors)));
+        foreach ($errors as $className => $error) {
+            fwrite(STDERR, sprintf("  %s\n", $className));
+            fwrite(STDERR, sprintf("    %s: %s\n\n", get_class($error), $error->getMessage()));
+        }
+    }
+
     if ($outputFile !== null) {
         file_put_contents($outputFile, $output);
         fwrite(STDERR, "Config written to: $outputFile\n");

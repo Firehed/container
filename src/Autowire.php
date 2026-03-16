@@ -104,9 +104,13 @@ class Autowire
      * Check if a class can be autowired based on its constructor signature.
      *
      * @param class-string $className
+     * @throws \Throwable If the class cannot be loaded (e.g., has side effects or broken dependencies)
      */
     public static function isEligible(string $className): bool
     {
+        // ReflectionClass constructor triggers autoloading, which can fail if
+        // the class has side effects or broken dependencies at include-time.
+        // We let this propagate so callers can handle/report it appropriately.
         $rc = new ReflectionClass($className);
 
         if (!$rc->isInstantiable()) {

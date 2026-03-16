@@ -6,6 +6,7 @@ namespace Firehed\Container;
 
 use Composer\ClassMapGenerator\ClassMapGenerator;
 use RuntimeException;
+use Throwable;
 
 /**
  * Discovers autowire-eligible classes and generates container configuration.
@@ -16,6 +17,9 @@ class ConfigGenerator
 
     /** @var list<class-string> */
     private array $excludedClasses = [];
+
+    /** @var array<class-string, Throwable> */
+    private array $errors = [];
 
     public function __construct()
     {
@@ -85,19 +89,37 @@ class ConfigGenerator
     public function getEligibleClasses(): array
     {
         $classMap = $this->scanner->getClassMap();
+        $this->errors = [];
 
         $eligible = [];
         foreach ($classMap->getMap() as $className => $path) {
             if (in_array($className, $this->excludedClasses, true)) {
                 continue;
             }
-            if (Autowire::isEligible($className)) {
-                $eligible[] = $className;
+            try {
+                if (Autowire::isEligible($className)) {
+                    $eligible[] = $className;
+                }
+            } catch (Throwable $e) {
+                $this->errors[$className] = $e;
             }
         }
 
         sort($eligible);
         return $eligible;
+    }
+
+    /**
+     * Get errors that occurred while checking class eligibility.
+     *
+     * These are typically caused by classes that have side effects or
+     * broken dependencies when loaded via the autoloader.
+     *
+     * @return array<class-string, Throwable>
+     */
+    public function getErrors(): array
+    {
+        return $this->errors;
     }
 
     /**
