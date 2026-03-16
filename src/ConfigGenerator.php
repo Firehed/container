@@ -18,7 +18,7 @@ class ConfigGenerator
     /** @var list<class-string> */
     private array $excludedClasses = [];
 
-    /** @var array<class-string, Throwable> */
+    /** @var array<class-string, array{error: Throwable, file: string}> */
     private array $errors = [];
 
     public function __construct()
@@ -96,12 +96,16 @@ class ConfigGenerator
             if (in_array($className, $this->excludedClasses, true)) {
                 continue;
             }
+            // Suppress warnings/deprecations during autoload - they're noise
+            $previousLevel = error_reporting(E_ERROR);
             try {
                 if (Autowire::isEligible($className)) {
                     $eligible[] = $className;
                 }
             } catch (Throwable $e) {
-                $this->errors[$className] = $e;
+                $this->errors[$className] = ['error' => $e, 'file' => $path];
+            } finally {
+                error_reporting($previousLevel);
             }
         }
 
@@ -115,7 +119,7 @@ class ConfigGenerator
      * These are typically caused by classes that have side effects or
      * broken dependencies when loaded via the autoloader.
      *
-     * @return array<class-string, Throwable>
+     * @return array<class-string, array{error: Throwable, file: string}>
      */
     public function getErrors(): array
     {
