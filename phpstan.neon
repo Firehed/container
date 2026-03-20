@@ -6,6 +6,8 @@ parameters:
     ignoreErrors:
         - '#^Dynamic call to static method PHPUnit\\Framework\\Assert::assert#'
         - '#^Property .* is never read, only written.$#'
+        - identifier: method.alreadyNarrowedType
+          path: tests/*
     level: max
     paths:
         - src

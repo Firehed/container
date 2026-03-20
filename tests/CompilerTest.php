@@ -11,7 +11,7 @@ use Psr\Log\AbstractLogger;
  * @covers Firehed\Container\Compiler\AutowiredValue
  * @covers Firehed\Container\Compiler\ClosureValue
  * @covers Firehed\Container\Compiler\ClosureVisitor
- * @covers Firehed\Container\Compiler\EnvironmentVariableValue
+ * @covers Firehed\Container\EnvironmentVariable
  * @covers Firehed\Container\Compiler\LiteralValue
  * @covers Firehed\Container\Compiler\NoDependenciesTrait
  * @covers Firehed\Container\Compiler\ParserLoader
