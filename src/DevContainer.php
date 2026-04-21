@@ -163,9 +163,16 @@ class DevContainer implements TypedContainerInterface
         $needed = [];
         foreach ($params as $param) {
             if ($param->isOptional()) {
-                $needed[] = function () use ($param) {
-                    return $param->getDefaultValue();
-                };
+                $typeName = Autowire::getOptionalDependencyType($param);
+                if ($typeName !== null && $this->has($typeName)) {
+                    $needed[] = (function (TypedContainerInterface $c) use ($typeName) {
+                        return $c->get($typeName);
+                    })->bindTo(null);
+                } else {
+                    $needed[] = function () use ($param) {
+                        return $param->getDefaultValue();
+                    };
+                }
             } else {
                 $name = Autowire::getRequiredDependencyType($param, $class);
                 if (!$this->has($name)) {
