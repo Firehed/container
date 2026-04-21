@@ -152,6 +152,20 @@ class AutowireTest extends TestCase
         Autowire::getRequiredDependencyType($param, Fixtures\UnionTypeParam::class);
     }
 
+    public function testGetOptionalDependencyTypeReturnsTypeForObjectParam(): void
+    {
+        $param = $this->getConstructorParam(Fixtures\OptionalObjectParam::class, 'sessionId');
+        $type = Autowire::getOptionalDependencyType($param);
+        self::assertSame(\SessionIdInterface::class, $type);
+    }
+
+    public function testGetOptionalDependencyTypeReturnsNullForScalarParam(): void
+    {
+        $param = $this->getConstructorParam(Fixtures\OptionalScalarParam::class, 'param');
+        $type = Autowire::getOptionalDependencyType($param);
+        self::assertNull($type);
+    }
+
     /**
      * @param class-string $class
      */
