@@ -319,6 +319,28 @@ trait ContainerBuilderTestTrait
         $this->assertNull($osp->getParam());
     }
 
+    /**
+     * OptionalObjectParam::class => autowire()
+     * SessionIdInterface::class => Fixtures\SessionId::class
+     *
+     * When the container has an entry for an optional parameter's type,
+     * it should be injected rather than using the default value.
+     */
+    public function testOptionalObjectParamUsesContainerEntryWhenAvailable(): void
+    {
+        $container = $this->getContainer();
+        $oop = $this->assertGetSingleton(
+            $container,
+            Fixtures\OptionalObjectParam::class
+        );
+        assert($oop instanceof Fixtures\OptionalObjectParam);
+        // SessionIdInterface is registered, so it should be injected
+        $this->assertInstanceOf(
+            Fixtures\SessionId::class,
+            $oop->getSessionId(),
+        );
+    }
+
     public function testHasWithMissingKeyReturnsFalse(): void
     {
         $container = $this->getContainer();
