@@ -28,6 +28,51 @@ class Autowire
     ];
 
     /**
+     * Extract the resolvable type name from a parameter, if any.
+     *
+     * @return ?class-string The type name if resolvable, null otherwise
+     */
+    private static function getResolvableTypeName(ReflectionParameter $param): ?string
+    {
+        if (!$param->hasType()) {
+            return null;
+        }
+
+        $type = $param->getType();
+
+        // TODO: support ReflectionUnionType (#35), ReflectionIntersectionType (#36)?
+        if (!$type instanceof ReflectionNamedType) {
+            return null;
+        }
+
+        if ($type->isBuiltin()) {
+            return null;
+        }
+
+        $typeName = $type->getName();
+
+        if (in_array($typeName, self::NON_AUTOWIRABLE_TYPES, true)) {
+            return null;
+        }
+
+        /** @var class-string */
+        return $typeName;
+    }
+
+    /**
+     * Get the dependency type name for an optional parameter, if resolvable.
+     *
+     * Returns the type name if the parameter has an autowirable object type,
+     * null otherwise (scalar, untyped, union, etc).
+     *
+     * @return ?class-string
+     */
+    public static function getOptionalDependencyType(ReflectionParameter $param): ?string
+    {
+        return self::getResolvableTypeName($param);
+    }
+
+    /**
      * Get the dependency type name for a required parameter.
      *
      * This validates that the parameter can be autowired and returns
@@ -41,28 +86,10 @@ class Autowire
         ReflectionParameter $param,
         string $declaringClass,
     ): string {
-        if (!$param->hasType()) {
+        $typeName = self::getResolvableTypeName($param);
+        if ($typeName === null) {
             throw new Exceptions\UntypedValue($param->getName(), $declaringClass);
         }
-
-        $type = $param->getType();
-
-        // TODO: support ReflectionUnionType (#35), ReflectionIntersectionType (#36)?
-        if (!$type instanceof ReflectionNamedType) {
-            throw new Exceptions\UntypedValue($param->getName(), $declaringClass);
-        }
-
-        if ($type->isBuiltin()) {
-            throw new Exceptions\UntypedValue($param->getName(), $declaringClass);
-        }
-
-        $typeName = $type->getName();
-
-        if (in_array($typeName, self::NON_AUTOWIRABLE_TYPES, true)) {
-            throw new Exceptions\UntypedValue($param->getName(), $declaringClass);
-        }
-
-        /** @var class-string */
         return $typeName;
     }
 
@@ -75,29 +102,7 @@ class Autowire
      */
     public static function isParameterAutowirable(ReflectionParameter $param): bool
     {
-        if ($param->isOptional()) {
-            return true;
-        }
-
-        if (!$param->hasType()) {
-            return false;
-        }
-
-        $type = $param->getType();
-
-        if (!$type instanceof ReflectionNamedType) {
-            return false;
-        }
-
-        if ($type->isBuiltin()) {
-            return false;
-        }
-
-        if (in_array($type->getName(), self::NON_AUTOWIRABLE_TYPES, true)) {
-            return false;
-        }
-
-        return true;
+        return $param->isOptional() || self::getResolvableTypeName($param) !== null;
     }
 
     /**
