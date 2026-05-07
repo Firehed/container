@@ -186,6 +186,19 @@ class EnvironmentVariableTest extends TestCase
         $env->resolve(self::createStub(TypedContainerInterface::class), $envReader);
     }
 
+    #[DataProvider('boolCastingProvider')]
+    public function testParseBool(string $value, bool $expected): void
+    {
+        $this->assertSame($expected, EnvironmentVariable::parseBool($value));
+    }
+
+    public function testParseBoolThrowsOnInvalidValue(): void
+    {
+        $this->expectException(\OutOfBoundsException::class);
+        $this->expectExceptionMessage('Invalid boolean value');
+        EnvironmentVariable::parseBool('invalid');
+    }
+
     public function testGenerateCodeContainsEnvReaderCall(): void
     {
         $env = new EnvironmentVariable('MY_VAR');
@@ -212,5 +225,13 @@ class EnvironmentVariableTest extends TestCase
         $env = new EnvironmentVariable('MY_VAR');
         $code = $env->generateCode();
         $this->assertStringContainsString('EnvironmentVariableNotSet', $code);
+    }
+
+    public function testGenerateCodeForBoolContainsParseBoolCall(): void
+    {
+        $env = new EnvironmentVariable('MY_VAR');
+        $env->asBool();
+        $code = $env->generateCode();
+        $this->assertStringContainsString('EnvironmentVariable::parseBool($value)', $code);
     }
 }

@@ -72,6 +72,15 @@ class EnvironmentVariable implements EnvironmentVariableInterface, DefinitionInt
         return $this;
     }
 
+    public static function parseBool(string $value): bool
+    {
+        return match (strtolower($value)) {
+            '1', 'true' => true,
+            '', '0', 'false' => false,
+            default => throw new \OutOfBoundsException('Invalid boolean value'),
+        };
+    }
+
     // DefinitionInterface implementation
 
     public function generateCode(): string
@@ -89,13 +98,10 @@ PHP;
     {
         return match ($this->cast) {
             EnvironmentVariableInterface::CAST_NONE => 'return $value;',
-            EnvironmentVariableInterface::CAST_BOOL => <<<'PHP'
-return match (strtolower($value)) {
-    '1', 'true' => true,
-    '', '0', 'false' => false,
-    default => throw new \OutOfBoundsException('Invalid boolean value'),
-};
-PHP,
+            EnvironmentVariableInterface::CAST_BOOL => sprintf(
+                'return %s::parseBool($value);',
+                self::class,
+            ),
             EnvironmentVariableInterface::CAST_INT,
             EnvironmentVariableInterface::CAST_FLOAT => sprintf('return (%s)$value;', $this->cast),
             default => sprintf('return %s::from($value);', $this->cast),
@@ -132,11 +138,7 @@ PHP,
 
         return match ($this->cast) {
             EnvironmentVariableInterface::CAST_NONE => $envValue,
-            EnvironmentVariableInterface::CAST_BOOL => match (strtolower((string) $envValue)) {
-                '1', 'true' => true,
-                '', '0', 'false' => false,
-                default => throw new \OutOfBoundsException('Invalid boolean value'),
-            },
+            EnvironmentVariableInterface::CAST_BOOL => self::parseBool((string) $envValue),
             EnvironmentVariableInterface::CAST_INT => (int) $envValue,
             EnvironmentVariableInterface::CAST_FLOAT => (float) $envValue,
             // Remaining cast type is an enum; use its `::from` method
