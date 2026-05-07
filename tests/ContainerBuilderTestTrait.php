@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Firehed\Container;
@@ -7,6 +8,7 @@ use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Firehed\Container\Exceptions\IncorrectlyTypedValue;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use SessionHandlerInterface;
@@ -241,10 +243,9 @@ trait ContainerBuilderTestTrait
 
     /**
      * some_string => scalar_literal
-     * @dataProvider scalarLiterals
-     * @param mixed $expectedValue
      */
-    public function testScalarLiteral(string $key, $expectedValue): void
+    #[DataProvider('scalarLiterals')]
+    public function testScalarLiteral(string $key, mixed $expectedValue): void
     {
         $container = $this->getContainer();
         $this->assertTrue($container->has($key), 'has should be true');
@@ -361,10 +362,6 @@ trait ContainerBuilderTestTrait
         self::assertIsString($value);
     }
 
-    /**
-     * @covers \Firehed\Container\Compiler\ClosureValue
-     * @covers \Firehed\Container\Compiler\ClosureVisitor
-     */
     public function testAliasedImportsAreNotMangled(): void
     {
         $container = $this->getContainer();
