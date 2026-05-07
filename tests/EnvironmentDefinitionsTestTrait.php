@@ -122,6 +122,29 @@ trait EnvironmentDefinitionsTestTrait
             ['env_asfloat_zero', 0.0],
             ['env_asfloat_notset', 3.14],
             ['env_asenum', Fixtures\Environment::TESTING],
+            ['env_asenum_valid_default', Fixtures\Environment::PRODUCTION],
         ];
+    }
+
+    public function testEnumWithNullDefaultThrowsTypeError(): void
+    {
+        $container = $this->getContainer();
+        $this->assertTrue($container->has('env_asenum_null_default'));
+        $this->expectException(Exceptions\ValueRetrievalException::class);
+        // BackedEnum::from TypeError
+        $this->expectExceptionMessage('must be of type string, null given');
+        $container->get('env_asenum_null_default');
+    }
+
+    public function testEnumWithInvalidDefaultThrowsValueError(): void
+    {
+        $container = $this->getContainer();
+        $this->assertTrue($container->has('env_asenum_invalid_default'));
+        $this->expectException(Exceptions\ValueRetrievalException::class);
+        // This is the PHP native message for BackedEnum::from failure. It's
+        // a little fragile since PHPUnit lacks tooling for
+        // $exception->previous AFAIK.
+        $this->expectExceptionMessage('is not a valid backing value');
+        $container->get('env_asenum_invalid_default');
     }
 }
