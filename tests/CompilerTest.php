@@ -14,7 +14,6 @@ use Psr\Log\AbstractLogger;
 #[CoversClass(Compiler\ClosureVisitor::class)]
 #[CoversClass(Compiler\EnvironmentVariableValue::class)]
 #[CoversClass(Compiler\LiteralValue::class)]
-#[CoversClass(Compiler\ParserLoader::class)]
 #[CoversClass(Compiler\ProxyValue::class)]
 #[CoversClass(CompiledContainer::class)]
 #[CoversClass(Exceptions\IncorrectlyTypedValue::class)]
