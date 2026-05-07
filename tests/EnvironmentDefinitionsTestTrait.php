@@ -1,9 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Firehed\Container;
 
 use Firehed\Container\Exceptions\ValueRetrievalException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Container\ContainerExceptionInterface;
 
 trait EnvironmentDefinitionsTestTrait
@@ -25,9 +27,7 @@ trait EnvironmentDefinitionsTestTrait
         $this->assertSame($rawGetEnvValue, $value, 'get should return the value');
     }
 
-    /**
-     * @dataProvider envVarsThatAreSet
-     */
+    #[DataProvider('envVarsThatAreSet')]
     public function testWrappedEnv(string $key): void
     {
         $unittestEnvVar = md5((string)random_int(0, PHP_INT_MAX));
@@ -61,11 +61,11 @@ trait EnvironmentDefinitionsTestTrait
     }
 
     /**
-     * @dataProvider casts
      * @param string $containerKey Access key
      * @param mixed $expected Expected value (post-casting)
      */
-    public function testCastingBehavior(string $containerKey, $expected): void
+    #[DataProvider('casts')]
+    public function testCastingBehavior(string $containerKey, mixed $expected): void
     {
         $_ENV[self::$prefix . 'ONE_POINT_FIVE'] = '1.5';
         $_ENV[self::$prefix . 'ONE'] = '1';
