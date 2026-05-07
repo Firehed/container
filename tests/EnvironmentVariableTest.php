@@ -170,6 +170,22 @@ class EnvironmentVariableTest extends TestCase
         $this->assertSame(Fixtures\Environment::TESTING, $result);
     }
 
+    public function testResolveWithEnumCastingThrowsWhenNullDefault(): void
+    {
+        $envReader = $this->createMock(EnvReader::class);
+        $envReader->expects($this->once())
+            ->method('read')
+            ->with('ENV')
+            ->willReturn(null);
+
+        $env = new EnvironmentVariable('ENV', null);
+        $env->asEnum(Fixtures\Environment::class);
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage("'ENV' was not set and its null default cannot be cast to enum");
+        $env->resolve(self::createStub(TypedContainerInterface::class), $envReader);
+    }
+
     public function testGenerateCodeContainsEnvReaderCall(): void
     {
         $env = new EnvironmentVariable('MY_VAR');

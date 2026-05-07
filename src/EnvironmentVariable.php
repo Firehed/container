@@ -87,30 +87,19 @@ PHP;
 
     private function getCastCodeBody(): string
     {
-        if ($this->cast === EnvironmentVariableInterface::CAST_NONE) {
-            return 'return $value;';
-        } elseif ($this->cast === EnvironmentVariableInterface::CAST_BOOL) {
-            return <<<'PHP'
-switch (strtolower($value)) {
-    case '1':  // fallthrough
-    case 'true':
-        return true;
-    case '': // fallthrough
-    case '0':  // fallthrough
-    case 'false':
-        return false;
-    default:
-        throw new \OutOfBoundsException('Invalid boolean value');
-}
-PHP;
-        } elseif ($this->cast === EnvironmentVariableInterface::CAST_INT) {
-            return sprintf('return (%s)$value;', $this->cast);
-        } elseif ($this->cast === EnvironmentVariableInterface::CAST_FLOAT) {
-            return sprintf('return (%s)$value;', $this->cast);
-        } else {
-            // class-string<BackedEnum>
-            return sprintf('return %s::from($value);', $this->cast);
-        }
+        return match ($this->cast) {
+            EnvironmentVariableInterface::CAST_NONE => 'return $value;',
+            EnvironmentVariableInterface::CAST_BOOL => <<<'PHP'
+return match (strtolower($value)) {
+    '1', 'true' => true,
+    '', '0', 'false' => false,
+    default => throw new \OutOfBoundsException('Invalid boolean value'),
+};
+PHP,
+            EnvironmentVariableInterface::CAST_INT,
+            EnvironmentVariableInterface::CAST_FLOAT => sprintf('return (%s)$value;', $this->cast),
+            default => sprintf('return %s::from($value);', $this->cast),
+        };
     }
 
     private function getDefaultCodeBody(): string
@@ -141,31 +130,20 @@ PHP;
             }
         }
 
-        switch ($this->cast) {
-            case EnvironmentVariableInterface::CAST_NONE:
-                return $envValue;
-            case EnvironmentVariableInterface::CAST_BOOL:
-                switch (strtolower((string) $envValue)) {
-                    case '1': // fallthrough
-                    case 'true':
-                        return true;
-                    case '': // fallthrough
-                    case '0': // fallthrough
-                    case 'false':
-                        return false;
-                    default:
-                        throw new \OutOfBoundsException('Invalid boolean value');
-                }
-                // unreachable
-            case EnvironmentVariableInterface::CAST_INT:
-                return (int) $envValue;
-            case EnvironmentVariableInterface::CAST_FLOAT:
-                return (float) $envValue;
-            default:
-                // class-string<BackedEnum>
-                assert($envValue !== null);
-                return $this->cast::from($envValue);
-        }
+        return match ($this->cast) {
+            EnvironmentVariableInterface::CAST_NONE => $envValue,
+            EnvironmentVariableInterface::CAST_BOOL => match (strtolower((string) $envValue)) {
+                '1', 'true' => true,
+                '', '0', 'false' => false,
+                default => throw new \OutOfBoundsException('Invalid boolean value'),
+            },
+            EnvironmentVariableInterface::CAST_INT => (int) $envValue,
+            EnvironmentVariableInterface::CAST_FLOAT => (float) $envValue,
+            default => $this->cast::from($envValue ?? throw new \LogicException(sprintf(
+                "Environment variable '%s' was not set and its null default cannot be cast to enum",
+                $this->name,
+            ))),
+        };
     }
 
     public function isCacheable(): bool
