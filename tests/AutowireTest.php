@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace Firehed\Container;
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionParameter;
 
-/**
- * @covers Firehed\Container\Autowire
- */
+#[CoversClass(Autowire::class)]
 class AutowireTest extends TestCase
 {
     public function testClassWithNoConstructorIsEligible(): void
