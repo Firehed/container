@@ -7,4 +7,5 @@ use Firehed\Container\Fixtures;
 return [
     Fixtures\DefaultScalarParam::class => autowire(),
     Fixtures\OptionalScalarParam::class => autowire(),
+    Fixtures\OptionalObjectParam::class => autowire(),
 ];

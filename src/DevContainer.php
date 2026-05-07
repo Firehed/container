@@ -7,9 +7,7 @@ use Closure;
 use Exception;
 use Psr\Container\ContainerExceptionInterface;
 use ReflectionClass;
-use ReflectionNamedType;
 use Throwable;
-use TypeError;
 
 class DevContainer implements TypedContainerInterface
 {
@@ -129,19 +127,18 @@ class DevContainer implements TypedContainerInterface
         $needed = [];
         foreach ($params as $param) {
             if ($param->isOptional()) {
-                $needed[] = function () use ($param) {
-                    return $param->getDefaultValue();
-                };
+                $typeName = Autowire::getOptionalDependencyType($param);
+                if ($typeName !== null && $this->has($typeName)) {
+                    $needed[] = (function (TypedContainerInterface $c) use ($typeName) {
+                        return $c->get($typeName);
+                    })->bindTo(null);
+                } else {
+                    $needed[] = function () use ($param) {
+                        return $param->getDefaultValue();
+                    };
+                }
             } else {
-                if (!$param->hasType()) {
-                    throw new Exceptions\UntypedValue($param->getName(), $class);
-                }
-                $type = $param->getType();
-                assert($type instanceof ReflectionNamedType);
-                if ($type->isBuiltin()) {
-                    throw new Exceptions\UntypedValue($param->getName(), $class);
-                }
-                $name = $type->getName();
+                $name = Autowire::getRequiredDependencyType($param, $class);
                 if (!$this->has($name)) {
                     throw Exceptions\NotFound::autowireMissing($name, $class, $param->getName());
                 }
