@@ -4,22 +4,22 @@ declare(strict_types=1);
 
 namespace Firehed\Container;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\AbstractLogger;
 
-/**
- * @covers Firehed\Container\Compiler
- * @covers Firehed\Container\Compiler\AutowiredValue
- * @covers Firehed\Container\Compiler\ClosureValue
- * @covers Firehed\Container\Compiler\ClosureVisitor
- * @covers Firehed\Container\Compiler\EnvironmentVariableValue
- * @covers Firehed\Container\Compiler\LiteralValue
- * @covers Firehed\Container\Compiler\NoDependenciesTrait
- * @covers Firehed\Container\Compiler\ParserLoader
- * @covers Firehed\Container\Compiler\ProxyValue
- * @covers Firehed\Container\CompiledContainer
- * @covers Firehed\Container\Exceptions\IncorrectlyTypedValue
- */
-class CompilerTest extends \PHPUnit\Framework\TestCase
+#[CoversClass(Compiler::class)]
+#[CoversClass(Compiler\AutowiredValue::class)]
+#[CoversClass(Compiler\ClosureValue::class)]
+#[CoversClass(Compiler\ClosureVisitor::class)]
+#[CoversClass(Compiler\EnvironmentVariableValue::class)]
+#[CoversClass(Compiler\LiteralValue::class)]
+#[CoversClass(Compiler\NoDependenciesTrait::class)]
+#[CoversClass(Compiler\ParserLoader::class)]
+#[CoversClass(Compiler\ProxyValue::class)]
+#[CoversClass(CompiledContainer::class)]
+#[CoversClass(Exceptions\IncorrectlyTypedValue::class)]
+class CompilerTest extends TestCase
 {
     use ContainerBuilderTestTrait;
 
