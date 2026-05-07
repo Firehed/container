@@ -31,7 +31,7 @@ class Compiler implements BuilderInterface
     /** @var class-string<TypedContainerInterface> */
     private string $className;
 
-    /** @var array<string, Compiler\CodeGeneratorInterface|DefinitionInterface> */
+    /** @var array<string, Compiler\CodeGeneratorInterface> */
     private array $definitions = [];
 
     /** @var array<class-string, class-string[]> */
@@ -138,9 +138,6 @@ class Compiler implements BuilderInterface
         } elseif ($value instanceof Closure) {
             // someName => fn ($container) => new Something(...)
             $this->definitions[$key] = new Compiler\ClosureValue($value);
-        } elseif ($value instanceof EnvironmentVariableInterface) {
-            // someName => env('SOME_NAME')
-            $this->definitions[$key] = new Compiler\EnvironmentVariableValue($value);
         } elseif (interface_exists($key)) {
             assert(is_string($value), 'Values without keys must be strings that correspond to autowirable classes');
             if (class_exists($value)) {

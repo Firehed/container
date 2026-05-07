@@ -8,14 +8,14 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\AbstractLogger;
 
+#[CoversClass(CompiledContainer::class)]
 #[CoversClass(Compiler::class)]
 #[CoversClass(Compiler\AutowiredValue::class)]
 #[CoversClass(Compiler\ClosureValue::class)]
 #[CoversClass(Compiler\ClosureVisitor::class)]
-#[CoversClass(Compiler\EnvironmentVariableValue::class)]
 #[CoversClass(Compiler\LiteralValue::class)]
 #[CoversClass(Compiler\ProxyValue::class)]
-#[CoversClass(CompiledContainer::class)]
+#[CoversClass(EnvironmentVariable::class)]
 #[CoversClass(Exceptions\IncorrectlyTypedValue::class)]
 class CompilerTest extends TestCase
 {

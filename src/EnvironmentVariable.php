@@ -9,7 +9,7 @@ use function enum_exists;
 use function func_num_args;
 use function sprintf;
 
-class EnvironmentVariable implements EnvironmentVariableInterface
+class EnvironmentVariable implements EnvironmentVariableInterface, DefinitionInterface
 {
     /** @var EnvironmentVariableInterface::CAST_* | class-string<\BackedEnum> */
     private string $cast = EnvironmentVariableInterface::CAST_NONE;
@@ -70,5 +70,85 @@ class EnvironmentVariable implements EnvironmentVariableInterface
     {
         $this->cast = EnvironmentVariableInterface::CAST_INT;
         return $this;
+    }
+
+    public static function parseBool(string $value): bool
+    {
+        return match (strtolower($value)) {
+            '1', 'true' => true,
+            '', '0', 'false' => false,
+            default => throw new \OutOfBoundsException('Invalid boolean value'),
+        };
+    }
+
+    // DefinitionInterface implementation
+
+    public function generateCode(): string
+    {
+        return <<<PHP
+\$value = \$this->envReader->read('{$this->name}');
+if (\$value === null) {
+    {$this->getDefaultCodeBody()}
+}
+{$this->getCastCodeBody()}
+PHP;
+    }
+
+    private function getCastCodeBody(): string
+    {
+        return match ($this->cast) {
+            EnvironmentVariableInterface::CAST_NONE => 'return $value;',
+            EnvironmentVariableInterface::CAST_BOOL => sprintf(
+                'return %s::parseBool($value);',
+                self::class,
+            ),
+            EnvironmentVariableInterface::CAST_INT,
+            EnvironmentVariableInterface::CAST_FLOAT => sprintf('return (%s)$value;', $this->cast),
+            default => sprintf('return %s::from($value);', $this->cast),
+        };
+    }
+
+    private function getDefaultCodeBody(): string
+    {
+        if ($this->hasDefault) {
+            $default = var_export($this->default, true);
+            return "\$value = $default;";
+        } else {
+            $varName = var_export($this->name, true);
+            return sprintf('throw new %s(%s);', Exceptions\EnvironmentVariableNotSet::class, $varName);
+        }
+    }
+
+    /** @return class-string[] */
+    public function getDependencies(): array
+    {
+        return [];
+    }
+
+    public function resolve(TypedContainerInterface $container, EnvReader $envReader): mixed
+    {
+        $envValue = $envReader->read($this->name);
+        if ($envValue === null) {
+            if ($this->hasDefault) {
+                $envValue = $this->default;
+            } else {
+                throw new Exceptions\EnvironmentVariableNotSet($this->name);
+            }
+        }
+
+        return match ($this->cast) {
+            EnvironmentVariableInterface::CAST_NONE => $envValue,
+            EnvironmentVariableInterface::CAST_BOOL => self::parseBool((string) $envValue),
+            EnvironmentVariableInterface::CAST_INT => (int) $envValue,
+            EnvironmentVariableInterface::CAST_FLOAT => (float) $envValue,
+            // Remaining cast type is an enum; use its `::from` method
+            // @phpstan-ignore argument.type (null intentionally triggers native TypeError)
+            default => $this->cast::from($envValue),
+        };
+    }
+
+    public function isCacheable(): bool
+    {
+        return true;
     }
 }
