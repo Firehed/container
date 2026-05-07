@@ -6,21 +6,11 @@ namespace Firehed\Container;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(EnvironmentVariable::class)]
 class EnvironmentVariableTest extends TestCase
 {
-    private EnvReader&MockObject $envReader;
-    private TypedContainerInterface&MockObject $container;
-
-    protected function setUp(): void
-    {
-        $this->envReader = $this->createMock(EnvReader::class);
-        $this->container = $this->createMock(TypedContainerInterface::class);
-    }
-
     public function testImplementsDefinitionInterface(): void
     {
         $env = new EnvironmentVariable('FOO');
@@ -41,56 +31,68 @@ class EnvironmentVariableTest extends TestCase
 
     public function testResolveReturnsEnvValue(): void
     {
-        $this->envReader->method('read')
+        $envReader = $this->createMock(EnvReader::class);
+        $envReader->expects($this->once())
+            ->method('read')
             ->with('FOO')
             ->willReturn('bar');
 
         $env = new EnvironmentVariable('FOO');
-        $result = $env->resolve($this->container, $this->envReader);
+        $result = $env->resolve(self::createStub(TypedContainerInterface::class), $envReader);
         $this->assertSame('bar', $result);
     }
 
     public function testResolveReturnsDefaultWhenNotSet(): void
     {
-        $this->envReader->method('read')
+        $envReader = $this->createMock(EnvReader::class);
+        $envReader->expects($this->once())
+            ->method('read')
             ->with('FOO')
             ->willReturn(null);
 
         $env = new EnvironmentVariable('FOO', 'default_value');
-        $result = $env->resolve($this->container, $this->envReader);
+        $result = $env->resolve(self::createStub(TypedContainerInterface::class), $envReader);
         $this->assertSame('default_value', $result);
     }
 
     public function testResolveReturnsNullDefaultWhenNotSet(): void
     {
-        $this->envReader->method('read')
+        $envReader = $this->createMock(EnvReader::class);
+        $envReader->expects($this->once())
+            ->method('read')
             ->with('FOO')
             ->willReturn(null);
 
         $env = new EnvironmentVariable('FOO', null);
-        $result = $env->resolve($this->container, $this->envReader);
+        $result = $env->resolve(self::createStub(TypedContainerInterface::class), $envReader);
         $this->assertNull($result);
     }
 
     public function testResolveThrowsWhenNotSetAndNoDefault(): void
     {
-        $this->envReader->method('read')
+        $envReader = $this->createMock(EnvReader::class);
+        $envReader->expects($this->once())
+            ->method('read')
             ->with('FOO')
             ->willReturn(null);
 
         $env = new EnvironmentVariable('FOO');
         $this->expectException(Exceptions\EnvironmentVariableNotSet::class);
-        $env->resolve($this->container, $this->envReader);
+        $env->resolve(self::createStub(TypedContainerInterface::class), $envReader);
     }
 
     #[DataProvider('boolCastingProvider')]
     public function testResolveWithBoolCasting(string $envValue, bool $expected): void
     {
-        $this->envReader->method('read')->with('FOO')->willReturn($envValue);
+        $envReader = $this->createMock(EnvReader::class);
+        $envReader->expects($this->once())
+            ->method('read')
+            ->with('FOO')
+            ->willReturn($envValue);
 
         $env = new EnvironmentVariable('FOO');
         $env->asBool();
-        $this->assertSame($expected, $env->resolve($this->container, $this->envReader));
+        $this->assertSame($expected, $env->resolve(self::createStub(TypedContainerInterface::class), $envReader));
     }
 
     /** @return array<string, array{string, bool}> */
@@ -108,11 +110,15 @@ class EnvironmentVariableTest extends TestCase
     #[DataProvider('intCastingProvider')]
     public function testResolveWithIntCasting(string $envValue, int $expected): void
     {
-        $this->envReader->method('read')->with('FOO')->willReturn($envValue);
+        $envReader = $this->createMock(EnvReader::class);
+        $envReader->expects($this->once())
+            ->method('read')
+            ->with('FOO')
+            ->willReturn($envValue);
 
         $env = new EnvironmentVariable('FOO');
         $env->asInt();
-        $this->assertSame($expected, $env->resolve($this->container, $this->envReader));
+        $this->assertSame($expected, $env->resolve(self::createStub(TypedContainerInterface::class), $envReader));
     }
 
     /** @return array<string, array{string, int}> */
@@ -128,11 +134,15 @@ class EnvironmentVariableTest extends TestCase
     #[DataProvider('floatCastingProvider')]
     public function testResolveWithFloatCasting(string $envValue, float $expected): void
     {
-        $this->envReader->method('read')->with('FOO')->willReturn($envValue);
+        $envReader = $this->createMock(EnvReader::class);
+        $envReader->expects($this->once())
+            ->method('read')
+            ->with('FOO')
+            ->willReturn($envValue);
 
         $env = new EnvironmentVariable('FOO');
         $env->asFloat();
-        $this->assertSame($expected, $env->resolve($this->container, $this->envReader));
+        $this->assertSame($expected, $env->resolve(self::createStub(TypedContainerInterface::class), $envReader));
     }
 
     /** @return array<string, array{string, float}> */
@@ -147,13 +157,15 @@ class EnvironmentVariableTest extends TestCase
 
     public function testResolveWithEnumCasting(): void
     {
-        $this->envReader->method('read')
+        $envReader = $this->createMock(EnvReader::class);
+        $envReader->expects($this->once())
+            ->method('read')
             ->with('ENV')
             ->willReturn('testing');
 
         $env = new EnvironmentVariable('ENV');
         $env->asEnum(Fixtures\Environment::class);
-        $result = $env->resolve($this->container, $this->envReader);
+        $result = $env->resolve(self::createStub(TypedContainerInterface::class), $envReader);
         $this->assertSame(Fixtures\Environment::TESTING, $result);
     }
 
