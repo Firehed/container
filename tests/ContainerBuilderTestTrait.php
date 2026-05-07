@@ -8,7 +8,6 @@ use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Firehed\Container\Exceptions\IncorrectlyTypedValue;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -363,8 +362,6 @@ trait ContainerBuilderTestTrait
         self::assertIsString($value);
     }
 
-    #[CoversClass(Compiler\ClosureValue::class)]
-    #[CoversClass(Compiler\ClosureVisitor::class)]
     public function testAliasedImportsAreNotMangled(): void
     {
         $container = $this->getContainer();
