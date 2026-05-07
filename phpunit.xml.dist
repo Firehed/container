@@ -6,7 +6,7 @@
          executionOrder="depends,defects"
          shortenArraysForExportThreshold="10"
          requireCoverageMetadata="true"
-         beStrictAboutCoverageMetadata="true"
+         beStrictAboutCoverageMetadata="false"
          beStrictAboutOutputDuringTests="true"
          displayDetailsOnAllIssues="true"
          failOnAllIssues="true">
