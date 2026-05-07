@@ -14,6 +14,7 @@ class EnvironmentVariableTest extends TestCase
     public function testImplementsDefinitionInterface(): void
     {
         $env = new EnvironmentVariable('FOO');
+        // @phpstan-ignore method.alreadyNarrowedType
         $this->assertInstanceOf(DefinitionInterface::class, $env);
     }
 
