@@ -140,10 +140,8 @@ PHP,
             EnvironmentVariableInterface::CAST_INT => (int) $envValue,
             EnvironmentVariableInterface::CAST_FLOAT => (float) $envValue,
             // Remaining cast type is an enum; use its `::from` method
-            default => $this->cast::from($envValue ?? throw new \LogicException(sprintf(
-                "Environment variable '%s' was not set and its null default cannot be cast to enum",
-                $this->name,
-            ))),
+            // @phpstan-ignore argument.type (null intentionally triggers native TypeError)
+            default => $this->cast::from($envValue),
         };
     }
 

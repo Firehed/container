@@ -181,8 +181,8 @@ class EnvironmentVariableTest extends TestCase
         $env = new EnvironmentVariable('ENV', null);
         $env->asEnum(Fixtures\Environment::class);
 
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage("'ENV' was not set and its null default cannot be cast to enum");
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('must be of type string, null given');
         $env->resolve(self::createStub(TypedContainerInterface::class), $envReader);
     }
 
