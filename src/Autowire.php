@@ -18,6 +18,46 @@ use ReflectionParameter;
 class Autowire
 {
     /**
+     * Instantiate a class by resolving its constructor dependencies from the container.
+     *
+     * @throws Exceptions\AmbiguousMapping if the class does not exist
+     */
+    public static function instantiate(string $class, TypedContainerInterface $container): object
+    {
+        if (!class_exists($class)) {
+            throw new Exceptions\AmbiguousMapping($class);
+        }
+        $rc = new ReflectionClass($class);
+
+        if (!$rc->hasMethod('__construct')) {
+            return new $class();
+        }
+
+        $construct = $rc->getMethod('__construct');
+        $params = $construct->getParameters();
+        $args = [];
+
+        foreach ($params as $param) {
+            if ($param->isOptional()) {
+                $typeName = self::getOptionalDependencyType($param);
+                if ($typeName !== null && $container->has($typeName)) {
+                    $args[] = $container->get($typeName);
+                } else {
+                    $args[] = $param->getDefaultValue();
+                }
+            } else {
+                $name = self::getRequiredDependencyType($param, $class);
+                if (!$container->has($name)) {
+                    throw Exceptions\NotFound::autowireMissing($name, $class, $param->getName());
+                }
+                $args[] = $container->get($name);
+            }
+        }
+
+        return new $class(...$args);
+    }
+
+    /**
      * Types that cannot meaningfully be autowired from a container.
      * These are internal PHP types that are not instantiable or are
      * created through special language constructs.
