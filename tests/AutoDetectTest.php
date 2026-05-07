@@ -7,6 +7,8 @@ namespace Firehed\Container;
 use LogicException;
 use RuntimeException;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -48,9 +50,9 @@ class AutoDetectTest extends TestCase
     }
 
     /**
-     * @dataProvider from
      * @param class-string<TypedContainerInterface> $expected
      */
+    #[DataProvider('from')]
     public function testOk(string $env, string $expected): void
     {
         $_ENV['ENVIRONMENT'] = $env;
@@ -61,10 +63,10 @@ class AutoDetectTest extends TestCase
     }
 
     /**
-     * @dataProvider from
      * @param class-string<TypedContainerInterface> $expected
-     * @runInSeparateProcess
      */
+    #[DataProvider('from')]
+    #[RunInSeparateProcess]
     public function testInstance(string $env, string $expected): void
     {
         $_ENV['ENVIRONMENT'] = $env;
@@ -74,9 +76,7 @@ class AutoDetectTest extends TestCase
         self::assertSame($c, $c2);
     }
 
-    /**
-     * @runInSeparateProcess
-     */
+    #[RunInSeparateProcess]
     public function testInstanceMisuse(): void
     {
         $_ENV['ENVIRONMENT'] = 'whatever';
