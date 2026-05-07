@@ -130,21 +130,25 @@ trait EnvironmentDefinitionsTestTrait
     {
         $container = $this->getContainer();
         $this->assertTrue($container->has('env_asenum_null_default'));
-        $this->expectException(Exceptions\ValueRetrievalException::class);
-        // BackedEnum::from TypeError
-        $this->expectExceptionMessage('must be of type string, null given');
-        $container->get('env_asenum_null_default');
+        try {
+            $container->get('env_asenum_null_default');
+            self::fail('Expected exception not thrown');
+        } catch (Exceptions\ValueRetrievalException $e) {
+            // BackedEnum::from() throws TypeError when given non-backing type
+            $this->assertInstanceOf(\TypeError::class, $e->getPrevious());
+        }
     }
 
     public function testEnumWithInvalidDefaultThrowsValueError(): void
     {
         $container = $this->getContainer();
         $this->assertTrue($container->has('env_asenum_invalid_default'));
-        $this->expectException(Exceptions\ValueRetrievalException::class);
-        // This is the PHP native message for BackedEnum::from failure. It's
-        // a little fragile since PHPUnit lacks tooling for
-        // $exception->previous AFAIK.
-        $this->expectExceptionMessage('is not a valid backing value');
-        $container->get('env_asenum_invalid_default');
+        try {
+            $container->get('env_asenum_invalid_default');
+            self::fail('Expected exception not thrown');
+        } catch (Exceptions\ValueRetrievalException $e) {
+            // BackedEnum::from() throws ValueError for invalid backing values
+            $this->assertInstanceOf(\ValueError::class, $e->getPrevious());
+        }
     }
 }
