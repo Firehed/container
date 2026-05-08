@@ -7,8 +7,10 @@ namespace Firehed\Container;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(Autowire::class)]
 #[CoversClass(Builder::class)]
 #[CoversClass(DevContainer::class)]
+#[CoversClass(Factory::class)]
 class BuilderTest extends TestCase
 {
     use ContainerBuilderTestTrait;
