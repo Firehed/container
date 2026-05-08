@@ -74,7 +74,12 @@ class ClosureDefinition implements DefinitionInterface
         );
     }
 
-    /** @return class-string[] */
+    /**
+     * @return class-string[]
+     *
+     * This is not strictly accurate yet, but a correct implementation requires
+     * pretty deep AST analysis. This should be treated as a known bug for now.
+     */
     public function getDependencies(): array
     {
         return [];
