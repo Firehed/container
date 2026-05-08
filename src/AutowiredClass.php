@@ -1,18 +1,54 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Firehed\Container;
 
-class AutowiredClass implements AutowireInterface
+class AutowiredClass implements AutowireInterface, DefinitionInterface
 {
+    private Compiler\AutowiredValue $codeGenerator;
+
     /** @param ?class-string $class */
     public function __construct(private ?string $class = null)
     {
     }
 
-    /** @inheritdoc */
     public function getWiredClass(): ?string
     {
         return $this->class;
+    }
+
+    /**
+     * @param class-string $class
+     */
+    public function withClass(string $class): self
+    {
+        $new = clone $this;
+        $new->class = $class;
+        return $new;
+    }
+
+    public function isCacheable(): bool
+    {
+        return true;
+    }
+
+    public function resolve(TypedContainerInterface $container, EnvReader $envReader): mixed
+    {
+        assert($this->class !== null, 'Class must be set before resolving');
+        return Autowire::instantiate($this->class, $container);
+    }
+
+    public function generateCode(): string
+    {
+        assert($this->class !== null, 'Class must be set before generating code');
+        $this->codeGenerator = new Compiler\AutowiredValue($this->class);
+        return $this->codeGenerator->generateCode();
+    }
+
+    /** @return class-string[] */
+    public function getDependencies(): array
+    {
+        return $this->codeGenerator->getDependencies();
     }
 }

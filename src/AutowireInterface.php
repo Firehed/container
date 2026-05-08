@@ -7,4 +7,9 @@ interface AutowireInterface
 {
     /** @return ?class-string */
     public function getWiredClass(): ?string;
+
+    /**
+     * @param class-string $class
+     */
+    public function withClass(string $class): self;
 }

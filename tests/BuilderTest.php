@@ -8,6 +8,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Autowire::class)]
+#[CoversClass(AutowiredClass::class)]
 #[CoversClass(Builder::class)]
 #[CoversClass(DevContainer::class)]
 #[CoversClass(Factory::class)]

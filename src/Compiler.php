@@ -112,24 +112,19 @@ class Compiler implements BuilderInterface
             }
             $value = $value->withClass($key);
         }
+        // Finalize autowire definitions that need the key as the class
+        if ($value instanceof AutowireInterface && $value->getWiredClass() === null) {
+            if (!class_exists($key)) {
+                $this->errors[] = new Exceptions\AmbiguousMapping($key);
+                return;
+            }
+            $value = $value->withClass($key);
+        }
         if ($value instanceof DefinitionInterface) {
             if (!$value->isCacheable()) {
                 $this->factories[$key] = true;
             }
             $this->definitions[$key] = $value;
-        } elseif ($value instanceof AutowireInterface) {
-            // someName => autowire(...)
-            // someName,
-            $wiredClass = $value->getWiredClass();
-            // autowire called without parameters: assume key is destination
-            if ($wiredClass === null) {
-                $wiredClass = $key;
-            }
-            if (class_exists($wiredClass)) {
-                $this->definitions[$key] = new Compiler\AutowiredValue($wiredClass);
-            } else {
-                $this->errors[] = new Exceptions\AmbiguousMapping($key);
-            }
         } elseif ($value instanceof Closure) {
             // someName => fn ($container) => new Something(...)
             $this->definitions[$key] = new Compiler\ClosureValue($value);
