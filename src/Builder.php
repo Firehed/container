@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Firehed\Container;
 
+use Closure;
 use Psr\Container\ContainerExceptionInterface;
 use UnexpectedValueException;
 
@@ -40,6 +41,9 @@ class Builder implements BuilderInterface
                 assert(is_string($value), 'Values without keys must be strings that correspond to autowirable classes');
                 $key = $value;
                 $value = autowire();
+            }
+            if ($value instanceof Closure) {
+                $value = new ClosureDefinition($value);
             }
             // Finalize factory definitions that need the key as the class
             if ($value instanceof FactoryInterface && !$value->hasDefinition()) {
