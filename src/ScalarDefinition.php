@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Firehed\Container;
 
+use UnitEnum;
+
 class ScalarDefinition implements DefinitionInterface
 {
-    public function __construct(private readonly int|bool|string|float $value)
+    public function __construct(private readonly array|int|bool|string|float|null|UnitEnum $value)
     {
     }
 
