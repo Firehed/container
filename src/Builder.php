@@ -41,16 +41,7 @@ class Builder implements BuilderInterface
                 $key = $value;
                 $value = autowire();
             }
-            // Finalize factory definitions that need the key as the class
-            if ($value instanceof FactoryInterface && !$value->hasDefinition()) {
-                if (!class_exists($key)) {
-                    $this->errors[] = new Exceptions\AmbiguousMapping($key);
-                    continue;
-                }
-                $value = $value->withClass($key);
-            }
-            // Finalize autowire definitions that need the key as the class
-            if ($value instanceof AutowireInterface && $value->getWiredClass() === null) {
+            if ($value instanceof ShorthandDefinitionInterface && $value->needsClass()) {
                 if (!class_exists($key)) {
                     $this->errors[] = new Exceptions\AmbiguousMapping($key);
                     continue;
