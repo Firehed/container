@@ -23,13 +23,15 @@ interface ClassBindable
 {
     /**
      * Returns true if this definition needs a class to be set via withClass().
+     * This is called during container building/compilation, not runtime.
      */
     public function needsClass(): bool;
 
     /**
-     * Returns a copy of this definition bound to the specified class.
+     * Returns a definition for the specified class. The class will be provided
+     * based on the config key, and is guaranteed to pass `class_exists()`.
      *
      * @param class-string $class
      */
-    public function withClass(string $class): self;
+    public function withClass(string $class): DefinitionInterface;
 }
