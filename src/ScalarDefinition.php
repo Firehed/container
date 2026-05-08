@@ -6,6 +6,9 @@ namespace Firehed\Container;
 
 use UnitEnum;
 
+/**
+ * Definition wrapper for non-object types
+ */
 class ScalarDefinition implements DefinitionInterface
 {
     public function __construct(private readonly array|int|bool|string|float|null|UnitEnum $value)
