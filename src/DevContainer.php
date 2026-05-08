@@ -89,13 +89,6 @@ class DevContainer implements TypedContainerInterface
             return $evaluated;
         }
 
-        if ($def instanceof FactoryInterface) {
-            if ($def->hasDefinition()) {
-                return $def->getDefinition()($this);
-            }
-            return $this->autowire($id);
-        }
-
         return $def;
     }
 
