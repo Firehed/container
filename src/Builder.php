@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Firehed\Container;
 
+use Closure;
 use Psr\Container\ContainerExceptionInterface;
 use UnexpectedValueException;
 
@@ -35,12 +36,21 @@ class Builder implements BuilderInterface
         $output = [];
 
         foreach ($defs as $key => $value) {
+            // Remap extra-lazy autowiring (SomeClass::class)
             if (is_int($key)) {
-                // Remap extra-lazy autowiring
                 assert(is_string($value), 'Values without keys must be strings that correspond to autowirable classes');
                 $key = $value;
                 $value = autowire();
             }
+
+            // SomeClass::class => function (TypedContainerInterface $c) {
+            //     return new SomeClass(...);
+            // }
+            if ($value instanceof Closure) {
+                $value = new ClosureDefinition($value);
+            }
+
+            // SomeClass::class => utilityFunction()
             if ($value instanceof ShorthandDefinitionInterface && $value->needsClass()) {
                 if (!class_exists($key)) {
                     $this->errors[] = new Exceptions\AmbiguousMapping($key);
@@ -48,6 +58,9 @@ class Builder implements BuilderInterface
                 }
                 $value = $value->withClass($key);
             }
+
+            // SomeInterface::class => SomeClassImplementingInterface::class
+            //
             // This assumes that any array key which is a FQCN for an interface
             // is an interface-to-implementation wiring. This means that simple
             // string value MUST NOT be keyed to an interface name

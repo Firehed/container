@@ -111,14 +111,14 @@ class Compiler implements BuilderInterface
             }
             $value = $value->withClass($key);
         }
+        if ($value instanceof Closure) {
+            $value = new ClosureDefinition($value);
+        }
         if ($value instanceof DefinitionInterface) {
             if (!$value->isCacheable()) {
                 $this->factories[$key] = true;
             }
             $this->definitions[$key] = $value;
-        } elseif ($value instanceof Closure) {
-            // someName => fn ($container) => new Something(...)
-            $this->definitions[$key] = new Compiler\ClosureValue($value);
         } elseif (interface_exists($key)) {
             assert(is_string($value), 'Values without keys must be strings that correspond to autowirable classes');
             if (class_exists($value)) {

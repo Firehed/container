@@ -10,6 +10,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(Autowire::class)]
 #[CoversClass(AutowiredClass::class)]
 #[CoversClass(Builder::class)]
+#[CoversClass(ClosureDefinition::class)]
 #[CoversClass(DevContainer::class)]
 #[CoversClass(Factory::class)]
 class BuilderTest extends TestCase

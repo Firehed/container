@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Firehed\Container;
 
-use Closure;
 use Psr\Container\ContainerExceptionInterface;
 use Throwable;
 
@@ -71,15 +70,6 @@ class DevContainer implements TypedContainerInterface
                 $this->evaluated[$id] = $result;
             }
             return $result;
-        }
-
-        if ($def instanceof Closure) {
-            $rebound = $def->bindTo(null);
-            assert($rebound !== null);
-            $evaluated = $rebound($this);
-            $this->evaluated[$id] = $evaluated;
-
-            return $evaluated;
         }
 
         return $def;
