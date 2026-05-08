@@ -22,12 +22,6 @@ class Factory implements FactoryInterface, DefinitionInterface
         return $this->def !== null;
     }
 
-    public function getDefinition(): Closure
-    {
-        assert($this->def !== null);
-        return $this->def;
-    }
-
     /**
      * Sets the class to autowire when there's no closure definition.
      * Used by builders when factory() is called without arguments.
