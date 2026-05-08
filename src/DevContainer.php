@@ -4,9 +4,7 @@ declare(strict_types=1);
 namespace Firehed\Container;
 
 use Closure;
-use Exception;
 use Psr\Container\ContainerExceptionInterface;
-use ReflectionClass;
 use Throwable;
 
 class DevContainer implements TypedContainerInterface
@@ -78,12 +76,12 @@ class DevContainer implements TypedContainerInterface
         if ($def instanceof AutowireInterface) {
             $classToAutowire = $def->getWiredClass() ?? $id;
             $value = $this->autowire($classToAutowire);
-        } else {
-            $value = $def;
+            $this->evaluated[$id] = $value;
+            return $value;
         }
 
-        if ($value instanceof Closure) {
-            $rebound = $value->bindTo(null);
+        if ($def instanceof Closure) {
+            $rebound = $def->bindTo(null);
             assert($rebound !== null);
             $evaluated = $rebound($this);
             $this->evaluated[$id] = $evaluated;
@@ -91,67 +89,18 @@ class DevContainer implements TypedContainerInterface
             return $evaluated;
         }
 
-        if ($value instanceof FactoryInterface) {
-            if ($value->hasDefinition()) {
-                return $value->getDefinition()($this);
+        if ($def instanceof FactoryInterface) {
+            if ($def->hasDefinition()) {
+                return $def->getDefinition()($this);
             }
-            return $this->autowire($id)($this);
+            return $this->autowire($id);
         }
 
-        return $value;
+        return $def;
     }
 
-    /**
-     * Returns a closure that takes the container as its only argument and
-     * returns the instantiated object
-     */
-    private function autowire(string $class): Closure
+    private function autowire(string $class): object
     {
-        if (!class_exists($class)) {
-            throw new Exceptions\AmbiguousMapping($class);
-        }
-        $rc = new ReflectionClass($class);
-
-        if (!$rc->hasMethod('__construct')) {
-            return (function () use ($class) {
-                return new $class();
-            })->bindTo(null);
-        }
-
-        $construct = $rc->getMethod('__construct');
-        if (!$construct->isPublic()) {
-            throw new \Exception('non public construct');
-        }
-
-        $params = $construct->getParameters();
-        $needed = [];
-        foreach ($params as $param) {
-            if ($param->isOptional()) {
-                $typeName = Autowire::getOptionalDependencyType($param);
-                if ($typeName !== null && $this->has($typeName)) {
-                    $needed[] = (function (TypedContainerInterface $c) use ($typeName) {
-                        return $c->get($typeName);
-                    })->bindTo(null);
-                } else {
-                    $needed[] = function () use ($param) {
-                        return $param->getDefaultValue();
-                    };
-                }
-            } else {
-                $name = Autowire::getRequiredDependencyType($param, $class);
-                if (!$this->has($name)) {
-                    throw Exceptions\NotFound::autowireMissing($name, $class, $param->getName());
-                }
-                $needed[] = (function (TypedContainerInterface $c) use ($name) {
-                    return $c->get($name);
-                })->bindTo(null);
-            }
-        }
-        return (function (TypedContainerInterface $container) use ($class, $needed) {
-            $args = array_map(function ($arg) use ($container) {
-                return $arg($container);
-            }, $needed);
-            return new $class(...$args);
-        })->bindTo(null);
+        return Autowire::instantiate($class, $this);
     }
 }
