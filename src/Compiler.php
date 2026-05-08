@@ -104,24 +104,19 @@ class Compiler implements BuilderInterface
     private function add(string $key, $value): void
     {
         $this->logger->debug('Adding definition for "{key}"', ['key' => $key]);
+        // Finalize factory definitions that need the key as the class
+        if ($value instanceof FactoryInterface && !$value->hasDefinition()) {
+            if (!class_exists($key)) {
+                $this->errors[] = new Exceptions\AmbiguousMapping($key);
+                return;
+            }
+            $value = $value->withClass($key);
+        }
         if ($value instanceof DefinitionInterface) {
             if (!$value->isCacheable()) {
                 $this->factories[$key] = true;
             }
             $this->definitions[$key] = $value;
-        } elseif ($value instanceof FactoryInterface) {
-            $this->factories[$key] = true;
-            if ($value->hasDefinition()) {
-                // Something::class => factory(fn ($container) => new Something(...))
-                $this->definitions[$key] = new Compiler\ClosureValue($value->getDefinition());
-            } else {
-                if (class_exists($key)) {
-                    // Something::class => factory()
-                    $this->definitions[$key] = new Compiler\AutowiredValue($key);
-                } else {
-                    $this->errors[] = new Exceptions\AmbiguousMapping($key);
-                }
-            }
         } elseif ($value instanceof AutowireInterface) {
             // someName => autowire(...)
             // someName,

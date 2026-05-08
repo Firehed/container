@@ -41,6 +41,14 @@ class Builder implements BuilderInterface
                 $key = $value;
                 $value = autowire();
             }
+            // Finalize factory definitions that need the key as the class
+            if ($value instanceof FactoryInterface && !$value->hasDefinition()) {
+                if (!class_exists($key)) {
+                    $this->errors[] = new Exceptions\AmbiguousMapping($key);
+                    continue;
+                }
+                $value = $value->withClass($key);
+            }
             // This assumes that any array key which is a FQCN for an interface
             // is an interface-to-implementation wiring. This means that simple
             // string value MUST NOT be keyed to an interface name
