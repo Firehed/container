@@ -41,7 +41,7 @@ class Builder implements BuilderInterface
                 $key = $value;
                 $value = autowire();
             }
-            if ($value instanceof ClassBindable && $value->needsClass()) {
+            if ($value instanceof ShorthandDefinitionInterface && $value->needsClass()) {
                 if (!class_exists($key)) {
                     $this->errors[] = new Exceptions\AmbiguousMapping($key);
                     continue;

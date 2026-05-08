@@ -6,7 +6,7 @@ namespace Firehed\Container;
 
 use Closure;
 
-class Factory implements ClassBindable, DefinitionInterface
+class Factory implements ShorthandDefinitionInterface, DefinitionInterface
 {
     /** @var ?class-string */
     private ?string $classToAutowire = null;

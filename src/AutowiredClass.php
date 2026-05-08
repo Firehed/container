@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Firehed\Container;
 
-class AutowiredClass implements ClassBindable, DefinitionInterface
+class AutowiredClass implements ShorthandDefinitionInterface, DefinitionInterface
 {
     private Compiler\AutowiredValue $codeGenerator;
 

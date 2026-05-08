@@ -5,7 +5,7 @@ namespace Firehed\Container;
 use Closure;
 
 /** @param ?class-string $class */
-function autowire(?string $class = null): ClassBindable
+function autowire(?string $class = null): ShorthandDefinitionInterface
 {
     return new AutowiredClass($class);
 }
@@ -21,7 +21,7 @@ function env(string $name, ?string $default = null): EnvironmentVariableInterfac
     }
 }
 
-function factory(?Closure $def = null): ClassBindable
+function factory(?Closure $def = null): ShorthandDefinitionInterface
 {
     return new Factory($def);
 }

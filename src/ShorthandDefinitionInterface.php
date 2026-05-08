@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Firehed\Container;
 
 /**
- * A definition that can be bound to a class.
+ * A definition that supports shorthand syntax.
  *
  * Definitions created without an explicit class (e.g., `factory()` or
  * `autowire()` with no arguments) implement this interface. The builder
  * will call `withClass()` using the array key from the definition file.
  *
- * This is to enable shorthand function definitions, e.g. avoiding the need for:
+ * This enables shorthand definitions, avoiding the need for:
  *
  *     `Foo::class => someTypeWrapper(Foo::class)`
  *
@@ -19,7 +19,7 @@ namespace Firehed\Container;
  *
  *     `Foo::class => someTypeWrapper()`
  */
-interface ClassBindable
+interface ShorthandDefinitionInterface
 {
     /**
      * Returns true if this definition needs a class to be set via withClass().

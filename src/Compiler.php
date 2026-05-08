@@ -104,7 +104,7 @@ class Compiler implements BuilderInterface
     private function add(string $key, $value): void
     {
         $this->logger->debug('Adding definition for "{key}"', ['key' => $key]);
-        if ($value instanceof ClassBindable && $value->needsClass()) {
+        if ($value instanceof ShorthandDefinitionInterface && $value->needsClass()) {
             if (!class_exists($key)) {
                 $this->errors[] = new Exceptions\AmbiguousMapping($key);
                 return;
