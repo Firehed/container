@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Firehed\Container;
 
-class AutowiredClass implements AutowireInterface, DefinitionInterface
+class AutowiredClass implements ClassBindable, DefinitionInterface
 {
     private Compiler\AutowiredValue $codeGenerator;
 
@@ -13,9 +13,9 @@ class AutowiredClass implements AutowireInterface, DefinitionInterface
     {
     }
 
-    public function getWiredClass(): ?string
+    public function needsClass(): bool
     {
-        return $this->class;
+        return $this->class === null;
     }
 
     /**
