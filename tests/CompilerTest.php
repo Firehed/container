@@ -17,6 +17,7 @@ use Psr\Log\AbstractLogger;
 #[CoversClass(Compiler\ProxyValue::class)]
 #[CoversClass(EnvironmentVariable::class)]
 #[CoversClass(Exceptions\IncorrectlyTypedValue::class)]
+#[CoversClass(Factory::class)]
 class CompilerTest extends TestCase
 {
     use ContainerBuilderTestTrait;
