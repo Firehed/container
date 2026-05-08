@@ -6,7 +6,7 @@ namespace Firehed\Container;
 
 use Closure;
 
-class Factory implements FactoryInterface, DefinitionInterface
+class Factory implements ShorthandDefinitionInterface, DefinitionInterface
 {
     /** @var ?class-string */
     private ?string $classToAutowire = null;
@@ -17,17 +17,12 @@ class Factory implements FactoryInterface, DefinitionInterface
     {
     }
 
-    public function hasDefinition(): bool
+    public function needsClass(): bool
     {
-        return $this->def !== null;
+        return $this->def === null;
     }
 
-    /**
-     * Sets the class to autowire when there's no closure definition.
-     * Used by builders when factory() is called without arguments.
-     *
-     * @param class-string $class
-     */
+    /** @param class-string $class */
     public function withClass(string $class): self
     {
         $new = clone $this;
