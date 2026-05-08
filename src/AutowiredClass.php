@@ -23,9 +23,7 @@ class AutowiredClass implements ClassBindable, DefinitionInterface
      */
     public function withClass(string $class): self
     {
-        $new = clone $this;
-        $new->class = $class;
-        return $new;
+        return new self($class);
     }
 
     public function isCacheable(): bool

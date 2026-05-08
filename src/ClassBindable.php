@@ -10,6 +10,14 @@ namespace Firehed\Container;
  * Definitions created without an explicit class (e.g., `factory()` or
  * `autowire()` with no arguments) implement this interface. The builder
  * will call `withClass()` using the array key from the definition file.
+ *
+ * This is to enable shorthand function defintions, e.g. avoiding the need for:
+ *
+ *     `Foo::class => someTypeWrapper(Foo::class)`
+ *
+ * and instead allowing:
+ *
+ *     `Foo::class => someTypeWrapper()`
  */
 interface ClassBindable
 {
