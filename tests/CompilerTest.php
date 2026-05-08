@@ -9,10 +9,10 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\AbstractLogger;
 
 #[CoversClass(AutowiredClass::class)]
+#[CoversClass(ClosureDefinition::class)]
 #[CoversClass(CompiledContainer::class)]
 #[CoversClass(Compiler::class)]
 #[CoversClass(Compiler\AutowiredValue::class)]
-#[CoversClass(Compiler\ClosureValue::class)]
 #[CoversClass(Compiler\ClosureVisitor::class)]
 #[CoversClass(Compiler\LiteralValue::class)]
 #[CoversClass(Compiler\ProxyValue::class)]
