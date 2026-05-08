@@ -11,7 +11,7 @@ namespace Firehed\Container;
  * `autowire()` with no arguments) implement this interface. The builder
  * will call `withClass()` using the array key from the definition file.
  *
- * This is to enable shorthand function defintions, e.g. avoiding the need for:
+ * This is to enable shorthand function definitions, e.g. avoiding the need for:
  *
  *     `Foo::class => someTypeWrapper(Foo::class)`
  *
