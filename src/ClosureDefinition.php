@@ -5,11 +5,20 @@ declare(strict_types=1);
 namespace Firehed\Container;
 
 use Closure;
+use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitor\NameResolver;
+use PhpParser\ParserFactory;
+use PhpParser\PhpVersion;
+use ReflectionFunction;
+use UnexpectedValueException;
+
+use function assert;
+use function file_get_contents;
+use function is_int;
+use function sprintf;
 
 class ClosureDefinition implements DefinitionInterface
 {
-    private Compiler\ClosureValue $codeGenerator;
-
     public function __construct(private Closure $closure)
     {
     }
@@ -28,13 +37,46 @@ class ClosureDefinition implements DefinitionInterface
 
     public function generateCode(): string
     {
-        $this->codeGenerator = new Compiler\ClosureValue($this->closure);
-        return $this->codeGenerator->generateCode();
+        $rf = new ReflectionFunction($this->closure);
+
+        $startLine = $rf->getStartLine();
+        assert(is_int($startLine));
+        $endLine = $rf->getEndLine();
+        assert(is_int($endLine));
+
+        $definingFile = $rf->getFileName();
+        assert($definingFile !== false);
+        $code = file_get_contents($definingFile);
+        assert($code !== false);
+
+        $visitor = new Compiler\ClosureVisitor($startLine, $endLine);
+
+        $parser = (new ParserFactory())->createForVersion(PhpVersion::fromString('8.2'));
+
+        $ast = $parser->parse($code);
+        assert($ast !== null);
+
+        $traverser = new NodeTraverser();
+        $traverser->addVisitor(new NameResolver());
+        $astWithResolvedNames = $traverser->traverse($ast);
+
+        $traverser = new NodeTraverser();
+        $traverser->addVisitor($visitor);
+        $traverser->traverse($astWithResolvedNames);
+        $code = $visitor->getCode();
+        if ($code === '') {
+            throw new UnexpectedValueException('No closure source code found');
+        }
+
+        return sprintf(
+            'return (%s)($this);',
+            $code
+        );
     }
 
     /** @return class-string[] */
     public function getDependencies(): array
     {
-        return $this->codeGenerator->getDependencies();
+        return [];
     }
 }
