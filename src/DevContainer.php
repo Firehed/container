@@ -73,13 +73,6 @@ class DevContainer implements TypedContainerInterface
             return $result;
         }
 
-        if ($def instanceof AutowireInterface) {
-            $classToAutowire = $def->getWiredClass() ?? $id;
-            $value = $this->autowire($classToAutowire);
-            $this->evaluated[$id] = $value;
-            return $value;
-        }
-
         if ($def instanceof Closure) {
             $rebound = $def->bindTo(null);
             assert($rebound !== null);
@@ -90,10 +83,5 @@ class DevContainer implements TypedContainerInterface
         }
 
         return $def;
-    }
-
-    private function autowire(string $class): object
-    {
-        return Autowire::instantiate($class, $this);
     }
 }
