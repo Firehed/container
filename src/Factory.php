@@ -55,7 +55,7 @@ class Factory implements FactoryInterface, DefinitionInterface
     public function generateCode(): string
     {
         if ($this->def !== null) {
-            $this->codeGenerator = new Compiler\ClosureValue($this->def);
+            $this->codeGenerator = new ClosureDefinition($this->def);
         } else {
             assert($this->classToAutowire !== null, 'Class must be set for factory without definition');
             $this->codeGenerator = new Compiler\AutowiredValue($this->classToAutowire);
