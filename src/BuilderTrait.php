@@ -1,0 +1,83 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Firehed\Container;
+
+use Closure;
+
+trait BuilderTrait
+{
+    /**
+     * @param mixed[] $definitions
+     */
+    private function processDefinitions(array $definitions)
+    {
+        foreach ($definitions as $key => $value) {
+            // Pre-process implicit autowiring (`SomeClass::class`)
+            if (is_int($key)) {
+                // throw if non-string?
+                assert(is_string($value), 'Values without keys must be strings that correspond to autowirable classes');
+                $key = $value;
+                $value = autowire($key);
+
+                yield $key => $value;
+                continue;
+            }
+
+            // SomeClass::class => utilityFunction()
+            if ($value instanceof ShorthandDefinitionInterface && $value->needsClass()) {
+                if (!class_exists($key)) {
+                    $this->errors[] = new Exceptions\AmbiguousMapping($key);
+                    continue;
+                }
+                $value = $value->withClass($key);
+
+                yield $key => $value;
+                continue;
+            }
+
+            // SomeClass::class => function (TypedContainerInterface $c) {
+            //     return new SomeClass(...);
+            // }
+            if ($value instanceof Closure) {
+                $value = new ClosureDefinition($value);
+
+                yield $key => $value;
+                continue;
+            }
+
+            // SomeInterface::class => SomeClassImplementingInterface::class
+            //
+            // This assumes that any array key which is a FQCN for an interface
+            // is an interface-to-implementation wiring. This means that simple
+            // string value MUST NOT be keyed to an interface name
+            if (interface_exists($key) && is_string($value)) {
+                if (!class_exists($value)) {
+                    $this->errors[] = new Exceptions\InvalidClassMapping($key, $value);
+                    continue;
+                }
+                // This is a factory so that if the value being proxied is
+                // a factory, the behavior passes through. If it isn't, the
+                // downstream will still cache as expected
+                $value = factory(function (TypedContainerInterface $c) use ($value) {
+                    return $c->get($value);
+                });
+
+                yield $key => $value;
+                continue;
+            }
+
+            // At this point, the only unhandled types should be scalars.
+            if (!$value instanceof DefinitionInterface) {
+                $value = new ScalarDefinition($value);
+            }
+
+            // yield?
+
+
+
+            yield $key => $value;
+        }
+    }
+}

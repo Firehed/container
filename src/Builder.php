@@ -9,6 +9,8 @@ use UnexpectedValueException;
 
 class Builder implements BuilderInterface
 {
+    use BuilderTrait;
+
     /** @var mixed[] */
     private $defs = [];
 
@@ -33,54 +35,10 @@ class Builder implements BuilderInterface
      */
     private function parseDefs(array $defs): array
     {
+        return iterator_to_array($this->processDefinitions($defs));
         $output = [];
 
         foreach ($defs as $key => $value) {
-            // Remap extra-lazy autowiring (SomeClass::class)
-            if (is_int($key)) {
-                assert(is_string($value), 'Values without keys must be strings that correspond to autowirable classes');
-                $key = $value;
-                $value = autowire();
-            }
-
-            // SomeClass::class => function (TypedContainerInterface $c) {
-            //     return new SomeClass(...);
-            // }
-            if ($value instanceof Closure) {
-                $value = new ClosureDefinition($value);
-            }
-
-            // SomeClass::class => utilityFunction()
-            if ($value instanceof ShorthandDefinitionInterface && $value->needsClass()) {
-                if (!class_exists($key)) {
-                    $this->errors[] = new Exceptions\AmbiguousMapping($key);
-                    continue;
-                }
-                $value = $value->withClass($key);
-            }
-
-            // SomeInterface::class => SomeClassImplementingInterface::class
-            //
-            // This assumes that any array key which is a FQCN for an interface
-            // is an interface-to-implementation wiring. This means that simple
-            // string value MUST NOT be keyed to an interface name
-            if (interface_exists($key) && is_string($value)) {
-                if (!class_exists($value)) {
-                    $this->errors[] = new Exceptions\InvalidClassMapping($key, $value);
-                    continue;
-                }
-                // This is a factory so that if the value being proxied is
-                // a factory, the behavior passes through. If it isn't, the
-                // downstream will still cache as expected
-                $value = factory(function (TypedContainerInterface $c) use ($value) {
-                    return $c->get($value);
-                });
-            }
-
-            if (!$value instanceof DefinitionInterface) {
-                $value = new ScalarDefinition($value);
-            }
-
             $output[$key] = $value;
         }
 
