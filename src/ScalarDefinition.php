@@ -11,8 +11,11 @@ use UnitEnum;
  */
 class ScalarDefinition implements DefinitionInterface
 {
-    public function __construct(private readonly array|int|bool|string|float|null|UnitEnum $value)
+    public function __construct(private readonly mixed $value)
     {
+        if (is_object($value) && !$value instanceof UnitEnum) {
+            throw new \UnexpectedValueException('Only scalars and enums can be wrapped');
+        }
     }
 
     public function generateCode(): string
