@@ -77,6 +77,10 @@ class Builder implements BuilderInterface
                 });
             }
 
+            if (!$value instanceof DefinitionInterface) {
+                $value = new ScalarDefinition($value);
+            }
+
             $output[$key] = $value;
         }
 

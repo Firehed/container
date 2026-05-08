@@ -13,6 +13,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(ClosureDefinition::class)]
 #[CoversClass(DevContainer::class)]
 #[CoversClass(Factory::class)]
+#[CoversClass(ScalarDefinition::class)]
 class BuilderTest extends TestCase
 {
     use ContainerBuilderTestTrait;
