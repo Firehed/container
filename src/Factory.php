@@ -6,7 +6,7 @@ namespace Firehed\Container;
 
 use Closure;
 
-class Factory implements ShorthandDefinitionInterface, DefinitionInterface
+class Factory implements ShorthandDefinitionInterface
 {
     /** @var ?class-string */
     private ?string $classToAutowire = null;
