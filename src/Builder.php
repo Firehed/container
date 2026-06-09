@@ -36,13 +36,6 @@ class Builder implements BuilderInterface
     private function parseDefs(array $defs): array
     {
         return iterator_to_array($this->processDefinitions($defs));
-        $output = [];
-
-        foreach ($defs as $key => $value) {
-            $output[$key] = $value;
-        }
-
-        return $output;
     }
 
     public function build(): TypedContainerInterface
