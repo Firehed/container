@@ -8,6 +8,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\AbstractLogger;
 
+#[CoversClass(AliasDefinition::class)]
 #[CoversClass(AutowiredClass::class)]
 #[CoversClass(ClosureDefinition::class)]
 #[CoversClass(CompiledContainer::class)]
