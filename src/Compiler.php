@@ -28,6 +28,8 @@ use function realpath;
 
 class Compiler implements BuilderInterface
 {
+    use BuilderTrait;
+
     /** @var class-string<TypedContainerInterface> */
     private string $className;
 
@@ -85,65 +87,12 @@ class Compiler implements BuilderInterface
                 $file
             ));
         }
-        foreach ($defs as $key => $value) {
-            if (is_int($key)) {
-                $this->logger->debug('Treating bare value {value} as autowired', [
-                    'value' => $value,
-                ]);
-                $key = $value;
-                $value = autowire();
-            }
-            assert(is_string($key));
-            $this->add($key, $value);
-        }
-    }
 
-    /**
-     * @param mixed $value
-     */
-    private function add(string $key, $value): void
-    {
-        $this->logger->debug('Adding definition for "{key}"', ['key' => $key]);
-        if ($value instanceof ShorthandDefinitionInterface && $value->needsClass()) {
-            if (!class_exists($key)) {
-                $this->errors[] = new Exceptions\AmbiguousMapping($key);
-                return;
-            }
-            $value = $value->withClass($key);
-        }
-        if ($value instanceof Closure) {
-            $value = new ClosureDefinition($value);
-        }
-        if ($value instanceof DefinitionInterface) {
+        foreach ($this->processDefinitions($defs) as $key => $value) {
+            $this->definitions[$key] = $value;
             if (!$value->isCacheable()) {
                 $this->factories[$key] = true;
             }
-            $this->definitions[$key] = $value;
-        } elseif (interface_exists($key)) {
-            assert(is_string($value), 'Values without keys must be strings that correspond to autowirable classes');
-            if (class_exists($value)) {
-                // Simple autowiring
-                // SomeInterface::class => Something::class
-                $this->logger->debug('Basic autowire {key} => {value}', [
-                    'key' => $key,
-                    'value' => $value,
-                ]);
-                // Never cache proxied values in case they point to a factory
-                $this->factories[$key] = true;
-                $this->definitions[$key] = new Compiler\ProxyValue($value);
-            } else {
-                $this->errors[] = new Exceptions\InvalidClassMapping($key, $value);
-                    // SomeInterface::class => nonClassString
-            }
-        } else {
-            assert(
-                is_scalar($value)
-                || is_array($value)
-                || $value === null
-                || $value instanceof UnitEnum,
-                'Literal values must be scalars or arrays of scalars'
-            );
-            $this->definitions[$key] = new ScalarDefinition($value);
         }
     }
 
