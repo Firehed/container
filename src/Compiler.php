@@ -143,8 +143,7 @@ class Compiler implements BuilderInterface
                 || $value instanceof UnitEnum,
                 'Literal values must be scalars or arrays of scalars'
             );
-            // @phpstan-ignore-next-line
-            $this->definitions[$key] = new Compiler\LiteralValue($value);
+            $this->definitions[$key] = new ScalarDefinition($value);
         }
     }
 

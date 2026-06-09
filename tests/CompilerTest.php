@@ -14,11 +14,11 @@ use Psr\Log\AbstractLogger;
 #[CoversClass(Compiler::class)]
 #[CoversClass(Compiler\AutowiredValue::class)]
 #[CoversClass(Compiler\ClosureVisitor::class)]
-#[CoversClass(Compiler\LiteralValue::class)]
 #[CoversClass(Compiler\ProxyValue::class)]
 #[CoversClass(EnvironmentVariable::class)]
 #[CoversClass(Exceptions\IncorrectlyTypedValue::class)]
 #[CoversClass(Factory::class)]
+#[CoversClass(ScalarDefinition::class)]
 class CompilerTest extends TestCase
 {
     use ContainerBuilderTestTrait;
