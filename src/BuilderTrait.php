@@ -9,14 +9,17 @@ use Closure;
 trait BuilderTrait
 {
     /**
-     * @param mixed[] $definitions
+     * Given the contents of a standard container config file, pre-process some
+     * of the shorthand/"magical" definitions into actual DefinitionInterface
+     * objects.
      *
+     * @param mixed[] $definitions
      * @return iterable<string, DefinitionInterface>
      */
     private function processDefinitions(array $definitions)
     {
         foreach ($definitions as $key => $value) {
-            // Pre-process implicit autowiring (`SomeClass::class`)
+            // SomeClass::class (implicit autowiring; no key set)
             if (is_int($key)) {
                 assert(is_string($value), 'Values without keys must be strings that correspond to autowirable classes');
                 $key = $value;
@@ -67,15 +70,13 @@ trait BuilderTrait
                 continue;
             }
 
-            // At this point, the only unhandled types should be scalars.
+            // At this point, the only non-wrapped types should be scalars (
+            // them.
             if (!$value instanceof DefinitionInterface) {
                 $value = new ScalarDefinition($value);
             }
 
-            // yield?
-
-
-
+            // Finally, yield the normalized/encapsulated value
             yield $key => $value;
         }
     }
