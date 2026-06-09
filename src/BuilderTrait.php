@@ -10,15 +10,20 @@ trait BuilderTrait
 {
     /**
      * @param mixed[] $definitions
+     *
+     * @return iterable<string, DefinitionInterface>
      */
     private function processDefinitions(array $definitions)
     {
         foreach ($definitions as $key => $value) {
             // Pre-process implicit autowiring (`SomeClass::class`)
             if (is_int($key)) {
-                // throw if non-string?
                 assert(is_string($value), 'Values without keys must be strings that correspond to autowirable classes');
                 $key = $value;
+                if (!class_exists($key)) {
+                    $this->errors[] = new Exceptions\AmbiguousMapping($key);
+                    continue;
+                }
                 $value = autowire($key);
 
                 yield $key => $value;
@@ -57,14 +62,8 @@ trait BuilderTrait
                     $this->errors[] = new Exceptions\InvalidClassMapping($key, $value);
                     continue;
                 }
-                // This is a factory so that if the value being proxied is
-                // a factory, the behavior passes through. If it isn't, the
-                // downstream will still cache as expected
-                $value = factory(function (TypedContainerInterface $c) use ($value) {
-                    return $c->get($value);
-                });
 
-                yield $key => $value;
+                yield $key => new AliasDefinition($value);
                 continue;
             }
 
