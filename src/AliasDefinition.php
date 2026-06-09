@@ -6,9 +6,6 @@ namespace Firehed\Container;
 
 /**
  * Maps one container key to another (e.g., interface to implementation).
- *
- * Acts as a factory so that the cacheability of the underlying value is
- * preserved.
  */
 class AliasDefinition implements DefinitionInterface
 {
@@ -34,6 +31,9 @@ class AliasDefinition implements DefinitionInterface
 
     public function isCacheable(): bool
     {
+        // This is set as non-cachable since the target value itself may also
+        // be non-cachable, and there's not a _great_ way to know whether the
+        // target is or isn't with the available data.
         return false;
     }
 
