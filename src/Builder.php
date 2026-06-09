@@ -77,6 +77,9 @@ class Builder implements BuilderInterface
                 });
             }
 
+            // For literal values that haven't been processed into something
+            // else, wrap into the ScalarDefinition. Enables unified downstream
+            // handling.
             if (!$value instanceof DefinitionInterface) {
                 $value = new ScalarDefinition($value);
             }
