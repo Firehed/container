@@ -14,7 +14,9 @@ class ScalarDefinition implements DefinitionInterface
     public function __construct(private readonly mixed $value)
     {
         if (is_object($value) && !$value instanceof UnitEnum) {
-            throw new \UnexpectedValueException('Only scalars and enums can be wrapped');
+            throw new \UnexpectedValueException(
+                'Only scalars and enums can be wrapped (got ' . get_debug_type($value) . ')',
+            );
         }
     }
 
