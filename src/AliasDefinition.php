@@ -31,8 +31,8 @@ class AliasDefinition implements DefinitionInterface
 
     public function isCacheable(): bool
     {
-        // This is set as non-cachable since the target value itself may also
-        // be non-cachable, and there's not a _great_ way to know whether the
+        // This is set as non-cacheable since the target value itself may also
+        // be non-cacheable, and there's not a _great_ way to know whether the
         // target is or isn't with the available data.
         return false;
     }
