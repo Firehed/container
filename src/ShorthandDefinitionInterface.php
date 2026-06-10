@@ -19,7 +19,7 @@ namespace Firehed\Container;
  *
  *     `Foo::class => someTypeWrapper()`
  */
-interface ShorthandDefinitionInterface
+interface ShorthandDefinitionInterface extends DefinitionInterface
 {
     /**
      * Returns true if this definition needs a class to be set via withClass().

@@ -8,13 +8,13 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\AbstractLogger;
 
+#[CoversClass(AliasDefinition::class)]
 #[CoversClass(AutowiredClass::class)]
 #[CoversClass(ClosureDefinition::class)]
 #[CoversClass(CompiledContainer::class)]
 #[CoversClass(Compiler::class)]
 #[CoversClass(Compiler\AutowiredValue::class)]
 #[CoversClass(Compiler\ClosureVisitor::class)]
-#[CoversClass(Compiler\ProxyValue::class)]
 #[CoversClass(EnvironmentVariable::class)]
 #[CoversClass(Exceptions\IncorrectlyTypedValue::class)]
 #[CoversClass(Factory::class)]
