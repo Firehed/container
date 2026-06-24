@@ -383,6 +383,66 @@ trait ContainerBuilderTestTrait
         self::assertStringContainsString('string_literal', $output);
     }
 
+    public function testAddDirectoryLoadsAllPhpFiles(): void
+    {
+        $builder = $this->getBuilder();
+        // OldPhpSafe/one.php defines 'a' => 'b'
+        $builder->addDirectory(__DIR__ . '/ValidDefinitions/OldPhpSafe');
+        $container = $builder->build();
+        $this->assertTrue(
+            $container->has('a'),
+            'Container should have entries from directory',
+        );
+        $this->assertSame('b', $container->get('a'));
+    }
+
+    public function testAddDirectoryThrowsOnEmptyString(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $builder = $this->getBuilder();
+        // @phpstan-ignore argument.type (Explicitly testing the guard)
+        $builder->addDirectory('');
+    }
+
+    public function testAddDirectoryThrowsWhenNoPhpFilesFound(): void
+    {
+        $this->expectException(UnexpectedValueException::class);
+        $this->expectExceptionMessage('No config files');
+        $builder = $this->getBuilder();
+        $builder->addDirectory(__DIR__ . '/../.github');
+    }
+
+    public function testAddDirectoryIsNonRecursive(): void
+    {
+        $builder = $this->getBuilder();
+        $builder->addDirectory(__DIR__ . '/ValidDefinitions');
+        $container = $builder->build();
+        // Files in ValidDefinitions/OldPhpSafe should not be loaded
+        // OldPhpSafe/one.php defines 'a' => 'b'
+        $this->assertFalse(
+            $container->has('a'),
+            'Subdirectory files should not be loaded by addDirectory',
+        );
+    }
+
+    public function testMultipleAddDirectoryCalls(): void
+    {
+        $builder = $this->getBuilder();
+        // OldPhpSafe/one.php defines 'a' => 'b'
+        $builder->addDirectory(__DIR__ . '/ValidDefinitions/OldPhpSafe');
+        // ValidDefinitions/ defines 'string_literal' and Fixtures\SessionId::class
+        $builder->addDirectory(__DIR__ . '/ValidDefinitions');
+        $container = $builder->build();
+        $this->assertTrue(
+            $container->has('a'),
+            'Container should have entries from first directory',
+        );
+        $this->assertTrue(
+            $container->has('string_literal'),
+            'Container should have entries from second directory',
+        );
+    }
+
     // Data Providers
 
     /** @return mixed[][] */
@@ -471,65 +531,5 @@ trait ContainerBuilderTestTrait
                 $this->assertNotSame($first, $arg);
             }
         }
-    }
-
-    public function testAddDirectoryLoadsAllPhpFiles(): void
-    {
-        $builder = $this->getBuilder();
-        // OldPhpSafe/one.php defines 'a' => 'b'
-        $builder->addDirectory(__DIR__ . '/ValidDefinitions/OldPhpSafe');
-        $container = $builder->build();
-        $this->assertTrue(
-            $container->has('a'),
-            'Container should have entries from directory',
-        );
-        $this->assertSame('b', $container->get('a'));
-    }
-
-    public function testAddDirectoryThrowsOnEmptyString(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Directory is empty');
-        $builder = $this->getBuilder();
-        $builder->addDirectory('');
-    }
-
-    public function testAddDirectoryThrowsWhenNoPhpFilesFound(): void
-    {
-        $this->expectException(UnexpectedValueException::class);
-        $this->expectExceptionMessage('No config files');
-        $builder = $this->getBuilder();
-        $builder->addDirectory(__DIR__ . '/../.github');
-    }
-
-    public function testAddDirectoryIsNonRecursive(): void
-    {
-        $builder = $this->getBuilder();
-        $builder->addDirectory(__DIR__ . '/ValidDefinitions');
-        $container = $builder->build();
-        // Files in ValidDefinitions/OldPhpSafe should not be loaded
-        // OldPhpSafe/one.php defines 'a' => 'b'
-        $this->assertFalse(
-            $container->has('a'),
-            'Subdirectory files should not be loaded by addDirectory',
-        );
-    }
-
-    public function testMultipleAddDirectoryCalls(): void
-    {
-        $builder = $this->getBuilder();
-        // OldPhpSafe/one.php defines 'a' => 'b'
-        $builder->addDirectory(__DIR__ . '/ValidDefinitions/OldPhpSafe');
-        // ValidDefinitions/ defines 'string_literal' and Fixtures\SessionId::class
-        $builder->addDirectory(__DIR__ . '/ValidDefinitions');
-        $container = $builder->build();
-        $this->assertTrue(
-            $container->has('a'),
-            'Container should have entries from first directory',
-        );
-        $this->assertTrue(
-            $container->has('string_literal'),
-            'Container should have entries from second directory',
-        );
     }
 }

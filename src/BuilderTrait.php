@@ -14,7 +14,7 @@ trait BuilderTrait
     public function addDirectory(string $directory): void
     {
         if ($directory === '') {
-            throw new InvalidArgumentException('Directory is empty. Did you mean "."?');
+            throw new InvalidArgumentException('Directory must not be empty. Did you mean `.`?');
         }
         $files = glob($directory . '/*.php');
         if ($files === false) {
