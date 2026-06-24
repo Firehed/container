@@ -26,18 +26,18 @@ final class AutoDetect
     }
 
     /**
-     * Imports all definitions in the directory provided, and builds into
-     * a container. This path is relative to your current working directory.
+     * Returns a Builder or Compiler based on environment detection.
      *
-     * This will look for common environment naming conventions and use either
-     * the dynamic or compiled config builder based on whether a development
-     * environment is detected.
+     * In development environments (dev, development, local), returns a Builder.
+     * In other environments, returns a Compiler that writes to the specified
+     * output path (or the default $compiledOutputPath).
      *
-     * @param non-empty-literal-string $directory
      * @param non-empty-array<literal-string> $envNames
      */
-    public static function from(string $directory, array $envNames = self::ENVIRONMENT_NAMES): TypedContainerInterface
-    {
+    public static function getBuilder(
+        array $envNames = self::ENVIRONMENT_NAMES,
+        ?string $compiledOutputPath = null,
+    ): BuilderInterface {
         $reader = new EnvReader($_ENV);
         $env = null;
         foreach ($envNames as $envName) {
@@ -56,10 +56,28 @@ final class AutoDetect
 
         $env = strtolower($env);
         if ($env === 'dev' || $env === 'development' || $env === 'local') {
-            $builder = new Builder();
-        } else {
-            $builder = new Compiler(self::$compiledOutputPath);
+            return new Builder();
         }
+
+        return new Compiler($compiledOutputPath ?? self::$compiledOutputPath);
+    }
+
+    /**
+     * Imports all definitions in the directory provided, and builds into
+     * a container. This path is relative to your current working directory.
+     *
+     * This will look for common environment naming conventions and use either
+     * the dynamic or compiled config builder based on whether a development
+     * environment is detected.
+     *
+     * @param non-empty-literal-string $directory
+     * @param non-empty-array<literal-string> $envNames
+     */
+    public static function from(
+        string $directory,
+        array $envNames = self::ENVIRONMENT_NAMES,
+    ): TypedContainerInterface {
+        $builder = self::getBuilder($envNames);
         $builder->addDirectory($directory);
         return $builder->build();
     }
