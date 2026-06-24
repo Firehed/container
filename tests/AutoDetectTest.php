@@ -25,8 +25,9 @@ class AutoDetectTest extends TestCase
 
     public function testEmptyDirectoryIsError(): void
     {
+        $_ENV['ENV'] = 'development';
         self::expectException(LogicException::class);
-        self::expectExceptionMessage('Directory is empty');
+        self::expectExceptionMessage('Directory must not be empty');
         // @phpstan-ignore argument.type (Explicitly testing the guard)
         AutoDetect::from('');
     }

@@ -38,10 +38,6 @@ final class AutoDetect
      */
     public static function from(string $directory, array $envNames = self::ENVIRONMENT_NAMES): TypedContainerInterface
     {
-        if ($directory === '') {
-            throw new InvalidArgumentException('Directory is empty. Did you mean "."?');
-        }
-
         $reader = new EnvReader($_ENV);
         $env = null;
         foreach ($envNames as $envName) {
