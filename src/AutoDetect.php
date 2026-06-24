@@ -63,18 +63,7 @@ final class AutoDetect
         } else {
             $builder = new Compiler(self::$compiledOutputPath);
         }
-
-        $files = glob($directory . '/*.php');
-        if ($files === false) {
-            throw new RuntimeException('Could not read config directory');
-        }
-        if ($files === []) {
-            throw new UnexpectedValueException('No config files found in the specified directory');
-        }
-        foreach ($files as $file) {
-            $builder->addFile($file);
-        }
-
+        $builder->addDirectory($directory);
         return $builder->build();
     }
 
