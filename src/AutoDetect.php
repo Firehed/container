@@ -73,8 +73,10 @@ final class AutoDetect
      * @param non-empty-literal-string $directory
      * @param non-empty-array<literal-string> $envNames
      */
-    public static function from(string $directory, array $envNames = self::ENVIRONMENT_NAMES): TypedContainerInterface
-    {
+    public static function from(
+        string $directory,
+        array $envNames = self::ENVIRONMENT_NAMES,
+    ): TypedContainerInterface {
         $builder = self::getBuilder($envNames);
         $builder->addDirectory($directory);
         return $builder->build();
