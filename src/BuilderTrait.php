@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Firehed\Container;
 
 use Closure;
+use InvalidArgumentException;
 use RuntimeException;
 use UnexpectedValueException;
 
@@ -12,6 +13,9 @@ trait BuilderTrait
 {
     public function addDirectory(string $directory): void
     {
+        if ($directory === '') {
+            throw new InvalidArgumentException('Directory must not be empty. Did you mean `.`?');
+        }
         $files = glob($directory . '/*.php');
         if ($files === false) {
             throw new RuntimeException('Could not read config directory');

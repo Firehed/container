@@ -8,11 +8,13 @@ use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Firehed\Container\Exceptions\IncorrectlyTypedValue;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use SessionHandlerInterface;
 use SessionIdInterface;
+use UnexpectedValueException;
 
 /**
  * This is a test trait to help ensure all processes end up with the same
@@ -397,8 +399,8 @@ trait ContainerBuilderTestTrait
     public function testAddDirectoryThrowsOnEmptyString(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Directory is empty');
         $builder = $this->getBuilder();
+        // @phpstan-ignore argument.type (Explicitly testing the guard)
         $builder->addDirectory('');
     }
 

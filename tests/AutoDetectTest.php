@@ -27,6 +27,7 @@ class AutoDetectTest extends TestCase
     {
         self::expectException(LogicException::class);
         self::expectExceptionMessage('Directory is empty');
+        // @phpstan-ignore argument.type (Explicitly testing the guard)
         AutoDetect::from('');
     }
 

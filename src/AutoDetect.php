@@ -33,6 +33,7 @@ final class AutoDetect
      * the dynamic or compiled config builder based on whether a development
      * environment is detected.
      *
+     * @param non-empty-literal-string $directory
      * @param non-empty-array<literal-string> $envNames
      */
     public static function from(string $directory, array $envNames = self::ENVIRONMENT_NAMES): TypedContainerInterface
@@ -72,6 +73,7 @@ final class AutoDetect
      * container to manage object instances, it's possible to run into subtle
      * issues if there are multiple instances of the container itself
      *
+     * @param non-empty-literal-string $directory
      * @param non-empty-array<literal-string> $envNames
      */
     public static function instance(
