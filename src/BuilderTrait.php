@@ -5,9 +5,29 @@ declare(strict_types=1);
 namespace Firehed\Container;
 
 use Closure;
+use InvalidArgumentException;
+use RuntimeException;
+use UnexpectedValueException;
 
 trait BuilderTrait
 {
+    public function addDirectory(string $directory): void
+    {
+        if ($directory === '') {
+            throw new InvalidArgumentException('Directory must not be empty. Did you mean `.`?');
+        }
+        $files = glob($directory . '/*.php');
+        if ($files === false) {
+            throw new RuntimeException('Could not read config directory');
+        }
+        if ($files === []) {
+            throw new UnexpectedValueException('No config files found in the specified directory');
+        }
+        foreach ($files as $file) {
+            $this->addFile($file);
+        }
+    }
+
     /**
      * Given the contents of a standard container config file, pre-process some
      * of the shorthand/"magical" definitions into actual DefinitionInterface
