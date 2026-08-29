@@ -72,7 +72,7 @@ jobs:
           --prefer-lowest
 
       - name: Configure matchers
-        uses: mheap/phpunit-matcher-action@d4addb24dfdb70604a164bc0efa3b5117e84e0bc
+        uses: mheap/phpunit-matcher-action@d9998831c44d6db0c9b268015932776807aefc11
 
       - name: PHPUnit
         run: vendor/bin/phpunit
