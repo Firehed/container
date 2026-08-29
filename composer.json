@@ -44,7 +44,14 @@
         "psr/container": "^1.0 || ^2.0",
         "psr/log": "^1.1 || ^2.0 || ^3.0"
     },
+    "suggest": {
+        "composer/class-map-generator": "Required for the config generator CLI tool"
+    },
+    "bin": [
+        "bin/generate-config"
+    ],
     "require-dev": {
+        "composer/class-map-generator": "^1.7",
         "phpstan/phpstan": "^2.0",
         "phpstan/phpstan-phpunit": "^2.0",
         "phpstan/phpstan-strict-rules": "^2.0",
