@@ -15,16 +15,23 @@ use UnitEnum;
 
 use function array_key_exists;
 use function assert;
+use function chmod;
 use function class_exists;
+use function dirname;
 use function file_exists;
+use function file_put_contents;
 use function is_array;
 use function is_int;
 use function is_scalar;
 use function is_string;
 use function is_writable;
 use function pathinfo;
+use function rename;
 use function sprintf;
 use function realpath;
+use function tempnam;
+use function umask;
+use function unlink;
 
 class Compiler implements BuilderInterface
 {
@@ -148,7 +155,50 @@ class Compiler implements BuilderInterface
         $code = $this->prettyPrint($tpl);
         $this->logger->info($code);
 
-        file_put_contents($this->path, $code);
+        $this->writeAtomically($code);
+    }
+
+    /**
+     * Write the compiled code to a temporary file in the destination
+     * directory, then rename it into place. `rename()` is atomic on the same
+     * filesystem, so a concurrent process (e.g. another php-fpm worker
+     * handling a cold-start request at the same time) either sees no file or
+     * the complete one. A plain `file_put_contents` would let that process
+     * `require` a partially-written file and fatal on a syntax error.
+     */
+    private function writeAtomically(string $code): void
+    {
+        $dir = dirname($this->path);
+        $tmp = tempnam($dir, 'cc');
+        if ($tmp === false) {
+            throw new UnexpectedValueException(sprintf(
+                'Could not create a temporary file in %s',
+                $dir,
+            ));
+        }
+        try {
+            if (file_put_contents($tmp, $code) === false) {
+                throw new UnexpectedValueException(sprintf(
+                    'Could not write compiled container to %s',
+                    $tmp,
+                ));
+            }
+            // tempnam creates the file 0600; give it the permissions a direct
+            // write would have had so other users can still read it.
+            chmod($tmp, 0666 & ~umask());
+            if (!rename($tmp, $this->path)) {
+                throw new UnexpectedValueException(sprintf(
+                    'Could not move compiled container to %s',
+                    $this->path,
+                ));
+            }
+        } finally {
+            // A successful rename leaves nothing behind; only clean up after
+            // a failure.
+            if (file_exists($tmp)) {
+                unlink($tmp);
+            }
+        }
     }
 
     private function prettyPrint(string $code): string
