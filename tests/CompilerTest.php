@@ -62,6 +62,45 @@ class CompilerTest extends TestCase
         return new Compiler($this->file, $logger);
     }
 
+    public function testCompiledFileLeavesNoTemporaryFilesBehind(): void
+    {
+        $dir = sprintf('%s/%d', sys_get_temp_dir(), random_int(0, PHP_INT_MAX));
+        $path = $dir . '/cc.php';
+        $compiler = new Compiler($path);
+        $compiler->addFile(__DIR__ . '/ValidDefinitions/Literals.php');
+        try {
+            $compiler->build();
+            self::assertFileExists($path, 'File was not written');
+            self::assertSame([$path], glob($dir . '/*'), 'Temporary file was left behind');
+        } finally {
+            $leftovers = glob($dir . '/*');
+            if ($leftovers !== false) {
+                foreach ($leftovers as $file) {
+                    unlink($file);
+                }
+            }
+            if (is_dir($dir)) {
+                rmdir($dir);
+            }
+        }
+    }
+
+    public function testCompiledFileIsReadableByOtherUsers(): void
+    {
+        $path = sprintf('%s/%d.php', sys_get_temp_dir(), random_int(0, PHP_INT_MAX));
+        $compiler = new Compiler($path);
+        $compiler->addFile(__DIR__ . '/ValidDefinitions/Literals.php');
+        try {
+            $compiler->build();
+            $expected = 0666 & ~umask();
+            self::assertSame($expected, fileperms($path) & 0777, 'File permissions do not follow umask');
+        } finally {
+            if (file_exists($path)) {
+                unlink($path);
+            }
+        }
+    }
+
     public function testMakingPathWritable(): void
     {
         $tmp = sys_get_temp_dir();
