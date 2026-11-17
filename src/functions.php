@@ -10,18 +10,25 @@ function autowire(?string $class = null): ShorthandDefinitionInterface
     return new AutowiredClass($class);
 }
 
+// env() and fileOrEnv() forward only the arguments actually passed, so that
+// an explicit null default stays distinct from no default.
+
 function env(string $name, ?string $default = null): EnvironmentVariableInterface
 {
-    // This is a little magic to separate a null literal from no argument
-    // provided
-    if (func_num_args() === 2) {
-        return new EnvironmentVariable(new EnvSource($name), $default);
-    } else {
-        return new EnvironmentVariable(new EnvSource($name));
-    }
+    return new EnvironmentVariable(new EnvSource($name), ...(func_num_args() === 2 ? [$default] : []));
 }
 
 function factory(?Closure $def = null): ShorthandDefinitionInterface
 {
     return new Factory($def);
+}
+
+function fileContents(string $path): EnvironmentVariableInterface
+{
+    return new EnvironmentVariable(new FileSource($path));
+}
+
+function fileOrEnv(string $name, ?string $default = null): EnvironmentVariableInterface
+{
+    return new EnvironmentVariable(new FileOrEnvSource($name), ...(func_num_args() === 2 ? [$default] : []));
 }
