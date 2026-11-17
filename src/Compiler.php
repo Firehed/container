@@ -33,15 +33,9 @@ use function tempnam;
 use function umask;
 use function unlink;
 
-/**
- * @phpstan-import-type Cast from CastableValueInterface
- */
 class Compiler implements BuilderInterface
 {
     use BuilderTrait;
-
-    /** @var array<string, Cast> */
-    private array $casts = [];
 
     /** @var class-string<TypedContainerInterface> */
     private string $className;
@@ -106,9 +100,6 @@ class Compiler implements BuilderInterface
             if (!$value->isCacheable()) {
                 $this->factories[$key] = true;
             }
-            if ($value instanceof CastableValueInterface) {
-                $this->casts[$key] = $value->getCast();
-            }
         }
     }
 
@@ -129,12 +120,16 @@ class Compiler implements BuilderInterface
         if ($this->exists) {
             return;
         }
+        $casts = [];
         $defs = [];
         $mappings = [];
         foreach ($this->definitions as $key => $value) {
             $name = $this->makeNameForKey($key);
             $mappings[$key] = $name;
             $defs[] = $this->makeFunctionBody($key, $name, $value);
+            if ($value instanceof CastableValueInterface) {
+                $casts[$key] = $value->getCast();
+            }
         }
 
         // makeFunctionBody fills in dependencies
@@ -151,7 +146,7 @@ class Compiler implements BuilderInterface
         $tpl .= "extends \\Firehed\\Container\\CompiledContainer\n";
         $tpl .= "{\n";
         $tpl .= '    protected array $casts = ';
-        $tpl .= var_export($this->casts, true);
+        $tpl .= var_export($casts, true);
         $tpl .= ";\n";
         $tpl .= '    protected array $factories = ';
         $tpl .= var_export($this->factories, true);
