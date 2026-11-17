@@ -68,6 +68,12 @@ class CasterTest extends TestCase
         (new Caster())->cast('invalid', Fixtures\Environment::class);
     }
 
+    public function testNoCastPassesAnyValueThrough(): void
+    {
+        $value = new \stdClass();
+        self::assertSame($value, (new Caster())->cast($value, CastableValueInterface::CAST_NONE), 'No cast means no checks');
+    }
+
     public function testNonStringValueThrows(): void
     {
         $this->expectException(UnexpectedValueException::class);
