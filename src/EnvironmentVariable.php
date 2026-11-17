@@ -16,14 +16,14 @@ class EnvironmentVariable implements EnvironmentVariableInterface, DefinitionInt
 
     private bool $hasDefault;
 
-    public function __construct(private string $name, private ?string $default = null)
+    public function __construct(private ValueSourceInterface $source, private ?string $default = null)
     {
         $this->hasDefault = func_num_args() === 2;
     }
 
     public function getName(): string
     {
-        return $this->name;
+        return $this->source->getName();
     }
 
     public function hasDefault(): bool
@@ -34,7 +34,7 @@ class EnvironmentVariable implements EnvironmentVariableInterface, DefinitionInt
     public function getDefault(): ?string
     {
         if (!$this->hasDefault) {
-            throw new Exceptions\EnvironmentVariableNotSet($this->name);
+            throw new Exceptions\EnvironmentVariableNotSet($this->getName());
         }
         return $this->default;
     }
@@ -86,7 +86,7 @@ class EnvironmentVariable implements EnvironmentVariableInterface, DefinitionInt
     public function generateCode(): string
     {
         return <<<PHP
-\$value = \$this->envReader->read('{$this->name}');
+\$value = {$this->source->generateReadExpression()};
 if (\$value === null) {
     {$this->getDefaultCodeBody()}
 }
@@ -114,7 +114,7 @@ PHP;
             $default = var_export($this->default, true);
             return "\$value = $default;";
         } else {
-            $varName = var_export($this->name, true);
+            $varName = var_export($this->getName(), true);
             return sprintf('throw new %s(%s);', Exceptions\EnvironmentVariableNotSet::class, $varName);
         }
     }
@@ -127,12 +127,12 @@ PHP;
 
     public function resolve(TypedContainerInterface $container, EnvReader $envReader): mixed
     {
-        $envValue = $envReader->read($this->name);
+        $envValue = $this->source->read($envReader);
         if ($envValue === null) {
             if ($this->hasDefault) {
                 $envValue = $this->default;
             } else {
-                throw new Exceptions\EnvironmentVariableNotSet($this->name);
+                throw new Exceptions\EnvironmentVariableNotSet($this->getName());
             }
         }
 

@@ -13,20 +13,20 @@ class EnvironmentVariableTest extends TestCase
 {
     public function testImplementsDefinitionInterface(): void
     {
-        $env = new EnvironmentVariable('FOO');
+        $env = new EnvironmentVariable(new EnvSource('FOO'));
         // @phpstan-ignore method.alreadyNarrowedType
         $this->assertInstanceOf(DefinitionInterface::class, $env);
     }
 
     public function testIsCacheableReturnsTrue(): void
     {
-        $env = new EnvironmentVariable('FOO');
+        $env = new EnvironmentVariable(new EnvSource('FOO'));
         $this->assertTrue($env->isCacheable());
     }
 
     public function testGetDependenciesReturnsEmptyArray(): void
     {
-        $env = new EnvironmentVariable('FOO');
+        $env = new EnvironmentVariable(new EnvSource('FOO'));
         $this->assertSame([], $env->getDependencies());
     }
 
@@ -38,7 +38,7 @@ class EnvironmentVariableTest extends TestCase
             ->with('FOO')
             ->willReturn('bar');
 
-        $env = new EnvironmentVariable('FOO');
+        $env = new EnvironmentVariable(new EnvSource('FOO'));
         $result = $env->resolve(self::createStub(TypedContainerInterface::class), $envReader);
         $this->assertSame('bar', $result);
     }
@@ -51,7 +51,7 @@ class EnvironmentVariableTest extends TestCase
             ->with('FOO')
             ->willReturn(null);
 
-        $env = new EnvironmentVariable('FOO', 'default_value');
+        $env = new EnvironmentVariable(new EnvSource('FOO'), 'default_value');
         $result = $env->resolve(self::createStub(TypedContainerInterface::class), $envReader);
         $this->assertSame('default_value', $result);
     }
@@ -64,7 +64,7 @@ class EnvironmentVariableTest extends TestCase
             ->with('FOO')
             ->willReturn(null);
 
-        $env = new EnvironmentVariable('FOO', null);
+        $env = new EnvironmentVariable(new EnvSource('FOO'), null);
         $result = $env->resolve(self::createStub(TypedContainerInterface::class), $envReader);
         $this->assertNull($result);
     }
@@ -77,7 +77,7 @@ class EnvironmentVariableTest extends TestCase
             ->with('FOO')
             ->willReturn(null);
 
-        $env = new EnvironmentVariable('FOO');
+        $env = new EnvironmentVariable(new EnvSource('FOO'));
         $this->expectException(Exceptions\EnvironmentVariableNotSet::class);
         $env->resolve(self::createStub(TypedContainerInterface::class), $envReader);
     }
@@ -91,7 +91,7 @@ class EnvironmentVariableTest extends TestCase
             ->with('FOO')
             ->willReturn($envValue);
 
-        $env = new EnvironmentVariable('FOO');
+        $env = new EnvironmentVariable(new EnvSource('FOO'));
         $env->asBool();
         $this->assertSame($expected, $env->resolve(self::createStub(TypedContainerInterface::class), $envReader));
     }
@@ -117,7 +117,7 @@ class EnvironmentVariableTest extends TestCase
             ->with('FOO')
             ->willReturn($envValue);
 
-        $env = new EnvironmentVariable('FOO');
+        $env = new EnvironmentVariable(new EnvSource('FOO'));
         $env->asInt();
         $this->assertSame($expected, $env->resolve(self::createStub(TypedContainerInterface::class), $envReader));
     }
@@ -141,7 +141,7 @@ class EnvironmentVariableTest extends TestCase
             ->with('FOO')
             ->willReturn($envValue);
 
-        $env = new EnvironmentVariable('FOO');
+        $env = new EnvironmentVariable(new EnvSource('FOO'));
         $env->asFloat();
         $this->assertSame($expected, $env->resolve(self::createStub(TypedContainerInterface::class), $envReader));
     }
@@ -164,7 +164,7 @@ class EnvironmentVariableTest extends TestCase
             ->with('ENV')
             ->willReturn('testing');
 
-        $env = new EnvironmentVariable('ENV');
+        $env = new EnvironmentVariable(new EnvSource('ENV'));
         $env->asEnum(Fixtures\Environment::class);
         $result = $env->resolve(self::createStub(TypedContainerInterface::class), $envReader);
         $this->assertSame(Fixtures\Environment::TESTING, $result);
@@ -178,7 +178,7 @@ class EnvironmentVariableTest extends TestCase
             ->with('ENV')
             ->willReturn(null);
 
-        $env = new EnvironmentVariable('ENV', null);
+        $env = new EnvironmentVariable(new EnvSource('ENV'), null);
         $env->asEnum(Fixtures\Environment::class);
 
         $this->expectException(\TypeError::class);
@@ -201,35 +201,35 @@ class EnvironmentVariableTest extends TestCase
 
     public function testGenerateCodeContainsEnvReaderCall(): void
     {
-        $env = new EnvironmentVariable('MY_VAR');
+        $env = new EnvironmentVariable(new EnvSource('MY_VAR'));
         $code = $env->generateCode();
         $this->assertStringContainsString("\$this->envReader->read('MY_VAR')", $code);
     }
 
     public function testGenerateCodeContainsReturnStatement(): void
     {
-        $env = new EnvironmentVariable('MY_VAR');
+        $env = new EnvironmentVariable(new EnvSource('MY_VAR'));
         $code = $env->generateCode();
         $this->assertStringContainsString('return', $code);
     }
 
     public function testGenerateCodeWithDefaultContainsDefault(): void
     {
-        $env = new EnvironmentVariable('MY_VAR', 'fallback');
+        $env = new EnvironmentVariable(new EnvSource('MY_VAR'), 'fallback');
         $code = $env->generateCode();
         $this->assertStringContainsString('fallback', $code);
     }
 
     public function testGenerateCodeWithoutDefaultContainsException(): void
     {
-        $env = new EnvironmentVariable('MY_VAR');
+        $env = new EnvironmentVariable(new EnvSource('MY_VAR'));
         $code = $env->generateCode();
         $this->assertStringContainsString('EnvironmentVariableNotSet', $code);
     }
 
     public function testGenerateCodeForBoolContainsParseBoolCall(): void
     {
-        $env = new EnvironmentVariable('MY_VAR');
+        $env = new EnvironmentVariable(new EnvSource('MY_VAR'));
         $env->asBool();
         $code = $env->generateCode();
         $this->assertStringContainsString('EnvironmentVariable::parseBool($value)', $code);

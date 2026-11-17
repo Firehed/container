@@ -15,9 +15,9 @@ function env(string $name, ?string $default = null): EnvironmentVariableInterfac
     // This is a little magic to separate a null literal from no argument
     // provided
     if (func_num_args() === 2) {
-        return new EnvironmentVariable($name, $default);
+        return new EnvironmentVariable(new EnvSource($name), $default);
     } else {
-        return new EnvironmentVariable($name);
+        return new EnvironmentVariable(new EnvSource($name));
     }
 }
 
