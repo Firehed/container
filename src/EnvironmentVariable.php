@@ -76,16 +76,11 @@ class EnvironmentVariable implements EnvironmentVariableInterface, DefinitionInt
     }
 
     /**
-     * Containers compiled by earlier versions call this directly, so it must
-     * stay here.
+     * Containers compiled by earlier versions call this directly.
      */
     public static function parseBool(string $value): bool
     {
-        return match (strtolower($value)) {
-            '1', 'true' => true,
-            '', '0', 'false' => false,
-            default => throw new \OutOfBoundsException('Invalid boolean value'),
-        };
+        return (new Caster())->parseBool($value);
     }
 
     // DefinitionInterface implementation
