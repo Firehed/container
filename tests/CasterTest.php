@@ -71,7 +71,8 @@ class CasterTest extends TestCase
     public function testNoCastPassesAnyValueThrough(): void
     {
         $value = new \stdClass();
-        self::assertSame($value, (new Caster())->cast($value, CastableValueInterface::CAST_NONE), 'No cast means no checks');
+        $result = (new Caster())->cast($value, CastableValueInterface::CAST_NONE);
+        self::assertSame($value, $result, 'No cast means no checks');
     }
 
     public function testNonStringValueThrows(): void
