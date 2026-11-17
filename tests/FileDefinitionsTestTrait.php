@@ -49,7 +49,11 @@ trait FileDefinitionsTestTrait
             'env' => ['file_or_env', ['CONTAINER_UNITTEST_SECRET' => 'from-env'], 'from-env'],
             'file' => ['file_or_env', ['CONTAINER_UNITTEST_SECRET_FILE' => $secret], 's3cr3t'],
             'default' => ['file_or_env_with_default', [], 'default'],
-            'file over default' => ['file_or_env_with_default', ['CONTAINER_UNITTEST_SECRET_FILE' => $secret], 's3cr3t'],
+            'file over default' => [
+                'file_or_env_with_default',
+                ['CONTAINER_UNITTEST_SECRET_FILE' => $secret],
+                's3cr3t',
+            ],
             'cast env' => ['file_or_env_asint', ['CONTAINER_UNITTEST_PORT' => '80'], 80],
             'cast file' => ['file_or_env_asint', ['CONTAINER_UNITTEST_PORT_FILE' => $port], 8080],
         ];
