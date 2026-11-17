@@ -10,12 +10,15 @@ class DevContainer implements TypedContainerInterface
 {
     use TypedContainerTrait;
 
+    private Caster $caster;
+
     /** @var mixed[] */
     private $evaluated = [];
 
     /** @param mixed[] $definitions */
     public function __construct(private array $definitions, private EnvReader $envReader)
     {
+        $this->caster = new Caster();
     }
 
     /** @return array{ids: list<string>} */
@@ -66,6 +69,9 @@ class DevContainer implements TypedContainerInterface
 
         if ($def instanceof DefinitionInterface) {
             $result = $def->resolve($this, $this->envReader);
+            if ($def instanceof CastableValueInterface) {
+                $result = $this->caster->cast($result, $def->getCast());
+            }
             if ($def->isCacheable()) {
                 $this->evaluated[$id] = $result;
             }

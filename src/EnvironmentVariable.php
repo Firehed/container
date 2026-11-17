@@ -72,6 +72,10 @@ class EnvironmentVariable implements EnvironmentVariableInterface, DefinitionInt
         return $this;
     }
 
+    /**
+     * Containers compiled by earlier versions call this directly, so it must
+     * stay here.
+     */
     public static function parseBool(string $value): bool
     {
         return match (strtolower($value)) {
@@ -90,22 +94,8 @@ class EnvironmentVariable implements EnvironmentVariableInterface, DefinitionInt
 if (\$value === null) {
     {$this->getDefaultCodeBody()}
 }
-{$this->getCastCodeBody()}
+return \$value;
 PHP;
-    }
-
-    private function getCastCodeBody(): string
-    {
-        return match ($this->cast) {
-            EnvironmentVariableInterface::CAST_NONE => 'return $value;',
-            EnvironmentVariableInterface::CAST_BOOL => sprintf(
-                'return %s::parseBool($value);',
-                self::class,
-            ),
-            EnvironmentVariableInterface::CAST_INT,
-            EnvironmentVariableInterface::CAST_FLOAT => sprintf('return (%s)$value;', $this->cast),
-            default => sprintf('return %s::from($value);', $this->cast),
-        };
     }
 
     private function getDefaultCodeBody(): string
@@ -136,15 +126,7 @@ PHP;
             }
         }
 
-        return match ($this->cast) {
-            EnvironmentVariableInterface::CAST_NONE => $envValue,
-            EnvironmentVariableInterface::CAST_BOOL => self::parseBool((string) $envValue),
-            EnvironmentVariableInterface::CAST_INT => (int) $envValue,
-            EnvironmentVariableInterface::CAST_FLOAT => (float) $envValue,
-            // Remaining cast type is an enum; use its `::from` method
-            // @phpstan-ignore argument.type (null intentionally triggers native TypeError)
-            default => $this->cast::from($envValue),
-        };
+        return $envValue;
     }
 
     public function isCacheable(): bool

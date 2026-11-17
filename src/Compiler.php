@@ -37,6 +37,9 @@ class Compiler implements BuilderInterface
 {
     use BuilderTrait;
 
+    /** @var array<string, CastableValueInterface::CAST_*|class-string<\BackedEnum>> */
+    private array $casts = [];
+
     /** @var class-string<TypedContainerInterface> */
     private string $className;
 
@@ -100,6 +103,9 @@ class Compiler implements BuilderInterface
             if (!$value->isCacheable()) {
                 $this->factories[$key] = true;
             }
+            if ($value instanceof CastableValueInterface && $value->getCast() !== CastableValueInterface::CAST_NONE) {
+                $this->casts[$key] = $value->getCast();
+            }
         }
     }
 
@@ -141,6 +147,9 @@ class Compiler implements BuilderInterface
         $tpl .= "class {$this->className}\n";
         $tpl .= "extends \\Firehed\\Container\\CompiledContainer\n";
         $tpl .= "{\n";
+        $tpl .= '    protected array $casts = ';
+        $tpl .= var_export($this->casts, true);
+        $tpl .= ";\n";
         $tpl .= '    protected array $factories = ';
         $tpl .= var_export($this->factories, true);
         $tpl .= ";\n";
