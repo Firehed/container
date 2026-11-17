@@ -20,13 +20,6 @@ interface EnvironmentVariableInterface extends CastableValueInterface
 
     /**
      * @internal
-     * Return the casting type: bool, int, float, '', or the class-string of
-     * a BackedEnum.
-     */
-    public function getCast(): string;
-
-    /**
-     * @internal
      * @throws BadMethodCallException if hasDefault would return false
      */
     public function getDefault(): ?string;

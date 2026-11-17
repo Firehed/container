@@ -21,4 +21,10 @@ interface CastableValueInterface
     public function asFloat(): CastableValueInterface;
 
     public function asInt(): CastableValueInterface;
+
+    /**
+     * @internal
+     * @return self::CAST_*|class-string<\BackedEnum>
+     */
+    public function getCast(): string;
 }
