@@ -30,6 +30,7 @@ return [
     'env_asbool_false' => env($prefix . 'FALSE')->asBool(),
     'env_asbool_empty' => env($prefix . 'EMPTY')->asBool(),
     'env_asbool_notset' => env($prefix . 'NOT_SET', 'true')->asBool(),
+    'env_asbool_null_default' => env($prefix . 'NOT_SET', null)->asBool(),
 
     // Casting: int
     'env_asint_one' => env($prefix . 'ONE')->asInt(),
