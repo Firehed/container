@@ -9,9 +9,12 @@ use function enum_exists;
 use function func_num_args;
 use function sprintf;
 
+/**
+ * @phpstan-import-type Cast from CastableValueInterface
+ */
 class EnvironmentVariable implements EnvironmentVariableInterface, DefinitionInterface
 {
-    /** @var EnvironmentVariableInterface::CAST_* | class-string<\BackedEnum> */
+    /** @var Cast */
     private string $cast = EnvironmentVariableInterface::CAST_NONE;
 
     private bool $hasDefault;
@@ -72,13 +75,14 @@ class EnvironmentVariable implements EnvironmentVariableInterface, DefinitionInt
         return $this;
     }
 
+    /**
+     * Containers compiled by earlier versions call this directly.
+     */
     public static function parseBool(string $value): bool
     {
-        return match (strtolower($value)) {
-            '1', 'true' => true,
-            '', '0', 'false' => false,
-            default => throw new \OutOfBoundsException('Invalid boolean value'),
-        };
+        $result = (new Caster())->cast($value, CastableValueInterface::CAST_BOOL);
+        assert(is_bool($result));
+        return $result;
     }
 
     // DefinitionInterface implementation
@@ -90,22 +94,8 @@ class EnvironmentVariable implements EnvironmentVariableInterface, DefinitionInt
 if (\$value === null) {
     {$this->getDefaultCodeBody()}
 }
-{$this->getCastCodeBody()}
+return \$value;
 PHP;
-    }
-
-    private function getCastCodeBody(): string
-    {
-        return match ($this->cast) {
-            EnvironmentVariableInterface::CAST_NONE => 'return $value;',
-            EnvironmentVariableInterface::CAST_BOOL => sprintf(
-                'return %s::parseBool($value);',
-                self::class,
-            ),
-            EnvironmentVariableInterface::CAST_INT,
-            EnvironmentVariableInterface::CAST_FLOAT => sprintf('return (%s)$value;', $this->cast),
-            default => sprintf('return %s::from($value);', $this->cast),
-        };
     }
 
     private function getDefaultCodeBody(): string
@@ -136,15 +126,7 @@ PHP;
             }
         }
 
-        return match ($this->cast) {
-            EnvironmentVariableInterface::CAST_NONE => $envValue,
-            EnvironmentVariableInterface::CAST_BOOL => self::parseBool((string) $envValue),
-            EnvironmentVariableInterface::CAST_INT => (int) $envValue,
-            EnvironmentVariableInterface::CAST_FLOAT => (float) $envValue,
-            // Remaining cast type is an enum; use its `::from` method
-            // @phpstan-ignore argument.type (null intentionally triggers native TypeError)
-            default => $this->cast::from($envValue),
-        };
+        return $envValue;
     }
 
     public function isCacheable(): bool

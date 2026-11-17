@@ -120,12 +120,16 @@ class Compiler implements BuilderInterface
         if ($this->exists) {
             return;
         }
+        $casts = [];
         $defs = [];
         $mappings = [];
         foreach ($this->definitions as $key => $value) {
             $name = $this->makeNameForKey($key);
             $mappings[$key] = $name;
             $defs[] = $this->makeFunctionBody($key, $name, $value);
+            if ($value instanceof CastableValueInterface) {
+                $casts[$key] = $value->getCast();
+            }
         }
 
         // makeFunctionBody fills in dependencies
@@ -141,6 +145,9 @@ class Compiler implements BuilderInterface
         $tpl .= "class {$this->className}\n";
         $tpl .= "extends \\Firehed\\Container\\CompiledContainer\n";
         $tpl .= "{\n";
+        $tpl .= '    protected array $casts = ';
+        $tpl .= var_export($casts, true);
+        $tpl .= ";\n";
         $tpl .= '    protected array $factories = ';
         $tpl .= var_export($this->factories, true);
         $tpl .= ";\n";
