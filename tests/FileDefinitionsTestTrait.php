@@ -23,12 +23,8 @@ trait FileDefinitionsTestTrait
     public function testFileContentsMissingThrows(): void
     {
         $container = $this->getContainer();
-        try {
-            $container->get('file_contents_missing');
-            self::fail('Expected exception not thrown');
-        } catch (Exceptions\ValueRetrievalException $e) {
-            self::assertInstanceOf(Exceptions\FileNotReadable::class, $e->getPrevious(), 'Missing file should fail');
-        }
+        $this->expectException(Exceptions\FileNotReadable::class);
+        $container->get('file_contents_missing');
     }
 
     /**
