@@ -101,6 +101,15 @@ class CompilerTest extends TestCase
         }
     }
 
+    public function testRedefiningKeyDropsPreviousCast(): void
+    {
+        $compiler = new Compiler($this->file);
+        $compiler->addFile(__DIR__ . '/ValidDefinitions/Redefined/CastFirst.php');
+        $compiler->addFile(__DIR__ . '/ValidDefinitions/Redefined/PlainSecond.php');
+        $container = $compiler->build();
+        self::assertSame('hello', $container->get('redefined'), 'Cast from the replaced definition must not apply');
+    }
+
     public function testMakingPathWritable(): void
     {
         $tmp = sys_get_temp_dir();
