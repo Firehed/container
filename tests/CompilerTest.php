@@ -62,6 +62,17 @@ class CompilerTest extends TestCase
         return new Compiler($this->file, $logger);
     }
 
+    public function testFileContentsAreNotCompiledIn(): void
+    {
+        $compiler = new Compiler($this->file);
+        $compiler->addFile(__DIR__ . '/ValidDefinitions/Files.php');
+        $compiler->build();
+        $compiled = file_get_contents($this->file);
+        self::assertIsString($compiled, 'Compiled container should be written');
+        self::assertStringContainsString('secret.txt', $compiled, 'Path should be compiled in');
+        self::assertStringNotContainsString('s3cr3t', $compiled, 'Contents must only be read at runtime');
+    }
+
     public function testMakingPathWritable(): void
     {
         $tmp = sys_get_temp_dir();
