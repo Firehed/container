@@ -42,9 +42,13 @@ class CasterTest extends TestCase
             'bool 0' => ['0', CastableValueInterface::CAST_BOOL, false],
             'bool empty' => ['', CastableValueInterface::CAST_BOOL, false],
             'bool null' => [null, CastableValueInterface::CAST_BOOL, false],
-            'int' => ['-5', CastableValueInterface::CAST_INT, -5],
+            'int' => ['42', CastableValueInterface::CAST_INT, 42],
+            'int zero' => ['0', CastableValueInterface::CAST_INT, 0],
+            'int negative' => ['-5', CastableValueInterface::CAST_INT, -5],
             'int null' => [null, CastableValueInterface::CAST_INT, 0],
             'float' => ['3.14', CastableValueInterface::CAST_FLOAT, 3.14],
+            'float zero' => ['0.0', CastableValueInterface::CAST_FLOAT, 0.0],
+            'float negative' => ['-2.5', CastableValueInterface::CAST_FLOAT, -2.5],
             'float null' => [null, CastableValueInterface::CAST_FLOAT, 0.0],
             'enum' => ['testing', Fixtures\Environment::class, Fixtures\Environment::TESTING],
         ];
@@ -59,6 +63,7 @@ class CasterTest extends TestCase
     public function testEnumNullThrows(): void
     {
         $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('must be of type string, null given');
         (new Caster())->cast(null, Fixtures\Environment::class);
     }
 
