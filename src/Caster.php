@@ -36,7 +36,7 @@ class Caster
         };
     }
 
-    public function parseBool(string $value): bool
+    private function parseBool(string $value): bool
     {
         return match (strtolower($value)) {
             '1', 'true' => true,
