@@ -33,11 +33,14 @@ use function tempnam;
 use function umask;
 use function unlink;
 
+/**
+ * @phpstan-import-type Cast from CastableValueInterface
+ */
 class Compiler implements BuilderInterface
 {
     use BuilderTrait;
 
-    /** @var array<string, CastableValueInterface::CAST_*|class-string<\BackedEnum>> */
+    /** @var array<string, Cast> */
     private array $casts = [];
 
     /** @var class-string<TypedContainerInterface> */

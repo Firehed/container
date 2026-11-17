@@ -10,11 +10,12 @@ use function is_string;
 
 /**
  * @internal
+ * @phpstan-import-type Cast from CastableValueInterface
  */
 class Caster
 {
     /**
-     * @param CastableValueInterface::CAST_*|class-string<\BackedEnum> $cast
+     * @param Cast $cast
      */
     public function cast(mixed $value, string $cast): mixed
     {

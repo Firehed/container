@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Firehed\Container;
 
+/**
+ * @phpstan-type Cast CastableValueInterface::CAST_*|class-string<\BackedEnum>
+ */
 interface CastableValueInterface
 {
     public const CAST_BOOL = 'bool';
@@ -24,7 +27,7 @@ interface CastableValueInterface
 
     /**
      * @internal
-     * @return self::CAST_*|class-string<\BackedEnum>
+     * @return Cast
      */
     public function getCast(): string;
 }

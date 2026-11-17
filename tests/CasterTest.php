@@ -9,11 +9,14 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use UnexpectedValueException;
 
+/**
+ * @phpstan-import-type Cast from CastableValueInterface
+ */
 #[CoversClass(Caster::class)]
 class CasterTest extends TestCase
 {
     /**
-     * @param CastableValueInterface::CAST_*|class-string<\BackedEnum> $cast
+     * @param Cast $cast
      */
     #[DataProvider('casts')]
     public function testCast(?string $value, string $cast, mixed $expected): void
@@ -24,7 +27,7 @@ class CasterTest extends TestCase
     /**
      * @return array<string, array{
      *   ?string,
-     *   CastableValueInterface::CAST_*|class-string<\BackedEnum>,
+     *   Cast,
      *   mixed,
      * }>
      */

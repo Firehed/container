@@ -6,6 +6,9 @@ namespace Firehed\Container;
 use Throwable;
 use Psr\Container\ContainerExceptionInterface;
 
+/**
+ * @phpstan-import-type Cast from CastableValueInterface
+ */
 abstract class CompiledContainer implements TypedContainerInterface
 {
     use TypedContainerTrait;
@@ -14,7 +17,7 @@ abstract class CompiledContainer implements TypedContainerInterface
 
     /**
      * Maps $id keys to the cast applied to their resolved value
-     * @var array<string, CastableValueInterface::CAST_*|class-string<\BackedEnum>>
+     * @var array<string, Cast>
      */
     protected array $casts = [];
 

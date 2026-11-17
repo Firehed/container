@@ -9,6 +9,9 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @phpstan-import-type Cast from CastableValueInterface
+ */
 #[CoversClass(EnvironmentVariable::class)]
 class EnvironmentVariableTest extends TestCase
 {
@@ -92,7 +95,7 @@ class EnvironmentVariableTest extends TestCase
 
     /**
      * @param Closure(EnvironmentVariable): mixed $setCast
-     * @param CastableValueInterface::CAST_*|class-string<\BackedEnum> $expected
+     * @param Cast $expected
      */
     #[DataProvider('castSetters')]
     public function testCastIsRecorded(Closure $setCast, string $expected): void
@@ -105,7 +108,7 @@ class EnvironmentVariableTest extends TestCase
     /**
      * @return array<string, array{
      *   Closure(EnvironmentVariable): mixed,
-     *   CastableValueInterface::CAST_*|class-string<\BackedEnum>,
+     *   Cast,
      * }>
      */
     public static function castSetters(): array

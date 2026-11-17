@@ -9,9 +9,12 @@ use function enum_exists;
 use function func_num_args;
 use function sprintf;
 
+/**
+ * @phpstan-import-type Cast from CastableValueInterface
+ */
 class EnvironmentVariable implements EnvironmentVariableInterface, DefinitionInterface
 {
-    /** @var EnvironmentVariableInterface::CAST_* | class-string<\BackedEnum> */
+    /** @var Cast */
     private string $cast = EnvironmentVariableInterface::CAST_NONE;
 
     private bool $hasDefault;
