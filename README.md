@@ -277,6 +277,30 @@ return [
 ];
 ```
 
+#### Files (e.g. mounted secrets)
+
+`fileContents($path)` reads a file at runtime.
+`fileOrEnv($name)` reads the file named by `{$name}_FILE` if that is set, and otherwise behaves like `env($name)`, including defaults.
+Both support the same casting methods as `env()`.
+
+```php
+<?php
+use function Firehed\Container\{fileContents, fileOrEnv};
+return [
+    'api_key' => fileContents('/run/secrets/api_key'),
+    // Reads the file at $DATABASE_URL_FILE, or falls back to $DATABASE_URL
+    'database_url' => fileOrEnv('DATABASE_URL'),
+    'port' => fileOrEnv('PORT', '8080')->asInt(),
+];
+```
+
+- Trailing line breaks (`\r` and `\n`) are removed, since secret files commonly end with a newline that isn't part of the value.
+  Other whitespace is kept.
+- A file that is missing or can't be read throws an exception, as does a `_FILE` variable set to an empty string.
+  There is no fallback to the environment variable or default in either case.
+- Setting both `{$name}` and `{$name}_FILE` throws an exception.
+- The file is read on first access and memoized like any other value; only its path is compiled into the container.
+
 
 ### Class Autowiring
 
