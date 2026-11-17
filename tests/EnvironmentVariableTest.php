@@ -18,6 +18,13 @@ class EnvironmentVariableTest extends TestCase
         $this->assertInstanceOf(DefinitionInterface::class, $env);
     }
 
+    public function testImplementsCastableValueInterface(): void
+    {
+        $env = new EnvironmentVariable('FOO');
+        // @phpstan-ignore staticMethod.alreadyNarrowedType
+        self::assertInstanceOf(CastableValueInterface::class, $env, 'Env vars should support casting');
+    }
+
     public function testIsCacheableReturnsTrue(): void
     {
         $env = new EnvironmentVariable('FOO');
