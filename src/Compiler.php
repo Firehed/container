@@ -106,7 +106,7 @@ class Compiler implements BuilderInterface
             if (!$value->isCacheable()) {
                 $this->factories[$key] = true;
             }
-            if ($value instanceof CastableValueInterface && $value->getCast() !== CastableValueInterface::CAST_NONE) {
+            if ($value instanceof CastableValueInterface) {
                 $this->casts[$key] = $value->getCast();
             }
         }

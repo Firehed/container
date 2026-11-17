@@ -21,11 +21,13 @@ class Caster
      */
     public function cast(mixed $value, string $cast): mixed
     {
+        if ($cast === CastableValueInterface::CAST_NONE) {
+            return $value;
+        }
         if ($value !== null && !is_string($value)) {
             throw new UnexpectedValueException('Castable values must resolve to a string or null');
         }
         return match ($cast) {
-            CastableValueInterface::CAST_NONE => $value,
             CastableValueInterface::CAST_BOOL => $this->parseBool((string) $value),
             CastableValueInterface::CAST_INT => (int) $value,
             CastableValueInterface::CAST_FLOAT => (float) $value,
