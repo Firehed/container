@@ -5,13 +5,8 @@ namespace Firehed\Container;
 
 use BadMethodCallException;
 
-interface EnvironmentVariableInterface
+interface EnvironmentVariableInterface extends CastableValueInterface
 {
-    public const CAST_BOOL = 'bool';
-    public const CAST_FLOAT = 'float';
-    public const CAST_INT = 'int';
-    public const CAST_NONE = '';
-
     public function asBool(): EnvironmentVariableInterface;
 
     public function asFloat(): EnvironmentVariableInterface;
