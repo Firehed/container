@@ -10,6 +10,7 @@ use function func_num_args;
 use function sprintf;
 
 /**
+ * @internal - use `Firehed\Container\env()` to reach this.
  * @phpstan-import-type Cast from CastableValueInterface
  */
 class EnvironmentVariable implements EnvironmentVariableInterface, DefinitionInterface

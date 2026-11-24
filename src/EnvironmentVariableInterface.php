@@ -5,6 +5,9 @@ namespace Firehed\Container;
 
 use BadMethodCallException;
 
+/**
+ * @internal for now, this may become public later
+ */
 interface EnvironmentVariableInterface extends CastableValueInterface
 {
     public function asBool(): EnvironmentVariableInterface;

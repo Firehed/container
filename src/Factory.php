@@ -6,6 +6,9 @@ namespace Firehed\Container;
 
 use Closure;
 
+/**
+ * @internal - use `Firehed\Container\factory()` to reach this.
+ */
 class Factory implements ShorthandDefinitionInterface
 {
     /** @var ?class-string */

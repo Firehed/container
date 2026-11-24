@@ -7,6 +7,9 @@ use Closure;
 use Psr\Container\ContainerExceptionInterface;
 use UnexpectedValueException;
 
+/**
+ * @api
+ */
 class Builder implements BuilderInterface
 {
     use BuilderTrait;

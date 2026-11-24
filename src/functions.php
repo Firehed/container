@@ -4,12 +4,18 @@ namespace Firehed\Container;
 
 use Closure;
 
-/** @param ?class-string $class */
+/**
+ * @api
+ * @param ?class-string $class
+ */
 function autowire(?string $class = null): ShorthandDefinitionInterface
 {
     return new AutowiredClass($class);
 }
 
+/**
+ * @api
+ */
 function env(string $name, ?string $default = null): EnvironmentVariableInterface
 {
     // This is a little magic to separate a null literal from no argument
@@ -21,6 +27,9 @@ function env(string $name, ?string $default = null): EnvironmentVariableInterfac
     }
 }
 
+/**
+ * @api
+ */
 function factory(?Closure $def = null): ShorthandDefinitionInterface
 {
     return new Factory($def);
