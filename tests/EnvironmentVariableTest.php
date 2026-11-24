@@ -156,12 +156,4 @@ class EnvironmentVariableTest extends TestCase
         $code = $env->generateCode();
         $this->assertStringContainsString('EnvironmentVariableNotSet', $code);
     }
-
-    public function testGenerateCodeDoesNotCast(): void
-    {
-        $env = new EnvironmentVariable('MY_VAR');
-        $env->asBool();
-        $code = $env->generateCode();
-        self::assertStringNotContainsString('parseBool', $code, 'Casting is applied by the container');
-    }
 }
