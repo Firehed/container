@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Firehed\Container;
 
+/**
+ * @internal for now, this may become public later
+ */
 interface BuilderInterface
 {
     /**
