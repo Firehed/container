@@ -10,17 +10,6 @@ use BadMethodCallException;
  */
 interface EnvironmentVariableInterface extends CastableValueInterface
 {
-    public function asBool(): EnvironmentVariableInterface;
-
-    public function asFloat(): EnvironmentVariableInterface;
-
-    /**
-     * @param class-string<\BackedEnum> $class
-     */
-    public function asEnum(string $class): EnvironmentVariableInterface;
-
-    public function asInt(): EnvironmentVariableInterface;
-
     /**
      * @internal
      * @throws BadMethodCallException if hasDefault would return false
