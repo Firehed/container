@@ -25,24 +25,6 @@ class EnvironmentVariable implements CastableValueInterface, DefinitionInterface
         $this->hasDefault = func_num_args() === 2;
     }
 
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    public function hasDefault(): bool
-    {
-        return $this->hasDefault;
-    }
-
-    public function getDefault(): ?string
-    {
-        if (!$this->hasDefault) {
-            throw new Exceptions\EnvironmentVariableNotSet($this->name);
-        }
-        return $this->default;
-    }
-
     public function getCast(): string
     {
         return $this->cast;
