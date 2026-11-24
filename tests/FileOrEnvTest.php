@@ -13,7 +13,7 @@ use Throwable;
 #[CoversClass(Exceptions\ConflictingEnvironmentVariables::class)]
 class FileOrEnvTest extends TestCase
 {
-    use GeneratedCodeTestTrait;
+    use DefinitionTestTrait;
 
     private const SECRET = __DIR__ . '/Fixtures/secret.txt';
 

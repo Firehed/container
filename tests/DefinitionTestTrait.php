@@ -6,7 +6,7 @@ namespace Firehed\Container;
 
 use Closure;
 
-trait GeneratedCodeTestTrait
+trait DefinitionTestTrait
 {
     /**
      * Runs a definition's generated code the way a compiled container would.
@@ -19,5 +19,10 @@ trait GeneratedCodeTestTrait
             return eval($code);
         }, $container, CompiledContainer::class);
         return $run();
+    }
+
+    private function resolveDefinition(DefinitionInterface $def, EnvReader $envReader): mixed
+    {
+        return $def->resolve(self::createStub(TypedContainerInterface::class), $envReader);
     }
 }

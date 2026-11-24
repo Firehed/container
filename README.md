@@ -297,6 +297,7 @@ return [
 
 Trailing newlines are stripped from file contents; all other whitespace is kept.
 An exception is thrown if the file is missing or unreadable, or if both `NAME` and `NAME_FILE` are set.
+Use absolute paths (or `__DIR__`); relative paths depend on the working directory of the running process.
 Files are read at runtime, so their contents are never written into a compiled container.
 Unlike `env`, these do not support casting.
 

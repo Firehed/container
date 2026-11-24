@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Firehed\Container;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use Psr\Container\ContainerExceptionInterface;
+use Throwable;
 
 trait FileDefinitionsTestTrait
 {
@@ -25,16 +25,17 @@ trait FileDefinitionsTestTrait
 
     /**
      * @param array<string, string> $env
+     * @param class-string<Throwable> $exception
      */
     #[DataProvider('fileErrors')]
-    public function testFileError(string $key, array $env): void
+    public function testFileError(string $key, array $env, string $exception): void
     {
         foreach ($env as $name => $value) {
             $_ENV[$name] = $value;
         }
         $container = $this->getContainer();
         self::assertTrue($container->has($key), 'has should be true');
-        $this->expectException(ContainerExceptionInterface::class);
+        $this->expectException($exception);
         $container->get($key);
     }
 
@@ -52,17 +53,21 @@ trait FileDefinitionsTestTrait
         ];
     }
 
-    /** @return array<string, array{string, array<string, string>}> */
+    /** @return array<string, array{string, array<string, string>, class-string<Throwable>}> */
     public static function fileErrors(): array
     {
         $prefix = 'CONTAINER_UNITTEST_FOE_';
         return [
-            'fileContents missing' => ['file_contents_missing', []],
-            'fileOrEnv not set' => ['file_or_env_not_set', []],
-            'fileOrEnv both set' => ['file_or_env_conflict', [
-                $prefix . 'CONFLICT' => 'from-env',
-                $prefix . 'CONFLICT_FILE' => __DIR__ . '/Fixtures/secret.txt',
-            ]],
+            'fileContents missing' => ['file_contents_missing', [], Exceptions\FileNotReadable::class],
+            'fileOrEnv not set' => ['file_or_env_not_set', [], Exceptions\EnvironmentVariableNotSet::class],
+            'fileOrEnv both set' => [
+                'file_or_env_conflict',
+                [
+                    $prefix . 'CONFLICT' => 'from-env',
+                    $prefix . 'CONFLICT_FILE' => __DIR__ . '/Fixtures/secret.txt',
+                ],
+                Exceptions\ConflictingEnvironmentVariables::class,
+            ],
         ];
     }
 }

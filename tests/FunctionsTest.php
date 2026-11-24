@@ -11,6 +11,8 @@ use PHPUnit\Framework\TestCase;
 #[CoversFunction('Firehed\Container\fileOrEnv')]
 class FunctionsTest extends TestCase
 {
+    use DefinitionTestTrait;
+
     public function testFileContents(): void
     {
         $def = fileContents(__DIR__ . '/Fixtures/secret.txt');
@@ -32,9 +34,6 @@ class FunctionsTest extends TestCase
 
     private function resolve(DefinitionInterface $def): mixed
     {
-        return $def->resolve(
-            self::createStub(TypedContainerInterface::class),
-            self::createStub(EnvReader::class),
-        );
+        return $this->resolveDefinition($def, self::createStub(EnvReader::class));
     }
 }
