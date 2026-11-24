@@ -7,8 +7,8 @@ use function Firehed\Container\fileOrEnv;
 $prefix = 'CONTAINER_UNITTEST_FOE_';
 
 return [
-    'file_contents' => fileContents(__DIR__ . '/../Fixtures/secret.txt'),
-    'file_contents_missing' => fileContents(__DIR__ . '/../Fixtures/does-not-exist.txt'),
+    'file_contents' => fileContents(__DIR__ . '/../Fixtures/fileContents/secret.txt'),
+    'file_contents_missing' => fileContents(__DIR__ . '/../Fixtures/fileContents/does-not-exist.txt'),
 
     'file_or_env_env' => fileOrEnv($prefix . 'ENV'),
     'file_or_env_file' => fileOrEnv($prefix . 'FILE'),

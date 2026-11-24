@@ -15,7 +15,7 @@ class FunctionsTest extends TestCase
 
     public function testFileContents(): void
     {
-        $def = fileContents(__DIR__ . '/Fixtures/secret.txt');
+        $def = fileContents(__DIR__ . '/Fixtures/fileContents/secret.txt');
         self::assertSame('from-file', $this->resolve($def), 'Definition should read the given path');
     }
 

@@ -43,7 +43,7 @@ trait FileDefinitionsTestTrait
     public static function fileValues(): array
     {
         $prefix = 'CONTAINER_UNITTEST_FOE_';
-        $secret = __DIR__ . '/Fixtures/secret.txt';
+        $secret = __DIR__ . '/Fixtures/fileContents/secret.txt';
         return [
             'fileContents' => ['file_contents', [], 'from-file'],
             'fileOrEnv via env' => ['file_or_env_env', [$prefix . 'ENV' => 'from-env'], 'from-env'],
@@ -64,7 +64,7 @@ trait FileDefinitionsTestTrait
                 'file_or_env_conflict',
                 [
                     $prefix . 'CONFLICT' => 'from-env',
-                    $prefix . 'CONFLICT_FILE' => __DIR__ . '/Fixtures/secret.txt',
+                    $prefix . 'CONFLICT_FILE' => __DIR__ . '/Fixtures/fileContents/secret.txt',
                 ],
                 Exceptions\ConflictingEnvironmentVariables::class,
             ],

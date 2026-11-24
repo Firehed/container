@@ -15,7 +15,7 @@ class FileOrEnvTest extends TestCase
 {
     use DefinitionTestTrait;
 
-    private const SECRET = __DIR__ . '/Fixtures/secret.txt';
+    private const SECRET = __DIR__ . '/Fixtures/fileContents/secret.txt';
 
     public function testIsCacheable(): void
     {
