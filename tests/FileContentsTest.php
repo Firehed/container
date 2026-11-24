@@ -95,6 +95,16 @@ class FileContentsTest extends TestCase
         $this->resolve($def);
     }
 
+    public function testUnreadableFileThrows(): void
+    {
+        chmod($this->path, 0o000);
+        if (is_readable($this->path)) {
+            self::markTestSkipped('File permissions are not enforced for this user (e.g. root)');
+        }
+        $this->expectException(Exceptions\FileNotReadable::class);
+        $this->resolve(new FileContents($this->path));
+    }
+
     public function testDirectoryThrows(): void
     {
         $def = new FileContents(sys_get_temp_dir());
