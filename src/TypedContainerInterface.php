@@ -6,6 +6,9 @@ namespace Firehed\Container;
 
 use Psr\Container\ContainerInterface;
 
+/**
+ * @api
+ */
 interface TypedContainerInterface extends ContainerInterface
 {
     /**
