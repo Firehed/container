@@ -48,7 +48,7 @@ PHP;
         return [];
     }
 
-    public function resolve(TypedContainerInterface $container, EnvReader $envReader): mixed
+    public function resolve(TypedContainerInterface $container, EnvReader $envReader): ?string
     {
         $envValue = $envReader->read($this->name);
         if ($envValue === null) {
