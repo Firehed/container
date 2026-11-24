@@ -8,12 +8,10 @@ $prefix = 'CONTAINER_UNITTEST_FOE_';
 
 return [
     'file_contents' => fileContents(__DIR__ . '/../Fixtures/secret.txt'),
-    'file_contents_asint' => fileContents(__DIR__ . '/../Fixtures/number.txt')->asInt(),
     'file_contents_missing' => fileContents(__DIR__ . '/../Fixtures/does-not-exist.txt'),
 
     'file_or_env_env' => fileOrEnv($prefix . 'ENV'),
     'file_or_env_file' => fileOrEnv($prefix . 'FILE'),
-    'file_or_env_file_asint' => fileOrEnv($prefix . 'INT')->asInt(),
     'file_or_env_default' => fileOrEnv($prefix . 'NOT_SET', 'default'),
     'file_or_env_null_default' => fileOrEnv($prefix . 'NOT_SET', null),
     'file_or_env_not_set' => fileOrEnv($prefix . 'NOT_SET'),

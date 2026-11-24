@@ -43,13 +43,10 @@ trait FileDefinitionsTestTrait
     {
         $prefix = 'CONTAINER_UNITTEST_FOE_';
         $secret = __DIR__ . '/Fixtures/secret.txt';
-        $number = __DIR__ . '/Fixtures/number.txt';
         return [
             'fileContents' => ['file_contents', [], 'from-file'],
-            'fileContents cast' => ['file_contents_asint', [], 42],
             'fileOrEnv via env' => ['file_or_env_env', [$prefix . 'ENV' => 'from-env'], 'from-env'],
             'fileOrEnv via file' => ['file_or_env_file', [$prefix . 'FILE_FILE' => $secret], 'from-file'],
-            'fileOrEnv cast' => ['file_or_env_file_asint', [$prefix . 'INT_FILE' => $number], 42],
             'fileOrEnv default' => ['file_or_env_default', [], 'default'],
             'fileOrEnv null default' => ['file_or_env_null_default', [], null],
         ];

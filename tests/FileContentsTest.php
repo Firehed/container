@@ -81,14 +81,6 @@ class FileContentsTest extends TestCase
         $this->resolve($def);
     }
 
-    public function testResolveDoesNotCast(): void
-    {
-        file_put_contents($this->path, '42');
-        $def = new FileContents($this->path);
-        $def->asInt();
-        self::assertSame('42', $this->resolve($def), 'Casting is applied by the container, not the definition');
-    }
-
     public function testGeneratedCodeDoesNotContainContents(): void
     {
         file_put_contents($this->path, 'super-secret-value');

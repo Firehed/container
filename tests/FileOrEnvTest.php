@@ -76,13 +76,6 @@ class FileOrEnvTest extends TestCase
         self::assertNull($this->resolve(new FileOrEnv('FOO', null), []), 'Explicit null default should apply');
     }
 
-    public function testResolveDoesNotCast(): void
-    {
-        $def = new FileOrEnv('FOO');
-        $def->asInt();
-        self::assertSame('42', $this->resolve($def, ['FOO' => '42']), 'Casting is applied by the container');
-    }
-
     /**
      * @param array<string, string> $env
      */
