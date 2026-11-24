@@ -281,7 +281,7 @@ return [
 ### Files and Secrets
 
 To read a file's contents at runtime (commonly a mounted secret), use `Firehed\Container\fileContents`.
-`fileOrEnv('NAME')` reads the file at the path in `NAME_FILE` if that is set, and otherwise behaves exactly like `env('NAME')`, including the optional default.
+`fileOrEnv('NAME')` reads the file at the path in `NAME_FILE` if that is set, and otherwise reads `NAME` like `env('NAME')`, including the optional default.
 
 ```php
 <?php
