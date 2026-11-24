@@ -10,11 +10,6 @@ namespace Firehed\Container;
  */
 interface CastableValueInterface
 {
-    public const CAST_BOOL = 'bool';
-    public const CAST_FLOAT = 'float';
-    public const CAST_INT = 'int';
-    public const CAST_NONE = '';
-
     public function asBool(): CastableValueInterface;
 
     /**
