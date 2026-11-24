@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(Exceptions\FileNotReadable::class)]
 class FileContentsTest extends TestCase
 {
-    use GeneratedCodeTestTrait;
+    use DefinitionTestTrait;
 
     private string $path;
 

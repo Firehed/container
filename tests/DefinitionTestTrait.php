@@ -6,7 +6,7 @@ namespace Firehed\Container;
 
 use Closure;
 
-trait GeneratedCodeTestTrait
+trait DefinitionTestTrait
 {
     /**
      * Runs a definition's generated code the way a compiled container would.
