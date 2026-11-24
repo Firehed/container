@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Firehed\Container;
 
 /**
+ * @internal for now, this may become public later
  * @phpstan-type Cast CastableValueInterface::CAST_*|class-string<\BackedEnum>
  */
 interface CastableValueInterface
