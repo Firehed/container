@@ -291,14 +291,14 @@ return [
     'api_key' => fileContents('/run/secrets/api-key'),
     // Reads the file at $DATABASE_URL_FILE, or falls back to $DATABASE_URL
     'database_url' => fileOrEnv('DATABASE_URL'),
-    'pool_size' => fileOrEnv('POOL_SIZE', '5')->asInt(),
+    'smtp_password' => fileOrEnv('SMTP_PASSWORD', null),
 ];
 ```
 
 Trailing newlines are stripped from file contents; all other whitespace is kept.
 An exception is thrown if the file is missing or unreadable, or if both `NAME` and `NAME_FILE` are set.
 Files are read at runtime, so their contents are never written into a compiled container.
-The same casting methods as `env` are available.
+Unlike `env`, these do not support casting.
 
 
 ### Class Autowiring
