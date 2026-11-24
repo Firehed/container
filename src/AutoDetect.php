@@ -8,6 +8,9 @@ use InvalidArgumentException;
 use RuntimeException;
 use UnexpectedValueException;
 
+/**
+ * @api
+ */
 final class AutoDetect
 {
     public const ENVIRONMENT_NAMES = [

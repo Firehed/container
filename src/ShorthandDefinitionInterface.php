@@ -18,6 +18,8 @@ namespace Firehed\Container;
  * and instead allowing:
  *
  *     `Foo::class => someTypeWrapper()`
+ *
+ * @internal for now, this may become public later
  */
 interface ShorthandDefinitionInterface extends DefinitionInterface
 {

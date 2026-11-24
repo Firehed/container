@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Firehed\Container;
 
+/**
+ * @internal - use `Firehed\Container\autowire()` to reach this.
+ */
 class AutowiredClass implements ShorthandDefinitionInterface
 {
     private Compiler\AutowiredValue $codeGenerator;

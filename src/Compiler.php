@@ -33,6 +33,9 @@ use function tempnam;
 use function umask;
 use function unlink;
 
+/**
+ * @api
+ */
 class Compiler implements BuilderInterface
 {
     use BuilderTrait;

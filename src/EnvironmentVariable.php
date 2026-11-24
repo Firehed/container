@@ -9,6 +9,9 @@ use function enum_exists;
 use function func_num_args;
 use function sprintf;
 
+/**
+ * @internal - use `Firehed\Container\env()` to reach this.
+ */
 class EnvironmentVariable implements EnvironmentVariableInterface, DefinitionInterface
 {
     /** @var EnvironmentVariableInterface::CAST_* | class-string<\BackedEnum> */
