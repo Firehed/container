@@ -16,7 +16,7 @@ function autowire(?string $class = null): ShorthandDefinitionInterface
 /**
  * @api
  */
-function env(string $name, ?string $default = null): EnvironmentVariableInterface
+function env(string $name, ?string $default = null): CastableValueInterface
 {
     // This is a little magic to separate a null literal from no argument
     // provided

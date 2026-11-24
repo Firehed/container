@@ -13,10 +13,10 @@ use function sprintf;
  * @internal - use `Firehed\Container\env()` to reach this.
  * @phpstan-import-type Cast from CastableValueInterface
  */
-class EnvironmentVariable implements EnvironmentVariableInterface, DefinitionInterface
+class EnvironmentVariable implements CastableValueInterface, DefinitionInterface
 {
     /** @var Cast */
-    private string $cast = EnvironmentVariableInterface::CAST_NONE;
+    private string $cast = CastableValueInterface::CAST_NONE;
 
     private bool $hasDefault;
 
@@ -48,13 +48,13 @@ class EnvironmentVariable implements EnvironmentVariableInterface, DefinitionInt
         return $this->cast;
     }
 
-    public function asBool(): EnvironmentVariableInterface
+    public function asBool(): CastableValueInterface
     {
-        $this->cast = EnvironmentVariableInterface::CAST_BOOL;
+        $this->cast = CastableValueInterface::CAST_BOOL;
         return $this;
     }
 
-    public function asEnum(string $class): EnvironmentVariableInterface
+    public function asEnum(string $class): CastableValueInterface
     {
         if (!enum_exists($class)) {
             throw new InvalidArgumentException(sprintf('Class for enum cast %s does not exist', $class));
@@ -64,15 +64,15 @@ class EnvironmentVariable implements EnvironmentVariableInterface, DefinitionInt
         return $this;
     }
 
-    public function asFloat(): EnvironmentVariableInterface
+    public function asFloat(): CastableValueInterface
     {
-        $this->cast = EnvironmentVariableInterface::CAST_FLOAT;
+        $this->cast = CastableValueInterface::CAST_FLOAT;
         return $this;
     }
 
-    public function asInt(): EnvironmentVariableInterface
+    public function asInt(): CastableValueInterface
     {
-        $this->cast = EnvironmentVariableInterface::CAST_INT;
+        $this->cast = CastableValueInterface::CAST_INT;
         return $this;
     }
 
