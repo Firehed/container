@@ -34,3 +34,24 @@ function factory(?Closure $def = null): ShorthandDefinitionInterface
 {
     return new Factory($def);
 }
+
+/**
+ * @api
+ */
+function fileContents(string $path): CastableValueInterface
+{
+    return new FileContents($path);
+}
+
+/**
+ * @api
+ */
+function fileOrEnv(string $name, ?string $default = null): CastableValueInterface
+{
+    // See env()
+    if (func_num_args() === 2) {
+        return new FileOrEnv($name, $default);
+    } else {
+        return new FileOrEnv($name);
+    }
+}
