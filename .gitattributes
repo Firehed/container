@@ -8,3 +8,5 @@
 /phpunit.xml export-ignore
 
 *.php diff=php
+# Line endings in these fixtures are the data under test
+/tests/Fixtures/newlines/** -text
