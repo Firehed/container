@@ -129,31 +129,6 @@ class EnvironmentVariableTest extends TestCase
         self::assertSame('42', $result, 'Casting is applied by the container, not the definition');
     }
 
-    /** @return array<string, array{string, bool}> */
-    public static function boolCastingProvider(): array
-    {
-        return [
-            'string true' => ['true', true],
-            'string 1' => ['1', true],
-            'string false' => ['false', false],
-            'string 0' => ['0', false],
-            'empty string' => ['', false],
-        ];
-    }
-
-    #[DataProvider('boolCastingProvider')]
-    public function testParseBool(string $value, bool $expected): void
-    {
-        $this->assertSame($expected, EnvironmentVariable::parseBool($value));
-    }
-
-    public function testParseBoolThrowsOnInvalidValue(): void
-    {
-        $this->expectException(\OutOfBoundsException::class);
-        $this->expectExceptionMessage('Invalid boolean value');
-        EnvironmentVariable::parseBool('invalid');
-    }
-
     public function testGenerateCodeContainsEnvReaderCall(): void
     {
         $env = new EnvironmentVariable('MY_VAR');

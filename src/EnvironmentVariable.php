@@ -76,16 +76,6 @@ class EnvironmentVariable implements EnvironmentVariableInterface, DefinitionInt
         return $this;
     }
 
-    /**
-     * Containers compiled by earlier versions call this directly.
-     */
-    public static function parseBool(string $value): bool
-    {
-        $result = (new Caster())->cast($value, CastableValueInterface::CAST_BOOL);
-        assert(is_bool($result));
-        return $result;
-    }
-
     // DefinitionInterface implementation
 
     public function generateCode(): string
