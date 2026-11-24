@@ -15,8 +15,8 @@ use function sprintf;
  */
 class EnvironmentVariable implements CastableValueInterface, DefinitionInterface
 {
-    /** @var Cast */
-    private string $cast = CastableValueInterface::CAST_NONE;
+    /** @var ?Cast */
+    private CastType|string|null $cast = null;
 
     private bool $hasDefault;
 
@@ -25,14 +25,14 @@ class EnvironmentVariable implements CastableValueInterface, DefinitionInterface
         $this->hasDefault = func_num_args() === 2;
     }
 
-    public function getCast(): string
+    public function getCast(): CastType|string|null
     {
         return $this->cast;
     }
 
     public function asBool(): CastableValueInterface
     {
-        $this->cast = CastableValueInterface::CAST_BOOL;
+        $this->cast = CastType::Bool;
         return $this;
     }
 
@@ -48,13 +48,13 @@ class EnvironmentVariable implements CastableValueInterface, DefinitionInterface
 
     public function asFloat(): CastableValueInterface
     {
-        $this->cast = CastableValueInterface::CAST_FLOAT;
+        $this->cast = CastType::Float;
         return $this;
     }
 
     public function asInt(): CastableValueInterface
     {
-        $this->cast = CastableValueInterface::CAST_INT;
+        $this->cast = CastType::Int;
         return $this;
     }
 

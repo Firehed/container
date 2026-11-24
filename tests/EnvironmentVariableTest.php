@@ -88,10 +88,10 @@ class EnvironmentVariableTest extends TestCase
 
     /**
      * @param Closure(EnvironmentVariable): mixed $setCast
-     * @param Cast $expected
+     * @param ?Cast $expected
      */
     #[DataProvider('castSetters')]
-    public function testCastIsRecorded(Closure $setCast, string $expected): void
+    public function testCastIsRecorded(Closure $setCast, CastType|string|null $expected): void
     {
         $env = new EnvironmentVariable('FOO');
         $setCast($env);
@@ -101,16 +101,16 @@ class EnvironmentVariableTest extends TestCase
     /**
      * @return array<string, array{
      *   Closure(EnvironmentVariable): mixed,
-     *   Cast,
+     *   ?Cast,
      * }>
      */
     public static function castSetters(): array
     {
         return [
-            'none' => [fn (EnvironmentVariable $e) => $e, CastableValueInterface::CAST_NONE],
-            'bool' => [fn (EnvironmentVariable $e) => $e->asBool(), CastableValueInterface::CAST_BOOL],
-            'int' => [fn (EnvironmentVariable $e) => $e->asInt(), CastableValueInterface::CAST_INT],
-            'float' => [fn (EnvironmentVariable $e) => $e->asFloat(), CastableValueInterface::CAST_FLOAT],
+            'none' => [fn (EnvironmentVariable $e) => $e, null],
+            'bool' => [fn (EnvironmentVariable $e) => $e->asBool(), CastType::Bool],
+            'int' => [fn (EnvironmentVariable $e) => $e->asInt(), CastType::Int],
+            'float' => [fn (EnvironmentVariable $e) => $e->asFloat(), CastType::Float],
             'enum' => [
                 fn (EnvironmentVariable $e) => $e->asEnum(Fixtures\Environment::class),
                 Fixtures\Environment::class,

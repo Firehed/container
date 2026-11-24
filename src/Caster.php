@@ -17,23 +17,25 @@ use function strtolower;
 class Caster
 {
     /**
-     * @param Cast $cast
+     * @param ?Cast $cast
      */
-    public function cast(mixed $value, string $cast): mixed
+    public function cast(mixed $value, CastType|string|null $cast): mixed
     {
-        if ($cast === CastableValueInterface::CAST_NONE) {
+        if ($cast === null) {
             return $value;
         }
         if ($value !== null && !is_string($value)) {
             throw new UnexpectedValueException('Castable values must resolve to a string or null');
         }
-        return match ($cast) {
-            CastableValueInterface::CAST_BOOL => $this->parseBool((string) $value),
-            CastableValueInterface::CAST_INT => (int) $value,
-            CastableValueInterface::CAST_FLOAT => (float) $value,
-            // @phpstan-ignore argument.type (null intentionally triggers native TypeError)
-            default => $cast::from($value),
-        };
+        if ($cast instanceof CastType) {
+            return match ($cast) {
+                CastType::Bool => $this->parseBool((string) $value),
+                CastType::Float => (float) $value,
+                CastType::Int => (int) $value,
+            };
+        }
+        // @phpstan-ignore argument.type (null intentionally triggers native TypeError)
+        return $cast::from($value);
     }
 
     private function parseBool(string $value): bool

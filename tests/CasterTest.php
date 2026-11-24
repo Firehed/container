@@ -16,10 +16,10 @@ use UnexpectedValueException;
 class CasterTest extends TestCase
 {
     /**
-     * @param Cast $cast
+     * @param ?Cast $cast
      */
     #[DataProvider('casts')]
-    public function testCast(?string $value, string $cast, mixed $expected): void
+    public function testCast(?string $value, CastType|string|null $cast, mixed $expected): void
     {
         self::assertSame($expected, (new Caster())->cast($value, $cast), 'Value should be cast');
     }
@@ -27,29 +27,29 @@ class CasterTest extends TestCase
     /**
      * @return array<string, array{
      *   ?string,
-     *   Cast,
+     *   ?Cast,
      *   mixed,
      * }>
      */
     public static function casts(): array
     {
         return [
-            'none' => ['abc', CastableValueInterface::CAST_NONE, 'abc'],
-            'none null' => [null, CastableValueInterface::CAST_NONE, null],
-            'bool true' => ['true', CastableValueInterface::CAST_BOOL, true],
-            'bool 1' => ['1', CastableValueInterface::CAST_BOOL, true],
-            'bool false' => ['false', CastableValueInterface::CAST_BOOL, false],
-            'bool 0' => ['0', CastableValueInterface::CAST_BOOL, false],
-            'bool empty' => ['', CastableValueInterface::CAST_BOOL, false],
-            'bool null' => [null, CastableValueInterface::CAST_BOOL, false],
-            'int' => ['42', CastableValueInterface::CAST_INT, 42],
-            'int zero' => ['0', CastableValueInterface::CAST_INT, 0],
-            'int negative' => ['-5', CastableValueInterface::CAST_INT, -5],
-            'int null' => [null, CastableValueInterface::CAST_INT, 0],
-            'float' => ['3.14', CastableValueInterface::CAST_FLOAT, 3.14],
-            'float zero' => ['0.0', CastableValueInterface::CAST_FLOAT, 0.0],
-            'float negative' => ['-2.5', CastableValueInterface::CAST_FLOAT, -2.5],
-            'float null' => [null, CastableValueInterface::CAST_FLOAT, 0.0],
+            'none' => ['abc', null, 'abc'],
+            'none null' => [null, null, null],
+            'bool true' => ['true', CastType::Bool, true],
+            'bool 1' => ['1', CastType::Bool, true],
+            'bool false' => ['false', CastType::Bool, false],
+            'bool 0' => ['0', CastType::Bool, false],
+            'bool empty' => ['', CastType::Bool, false],
+            'bool null' => [null, CastType::Bool, false],
+            'int' => ['42', CastType::Int, 42],
+            'int zero' => ['0', CastType::Int, 0],
+            'int negative' => ['-5', CastType::Int, -5],
+            'int null' => [null, CastType::Int, 0],
+            'float' => ['3.14', CastType::Float, 3.14],
+            'float zero' => ['0.0', CastType::Float, 0.0],
+            'float negative' => ['-2.5', CastType::Float, -2.5],
+            'float null' => [null, CastType::Float, 0.0],
             'enum' => ['testing', Fixtures\Environment::class, Fixtures\Environment::TESTING],
         ];
     }
@@ -57,7 +57,7 @@ class CasterTest extends TestCase
     public function testInvalidBoolThrows(): void
     {
         $this->expectException(\OutOfBoundsException::class);
-        (new Caster())->cast('invalid', CastableValueInterface::CAST_BOOL);
+        (new Caster())->cast('invalid', CastType::Bool);
     }
 
     public function testEnumNullThrows(): void
@@ -76,13 +76,13 @@ class CasterTest extends TestCase
     public function testNoCastPassesAnyValueThrough(): void
     {
         $value = new \stdClass();
-        $result = (new Caster())->cast($value, CastableValueInterface::CAST_NONE);
+        $result = (new Caster())->cast($value, null);
         self::assertSame($value, $result, 'No cast means no checks');
     }
 
     public function testNonStringValueThrows(): void
     {
         $this->expectException(UnexpectedValueException::class);
-        (new Caster())->cast(123, CastableValueInterface::CAST_INT);
+        (new Caster())->cast(123, CastType::Int);
     }
 }

@@ -130,10 +130,9 @@ class Compiler implements BuilderInterface
             $name = $this->makeNameForKey($key);
             $mappings[$key] = $name;
             $defs[] = $this->makeFunctionBody($key, $name, $value);
-            $isCast = $value instanceof CastableValueInterface
-                && $value->getCast() !== CastableValueInterface::CAST_NONE;
-            if ($isCast) {
-                $casts[$key] = $value->getCast();
+            $cast = $value instanceof CastableValueInterface ? $value->getCast() : null;
+            if ($cast !== null) {
+                $casts[$key] = $cast;
             }
         }
 
