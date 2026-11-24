@@ -38,7 +38,7 @@ function factory(?Closure $def = null): ShorthandDefinitionInterface
 /**
  * @api
  */
-function fileContents(string $path): CastableValueInterface
+function fileContents(string $path): DefinitionInterface
 {
     return new FileContents($path);
 }
@@ -46,7 +46,7 @@ function fileContents(string $path): CastableValueInterface
 /**
  * @api
  */
-function fileOrEnv(string $name, ?string $default = null): CastableValueInterface
+function fileOrEnv(string $name, ?string $default = null): DefinitionInterface
 {
     // See env()
     if (func_num_args() === 2) {
