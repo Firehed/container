@@ -14,7 +14,7 @@ class FileContentsTest extends TestCase
 {
     use DefinitionTestTrait;
 
-    private const NEWLINE_FIXTURES = __DIR__ . '/Fixtures/newlines/';
+    private const FIXTURES = __DIR__ . '/Fixtures/fileContents/';
 
     private string $path;
 
@@ -50,7 +50,7 @@ class FileContentsTest extends TestCase
     #[DataProvider('newlineFixtures')]
     public function testTrailingNewlinesAreStripped(string $fixture, string $expected): void
     {
-        $path = self::NEWLINE_FIXTURES . $fixture;
+        $path = self::FIXTURES . $fixture;
         self::assertStringEndsWith("\n", $this->readFixture($path), 'Invalid fixture: must end with a newline');
         self::assertSame(
             $expected,
@@ -62,7 +62,7 @@ class FileContentsTest extends TestCase
     #[DataProvider('noNewlineFixtures')]
     public function testContentsWithoutTrailingNewlineAreUnchanged(string $fixture): void
     {
-        $path = self::NEWLINE_FIXTURES . $fixture;
+        $path = self::FIXTURES . $fixture;
         $raw = $this->readFixture($path);
         self::assertStringEndsNotWith("\n", $raw, 'Invalid fixture: must not end with a newline');
         self::assertSame($raw, $this->resolve(new FileContents($path)), 'Contents should be returned as-is');
