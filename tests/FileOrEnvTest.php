@@ -101,6 +101,21 @@ class FileOrEnvTest extends TestCase
                 ['FOO_FILE' => self::SECRET . '-missing'],
                 Exceptions\FileNotReadable::class,
             ],
+            'empty file var counts as set' => [
+                new FileOrEnv('FOO', 'fallback'),
+                ['FOO_FILE' => ''],
+                Exceptions\FileNotReadable::class,
+            ],
+            'empty file var conflicts with env' => [
+                new FileOrEnv('FOO'),
+                ['FOO' => 'from-env', 'FOO_FILE' => ''],
+                Exceptions\ConflictingEnvironmentVariables::class,
+            ],
+            'empty env var conflicts with file' => [
+                new FileOrEnv('FOO'),
+                ['FOO' => '', 'FOO_FILE' => self::SECRET],
+                Exceptions\ConflictingEnvironmentVariables::class,
+            ],
             'neither, no default' => [
                 new FileOrEnv('FOO'),
                 [],
