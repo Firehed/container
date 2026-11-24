@@ -15,10 +15,8 @@ use function var_export;
  *
  * @internal - use `Firehed\Container\fileOrEnv()` to reach this.
  */
-class FileOrEnv implements CastableValueInterface, DefinitionInterface
+class FileOrEnv implements DefinitionInterface
 {
-    use CastableValueTrait;
-
     private bool $hasDefault;
 
     public function __construct(private readonly string $name, private readonly ?string $default = null)

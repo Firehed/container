@@ -14,10 +14,8 @@ use function var_export;
 /**
  * @internal - use `Firehed\Container\fileContents()` to reach this.
  */
-class FileContents implements CastableValueInterface, DefinitionInterface
+class FileContents implements DefinitionInterface
 {
-    use CastableValueTrait;
-
     public function __construct(private readonly string $path)
     {
     }
