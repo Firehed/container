@@ -10,17 +10,15 @@ use PHPUnit\Framework\TestCase;
 #[CoversFunction('Firehed\Container\fileContents')]
 class FunctionsTest extends TestCase
 {
+    use DefinitionTestTrait;
+
     public function testFileContents(): void
     {
         $def = fileContents(__DIR__ . '/Fixtures/secret.txt');
-        self::assertSame('from-file', $this->resolve($def), 'Definition should read the given path');
-    }
-
-    private function resolve(DefinitionInterface $def): mixed
-    {
-        return $def->resolve(
-            self::createStub(TypedContainerInterface::class),
-            self::createStub(EnvReader::class),
+        self::assertSame(
+            'from-file',
+            $this->resolveDefinition($def, self::createStub(EnvReader::class)),
+            'Definition should read the given path',
         );
     }
 }

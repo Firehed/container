@@ -20,4 +20,9 @@ trait DefinitionTestTrait
         }, $container, CompiledContainer::class);
         return $run();
     }
+
+    private function resolveDefinition(DefinitionInterface $def, EnvReader $envReader): mixed
+    {
+        return $def->resolve(self::createStub(TypedContainerInterface::class), $envReader);
+    }
 }

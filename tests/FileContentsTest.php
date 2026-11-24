@@ -108,9 +108,6 @@ class FileContentsTest extends TestCase
 
     private function resolve(FileContents $def): mixed
     {
-        return $def->resolve(
-            self::createStub(TypedContainerInterface::class),
-            self::createStub(EnvReader::class),
-        );
+        return $this->resolveDefinition($def, self::createStub(EnvReader::class));
     }
 }
