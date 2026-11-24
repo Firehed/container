@@ -51,7 +51,11 @@ class FileContentsTest extends TestCase
     public function testTrailingNewlinesAreStripped(string $fixture, string $expected): void
     {
         $path = self::FIXTURES . $fixture;
-        self::assertStringEndsWith("\n", $this->readFixture($path), 'Invalid fixture: must end with a newline');
+        self::assertMatchesRegularExpression(
+            '/[\r\n]$/D',
+            $this->readFixture($path),
+            'Invalid fixture: must end with a newline',
+        );
         self::assertSame(
             $expected,
             $this->resolve(new FileContents($path)),
@@ -64,7 +68,7 @@ class FileContentsTest extends TestCase
     {
         $path = self::FIXTURES . $fixture;
         $raw = $this->readFixture($path);
-        self::assertStringEndsNotWith("\n", $raw, 'Invalid fixture: must not end with a newline');
+        self::assertDoesNotMatchRegularExpression('/[\r\n]$/D', $raw, 'Invalid fixture: must not end with a newline');
         self::assertSame($raw, $this->resolve(new FileContents($path)), 'Contents should be returned as-is');
     }
 
@@ -73,6 +77,7 @@ class FileContentsTest extends TestCase
     {
         return [
             'LF' => ['lf.txt', 'secret'],
+            'CR' => ['cr.txt', 'secret'],
             'CRLF' => ['crlf.txt', 'secret'],
             'multiple' => ['multiple.txt', 'secret'],
             'other whitespace kept' => ['whitespace.txt', "  two\nlines \t"],
