@@ -25,6 +25,7 @@ trait ContainerBuilderTestTrait
     use CustomDefinitionTestTrait;
     use EnvironmentDefinitionsTestTrait;
     use ErrorDefinitionsTestTrait;
+    use FileDefinitionsTestTrait;
 
     public function getContainer(): TypedContainerInterface
     {
@@ -43,6 +44,7 @@ trait ContainerBuilderTestTrait
         $files = [
             'CustomDefinitions',
             'Environment',
+            'Files',
             'CaseSensitive',
             'RequiredParams',
             'Factories',
