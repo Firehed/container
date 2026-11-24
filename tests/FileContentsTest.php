@@ -12,6 +12,8 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(Exceptions\FileNotReadable::class)]
 class FileContentsTest extends TestCase
 {
+    use GeneratedCodeTestTrait;
+
     private string $path;
 
     protected function setUp(): void
@@ -89,6 +91,18 @@ class FileContentsTest extends TestCase
             'super-secret-value',
             $code,
             'Secrets must be read at runtime, not compiled in',
+        );
+    }
+
+    public function testGeneratedCodeReadsFileWhenRun(): void
+    {
+        file_put_contents($this->path, "at-compile-time\n");
+        $code = (new FileContents($this->path))->generateCode();
+        file_put_contents($this->path, "at-runtime\n");
+        self::assertSame(
+            'at-runtime',
+            $this->evaluateGeneratedCode($code, self::createStub(EnvReader::class)),
+            'Compiled code should read the file when run, the same way as resolve()',
         );
     }
 
