@@ -6,9 +6,20 @@ namespace Firehed\Container;
 use Throwable;
 use Psr\Container\ContainerExceptionInterface;
 
+/**
+ * @phpstan-import-type Cast from CastableValueInterface
+ */
 abstract class CompiledContainer implements TypedContainerInterface
 {
     use TypedContainerTrait;
+
+    private Caster $caster;
+
+    /**
+     * Maps $id keys to the cast applied to their resolved value
+     * @var array<string, Cast>
+     */
+    protected array $casts = [];
 
     /**
      * Tracks what $id keys correspond to factory definitions and must not be
@@ -31,6 +42,7 @@ abstract class CompiledContainer implements TypedContainerInterface
 
     public function __construct(protected EnvReader $envReader)
     {
+        $this->caster = new Caster();
     }
 
     /** @return array{ids: list<string>} */
@@ -81,6 +93,9 @@ abstract class CompiledContainer implements TypedContainerInterface
         /** @var callable */
         $function = [$this, $this->mappings[$id]];
         $result = $function();
+        if (array_key_exists($id, $this->casts)) {
+            $result = $this->caster->cast($result, $this->casts[$id]);
+        }
         if (isset($this->factories[$id])) {
             // Do not insert into value cache
         } else {

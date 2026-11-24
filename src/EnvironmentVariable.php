@@ -11,11 +11,12 @@ use function sprintf;
 
 /**
  * @internal - use `Firehed\Container\env()` to reach this.
+ * @phpstan-import-type Cast from CastableValueInterface
  */
-class EnvironmentVariable implements EnvironmentVariableInterface, DefinitionInterface
+class EnvironmentVariable implements CastableValueInterface, DefinitionInterface
 {
-    /** @var EnvironmentVariableInterface::CAST_* | class-string<\BackedEnum> */
-    private string $cast = EnvironmentVariableInterface::CAST_NONE;
+    /** @var Cast */
+    private string $cast = CastableValueInterface::CAST_NONE;
 
     private bool $hasDefault;
 
@@ -24,36 +25,18 @@ class EnvironmentVariable implements EnvironmentVariableInterface, DefinitionInt
         $this->hasDefault = func_num_args() === 2;
     }
 
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    public function hasDefault(): bool
-    {
-        return $this->hasDefault;
-    }
-
-    public function getDefault(): ?string
-    {
-        if (!$this->hasDefault) {
-            throw new Exceptions\EnvironmentVariableNotSet($this->name);
-        }
-        return $this->default;
-    }
-
     public function getCast(): string
     {
         return $this->cast;
     }
 
-    public function asBool(): EnvironmentVariableInterface
+    public function asBool(): CastableValueInterface
     {
-        $this->cast = EnvironmentVariableInterface::CAST_BOOL;
+        $this->cast = CastableValueInterface::CAST_BOOL;
         return $this;
     }
 
-    public function asEnum(string $class): EnvironmentVariableInterface
+    public function asEnum(string $class): CastableValueInterface
     {
         if (!enum_exists($class)) {
             throw new InvalidArgumentException(sprintf('Class for enum cast %s does not exist', $class));
@@ -63,25 +46,16 @@ class EnvironmentVariable implements EnvironmentVariableInterface, DefinitionInt
         return $this;
     }
 
-    public function asFloat(): EnvironmentVariableInterface
+    public function asFloat(): CastableValueInterface
     {
-        $this->cast = EnvironmentVariableInterface::CAST_FLOAT;
+        $this->cast = CastableValueInterface::CAST_FLOAT;
         return $this;
     }
 
-    public function asInt(): EnvironmentVariableInterface
+    public function asInt(): CastableValueInterface
     {
-        $this->cast = EnvironmentVariableInterface::CAST_INT;
+        $this->cast = CastableValueInterface::CAST_INT;
         return $this;
-    }
-
-    public static function parseBool(string $value): bool
-    {
-        return match (strtolower($value)) {
-            '1', 'true' => true,
-            '', '0', 'false' => false,
-            default => throw new \OutOfBoundsException('Invalid boolean value'),
-        };
     }
 
     // DefinitionInterface implementation
@@ -93,22 +67,8 @@ class EnvironmentVariable implements EnvironmentVariableInterface, DefinitionInt
 if (\$value === null) {
     {$this->getDefaultCodeBody()}
 }
-{$this->getCastCodeBody()}
+return \$value;
 PHP;
-    }
-
-    private function getCastCodeBody(): string
-    {
-        return match ($this->cast) {
-            EnvironmentVariableInterface::CAST_NONE => 'return $value;',
-            EnvironmentVariableInterface::CAST_BOOL => sprintf(
-                'return %s::parseBool($value);',
-                self::class,
-            ),
-            EnvironmentVariableInterface::CAST_INT,
-            EnvironmentVariableInterface::CAST_FLOAT => sprintf('return (%s)$value;', $this->cast),
-            default => sprintf('return %s::from($value);', $this->cast),
-        };
     }
 
     private function getDefaultCodeBody(): string
@@ -139,15 +99,7 @@ PHP;
             }
         }
 
-        return match ($this->cast) {
-            EnvironmentVariableInterface::CAST_NONE => $envValue,
-            EnvironmentVariableInterface::CAST_BOOL => self::parseBool((string) $envValue),
-            EnvironmentVariableInterface::CAST_INT => (int) $envValue,
-            EnvironmentVariableInterface::CAST_FLOAT => (float) $envValue,
-            // Remaining cast type is an enum; use its `::from` method
-            // @phpstan-ignore argument.type (null intentionally triggers native TypeError)
-            default => $this->cast::from($envValue),
-        };
+        return $envValue;
     }
 
     public function isCacheable(): bool
