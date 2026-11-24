@@ -14,6 +14,8 @@ class FileContentsTest extends TestCase
 {
     use DefinitionTestTrait;
 
+    private const NEWLINE_FIXTURES = __DIR__ . '/Fixtures/newlines/';
+
     private string $path;
 
     protected function setUp(): void
@@ -45,27 +47,44 @@ class FileContentsTest extends TestCase
         );
     }
 
-    #[DataProvider('contents')]
-    public function testResolve(string $contents, string $expected): void
+    #[DataProvider('newlineFixtures')]
+    public function testTrailingNewlinesAreStripped(string $fixture, string $expected): void
     {
-        file_put_contents($this->path, $contents);
+        $path = self::NEWLINE_FIXTURES . $fixture;
+        self::assertStringEndsWith("\n", $this->readFixture($path), 'Invalid fixture: must end with a newline');
         self::assertSame(
             $expected,
-            $this->resolve(new FileContents($this->path)),
+            $this->resolve(new FileContents($path)),
             'Only trailing newlines should be stripped',
         );
     }
 
+    #[DataProvider('noNewlineFixtures')]
+    public function testContentsWithoutTrailingNewlineAreUnchanged(string $fixture): void
+    {
+        $path = self::NEWLINE_FIXTURES . $fixture;
+        $raw = $this->readFixture($path);
+        self::assertStringEndsNotWith("\n", $raw, 'Invalid fixture: must not end with a newline');
+        self::assertSame($raw, $this->resolve(new FileContents($path)), 'Contents should be returned as-is');
+    }
+
     /** @return array<string, array{string, string}> */
-    public static function contents(): array
+    public static function newlineFixtures(): array
     {
         return [
-            'plain' => ['secret', 'secret'],
-            'empty' => ['', ''],
-            'trailing LF' => ["secret\n", 'secret'],
-            'trailing CRLF' => ["secret\r\n", 'secret'],
-            'multiple trailing newlines' => ["secret\n\n", 'secret'],
-            'other whitespace kept' => ["  sec\nret \t\n", "  sec\nret \t"],
+            'LF' => ['lf.txt', 'secret'],
+            'CRLF' => ['crlf.txt', 'secret'],
+            'multiple' => ['multiple.txt', 'secret'],
+            'other whitespace kept' => ['whitespace.txt', "  two\nlines \t"],
+        ];
+    }
+
+    /** @return array<string, array{string}> */
+    public static function noNewlineFixtures(): array
+    {
+        return [
+            'plain' => ['none.txt'],
+            'empty' => ['empty.txt'],
         ];
     }
 
@@ -104,6 +123,13 @@ class FileContentsTest extends TestCase
             $this->evaluateGeneratedCode($code, self::createStub(EnvReader::class)),
             'Compiled code should read the file when run, the same way as resolve()',
         );
+    }
+
+    private function readFixture(string $path): string
+    {
+        $raw = file_get_contents($path);
+        self::assertIsString($raw, 'Fixture should be readable');
+        return $raw;
     }
 
     private function resolve(FileContents $def): mixed
