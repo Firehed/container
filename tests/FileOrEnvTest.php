@@ -33,7 +33,7 @@ class FileOrEnvTest extends TestCase
     #[DataProvider('values')]
     public function testResolve(FileOrEnv $def, array $env, ?string $expected): void
     {
-        $value = $def->resolve(self::createStub(TypedContainerInterface::class), $this->envReader($env));
+        $value = $this->resolveDefinition($def, $this->envReader($env));
         self::assertSame($expected, $value, 'Resolved value is wrong');
     }
 
@@ -55,7 +55,7 @@ class FileOrEnvTest extends TestCase
     public function testResolveThrows(FileOrEnv $def, array $env, string $exception): void
     {
         $this->expectException($exception);
-        $def->resolve(self::createStub(TypedContainerInterface::class), $this->envReader($env));
+        $this->resolveDefinition($def, $this->envReader($env));
     }
 
     /**
