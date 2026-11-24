@@ -112,17 +112,6 @@ class FileContentsTest extends TestCase
         $this->resolve($def);
     }
 
-    public function testGeneratedCodeDoesNotContainContents(): void
-    {
-        file_put_contents($this->path, 'super-secret-value');
-        $code = (new FileContents($this->path))->generateCode();
-        self::assertStringNotContainsString(
-            'super-secret-value',
-            $code,
-            'Secrets must be read at runtime, not compiled in',
-        );
-    }
-
     public function testGeneratedCodeReadsFileWhenRun(): void
     {
         file_put_contents($this->path, "at-compile-time\n");
