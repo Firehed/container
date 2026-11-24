@@ -77,6 +77,7 @@ trait EnvironmentDefinitionsTestTrait
         $container = $this->getContainer();
         $this->assertTrue($container->has($containerKey));
         $this->assertSame($expected, $container->get($containerKey));
+        self::assertSame($expected, $container->get($containerKey), 'Cached value should be the cast value');
     }
 
     public function testEmptyValueBehavior(): void
