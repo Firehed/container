@@ -28,19 +28,30 @@ class FileContentsTest extends TestCase
 
     public function testIsCacheable(): void
     {
-        self::assertTrue((new FileContents($this->path))->isCacheable(), 'File contents should only be read once');
+        self::assertTrue(
+            (new FileContents($this->path))->isCacheable(),
+            'File contents should only be read once',
+        );
     }
 
     public function testHasNoDependencies(): void
     {
-        self::assertSame([], (new FileContents($this->path))->getDependencies(), 'Files depend on no other container entries');
+        self::assertSame(
+            [],
+            (new FileContents($this->path))->getDependencies(),
+            'Files depend on no other container entries',
+        );
     }
 
     #[DataProvider('contents')]
     public function testResolve(string $contents, string $expected): void
     {
         file_put_contents($this->path, $contents);
-        self::assertSame($expected, $this->resolve(new FileContents($this->path)), 'Only trailing newlines should be stripped');
+        self::assertSame(
+            $expected,
+            $this->resolve(new FileContents($this->path)),
+            'Only trailing newlines should be stripped',
+        );
     }
 
     /** @return array<string, array{string, string}> */
@@ -82,7 +93,11 @@ class FileContentsTest extends TestCase
     {
         file_put_contents($this->path, 'super-secret-value');
         $code = (new FileContents($this->path))->generateCode();
-        self::assertStringNotContainsString('super-secret-value', $code, 'Secrets must be read at runtime, not compiled in');
+        self::assertStringNotContainsString(
+            'super-secret-value',
+            $code,
+            'Secrets must be read at runtime, not compiled in',
+        );
     }
 
     private function resolve(FileContents $def): mixed
