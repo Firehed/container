@@ -96,6 +96,11 @@ class FileOrEnvTest extends TestCase
                 ['FOO_FILE' => self::SECRET . '-missing'],
                 Exceptions\FileNotReadable::class,
             ],
+            'missing file ignores default' => [
+                new FileOrEnv('FOO', 'fallback'),
+                ['FOO_FILE' => self::SECRET . '-missing'],
+                Exceptions\FileNotReadable::class,
+            ],
             'neither, no default' => [
                 new FileOrEnv('FOO'),
                 [],
