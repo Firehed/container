@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Firehed\Container;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use Psr\Container\ContainerExceptionInterface;
+use Throwable;
 
 trait FileDefinitionsTestTrait
 {
@@ -25,16 +25,17 @@ trait FileDefinitionsTestTrait
 
     /**
      * @param array<string, string> $env
+     * @param class-string<Throwable> $exception
      */
     #[DataProvider('fileErrors')]
-    public function testFileError(string $key, array $env): void
+    public function testFileError(string $key, array $env, string $exception): void
     {
         foreach ($env as $name => $value) {
             $_ENV[$name] = $value;
         }
         $container = $this->getContainer();
         self::assertTrue($container->has($key), 'has should be true');
-        $this->expectException(ContainerExceptionInterface::class);
+        $this->expectException($exception);
         $container->get($key);
     }
 
@@ -46,11 +47,11 @@ trait FileDefinitionsTestTrait
         ];
     }
 
-    /** @return array<string, array{string, array<string, string>}> */
+    /** @return array<string, array{string, array<string, string>, class-string<Throwable>}> */
     public static function fileErrors(): array
     {
         return [
-            'fileContents missing' => ['file_contents_missing', []],
+            'fileContents missing' => ['file_contents_missing', [], Exceptions\FileNotReadable::class],
         ];
     }
 }
