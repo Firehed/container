@@ -30,7 +30,7 @@ class ConfigGenerator
             // @codeCoverageIgnoreStart
             throw new RuntimeException(
                 'The config generator requires composer/class-map-generator. ' .
-                'Install it with: composer require composer/class-map-generator'
+                'Install it with: composer require --dev composer/class-map-generator'
             );
             // @codeCoverageIgnoreEnd
         }
