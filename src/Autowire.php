@@ -149,6 +149,7 @@ class Autowire
      * Check if a class can be autowired based on its constructor signature.
      *
      * @param class-string $className
+     * @throws \Throwable If the class cannot be loaded (e.g., has side effects or broken dependencies)
      */
     public static function isEligible(string $className): bool
     {

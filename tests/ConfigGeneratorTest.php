@@ -1,0 +1,134 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Firehed\Container;
+
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
+
+#[CoversClass(ConfigGenerator::class)]
+class ConfigGeneratorTest extends TestCase
+{
+    public function testScanFindsEligibleClasses(): void
+    {
+        $generator = new ConfigGenerator();
+        $generator->addDirectory(__DIR__ . '/Fixtures');
+
+        $classes = $generator->getEligibleClasses();
+
+        // These should be found (autowire-eligible)
+        self::assertContains(Fixtures\SessionId::class, $classes);
+        self::assertContains(Fixtures\SessionHandler::class, $classes);
+        self::assertContains(Fixtures\OptionalScalarParam::class, $classes);
+        self::assertContains(Fixtures\NoConstructorFactory::class, $classes);
+
+        // These should NOT be found
+        self::assertNotContains(Fixtures\ConstructorScalar::class, $classes);
+        self::assertNotContains(Fixtures\ConstructorUntyped::class, $classes);
+        self::assertNotContains(Fixtures\EmptyInterface::class, $classes);
+        self::assertNotContains(Fixtures\Environment::class, $classes);
+        // Closure cannot be autowired
+        self::assertNotContains(Fixtures\RequiresClosure::class, $classes);
+    }
+
+    public function testExcludeRemovesClasses(): void
+    {
+        $generator = new ConfigGenerator();
+        $generator->addDirectory(__DIR__ . '/Fixtures');
+        $generator->exclude(Fixtures\SessionId::class);
+
+        $classes = $generator->getEligibleClasses();
+
+        self::assertNotContains(Fixtures\SessionId::class, $classes);
+        self::assertContains(Fixtures\SessionHandler::class, $classes);
+    }
+
+    public function testExcludeFromFileRemovesDefinedClasses(): void
+    {
+        $generator = new ConfigGenerator();
+        $generator->addDirectory(__DIR__ . '/Fixtures');
+        $generator->excludeFromFile(__DIR__ . '/ValidDefinitions/NoParams.php');
+
+        $classes = $generator->getEligibleClasses();
+
+        // These are defined as keys in NoParams.php
+        self::assertNotContains(Fixtures\SessionId::class, $classes);
+        self::assertNotContains(Fixtures\SessionIdImplicit::class, $classes);
+        // SessionIdManual is a value (autowire target), not a key, so still included
+        self::assertContains(Fixtures\SessionIdManual::class, $classes);
+    }
+
+    public function testGenerateProducesValidPhp(): void
+    {
+        $generator = new ConfigGenerator();
+        $generator->addDirectory(__DIR__ . '/Fixtures');
+
+        $output = $generator->generate();
+
+        self::assertStringStartsWith("<?php\n", $output);
+        self::assertStringContainsString('declare(strict_types=1);', $output);
+        self::assertStringContainsString('return [', $output);
+        self::assertStringContainsString(Fixtures\SessionId::class . '::class,', $output);
+    }
+
+    public function testAddDirectoryThrowsForNonexistentDirectory(): void
+    {
+        $generator = new ConfigGenerator();
+
+        $this->expectException(\RuntimeException::class);
+        $generator->addDirectory('/nonexistent/path');
+    }
+
+    public function testExcludeFromFileThrowsForNonArrayConfig(): void
+    {
+        $generator = new ConfigGenerator();
+
+        $this->expectException(\InvalidArgumentException::class);
+        $generator->excludeFromFile(__DIR__ . '/ConfigGeneratorFixtures/not-array.php');
+    }
+
+    public function testThrowablesAreExcluded(): void
+    {
+        self::assertTrue(
+            Autowire::isEligible(ConfigGeneratorFixtures\Throwable\SomeException::class),
+            'Precondition: exception should be autowire-eligible',
+        );
+
+        $generator = new ConfigGenerator();
+        $generator->addDirectory(__DIR__ . '/ConfigGeneratorFixtures/Throwable');
+
+        self::assertNotContains(
+            ConfigGeneratorFixtures\Throwable\SomeException::class,
+            $generator->getEligibleClasses(),
+            'Exceptions are never services',
+        );
+    }
+
+    public function testClassesThatFailToLoadAreReportedAsErrors(): void
+    {
+        $generator = new ConfigGenerator();
+        $generator->addDirectory(__DIR__ . '/ConfigGeneratorFixtures/LoadFailure');
+
+        $classes = $generator->getEligibleClasses();
+        $errors = $generator->getErrors();
+
+        self::assertNotContains(
+            ConfigGeneratorFixtures\LoadFailure\ThrowsOnLoad::class,
+            $classes,
+            'Unloadable class should not be marked eligible',
+        );
+        self::assertArrayHasKey(
+            ConfigGeneratorFixtures\LoadFailure\ThrowsOnLoad::class,
+            $errors,
+            'Unloadable class should be reported',
+        );
+        $error = $errors[ConfigGeneratorFixtures\LoadFailure\ThrowsOnLoad::class];
+        self::assertSame('Side effect during load', $error['error']->getMessage(), 'Original error should be kept');
+        self::assertSame(
+            __DIR__ . '/ConfigGeneratorFixtures/LoadFailure/ThrowsOnLoad.php',
+            $error['file'],
+            'Error should identify the source file',
+        );
+    }
+}

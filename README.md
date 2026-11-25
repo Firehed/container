@@ -380,6 +380,26 @@ The topmost example is recommended for configuring any class that can be autowir
 >   'em' => Doctrine\ORM\EntityManager::class,
 > ];
 
+#### Generating autowiring config
+
+The `generate-config` tool scans directories for autowire-eligible classes and writes them to a config file.
+It requires `composer/class-map-generator` (`composer require --dev composer/class-map-generator`).
+
+```bash
+vendor/bin/generate-config -o config/autowired.php src/Services
+# Skip classes already defined in other config files
+vendor/bin/generate-config -e config/services.php -o config/autowired.php src/Services
+```
+
+Point it at directories of services.
+Eligibility is based only on constructor signatures, so entities, value objects, messages, and the like will also be listed if they qualify.
+Exceptions are always skipped.
+
+> [!WARNING]
+> The tool loads every class it finds, which runs any top-level code in those files.
+> Only run it against code you trust.
+> Classes that fail to load are skipped and listed as warnings.
+
 ### Manual Wiring
 
 If a class does not support autowiring or you'd prefer not to use it, provide a closure that returns a new implementation.

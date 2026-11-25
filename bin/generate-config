@@ -1,0 +1,113 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+// Composer's vendor/bin proxy sets this; fall back to running from this repo.
+require $GLOBALS['_composer_autoload_path'] ?? __DIR__ . '/../vendor/autoload.php';
+
+use Firehed\Container\ConfigGenerator;
+
+$options = getopt('ho:e:', ['help', 'output:', 'exclude:'], $restIndex);
+$directories = array_slice($argv, $restIndex);
+
+if (array_key_exists('h', $options) || array_key_exists('help', $options)) {
+    printUsage();
+    exit(0);
+}
+
+$outputFile = $options['o'] ?? $options['output'] ?? null;
+if (is_array($outputFile)) {
+    fwrite(STDERR, "Error: --output may only be given once\n");
+    exit(1);
+}
+
+$excludeFiles = array_merge((array) ($options['e'] ?? []), (array) ($options['exclude'] ?? []));
+
+foreach ($directories as $dir) {
+    if (str_starts_with($dir, '-')) {
+        fwrite(STDERR, "Error: options must come before directories ($dir)\n\n");
+        printUsage();
+        exit(1);
+    }
+}
+
+if ($directories === []) {
+    fwrite(STDERR, "Error: At least one directory is required\n\n");
+    printUsage();
+    exit(1);
+}
+
+// Run the generator
+try {
+    $generator = new ConfigGenerator();
+
+    foreach ($directories as $dir) {
+        if (!is_dir($dir)) {
+            fwrite(STDERR, "Error: Directory not found: $dir\n");
+            exit(1);
+        }
+        $generator->addDirectory($dir);
+    }
+
+    foreach ($excludeFiles as $file) {
+        if (!file_exists($file)) {
+            fwrite(STDERR, "Error: Exclude file not found: $file\n");
+            exit(1);
+        }
+        $generator->excludeFromFile($file);
+    }
+
+    $output = $generator->generate();
+    $errors = $generator->getErrors();
+
+    // Output the generated config first
+    if ($outputFile !== null) {
+        file_put_contents($outputFile, $output);
+        fwrite(STDERR, "Config written to: $outputFile\n");
+    } else {
+        echo $output;
+    }
+
+    // Report any errors at the end so they're visible
+    if ($errors !== []) {
+        fwrite(STDERR, sprintf("\nWarning: %d class(es) could not be checked:\n\n", count($errors)));
+        foreach ($errors as $className => $info) {
+            $error = $info['error'];
+            $file = $info['file'];
+            fwrite(STDERR, sprintf("  %s\n", $className));
+            fwrite(STDERR, sprintf("    File: %s\n", $file));
+            fwrite(STDERR, sprintf("    %s: %s\n", get_class($error), $error->getMessage()));
+            fwrite(STDERR, sprintf("    Thrown at: %s:%d\n\n", $error->getFile(), $error->getLine()));
+        }
+    }
+} catch (RuntimeException $e) {
+    fwrite(STDERR, "Error: " . $e->getMessage() . "\n");
+    exit(1);
+}
+
+function printUsage(): void
+{
+    $script = basename($GLOBALS['argv'][0]);
+    echo <<<USAGE
+Usage: $script [options] <directory> [directory...]
+
+Scans directories for autowire-eligible classes and generates a container
+configuration file.
+
+WARNING: every class found is loaded, which runs any top-level code in its
+file. Only run this against code you trust.
+
+Options:
+  -o, --output <file>   Write output to file instead of stdout
+  -e, --exclude <file>  Exclude classes already defined in config file
+                        (can be specified multiple times)
+  -h, --help            Show this help message
+
+Examples:
+  $script src/Services src/Repositories
+  $script -o config/autowired.php src/
+  $script -e config/manual.php -o config/autowired.php src/
+
+USAGE;
+}

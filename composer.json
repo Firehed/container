@@ -43,7 +43,11 @@
         "nikic/php-parser": "^5.0",
         "psr/container": "^1.0 || ^2.0"
     },
+    "bin": [
+        "bin/generate-config"
+    ],
     "require-dev": {
+        "composer/class-map-generator": "^1.7",
         "phpstan/phpstan": "^2.0",
         "phpstan/phpstan-phpunit": "^2.0",
         "phpstan/phpstan-strict-rules": "^2.0",
@@ -64,6 +68,7 @@
         "phpcs": "phpcs"
     },
     "suggest": {
+        "composer/class-map-generator": "Required for the config generator CLI tool",
         "psr/log": "Enables debug logging during container compilation"
     }
 }
