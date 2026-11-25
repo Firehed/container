@@ -9,7 +9,6 @@ use PhpParser\PhpVersion;
 use PhpParser\PrettyPrinter\Standard;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
 use UnexpectedValueException;
 use UnitEnum;
 
@@ -57,13 +56,13 @@ class Compiler implements BuilderInterface
     /** @var array<string, true> */
     private array $factories = [];
 
-    private LoggerInterface $logger;
+    private ?LoggerInterface $logger;
 
     private string $path;
 
     public function __construct(string $path = 'cc.php', ?LoggerInterface $logger = null)
     {
-        $this->logger = $logger ?? new NullLogger();
+        $this->logger = $logger;
         // @phpstan-ignore-next-line This class will be generated
         $this->className = 'CC_' . md5($path);
 
@@ -86,7 +85,7 @@ class Compiler implements BuilderInterface
 
     public function addFile(string $file): void
     {
-        $this->logger->debug('Adding file {file}', ['file' => $file]);
+        $this->logger?->debug('Adding file {file}', ['file' => $file]);
         if ($this->exists) {
             return;
         }
@@ -164,7 +163,7 @@ class Compiler implements BuilderInterface
         $tpl .= "}\n";
 
         $code = $this->prettyPrint($tpl);
-        $this->logger->info($code);
+        $this->logger?->info($code);
 
         $this->writeAtomically($code);
     }
@@ -243,7 +242,7 @@ class Compiler implements BuilderInterface
     private function makeNameForKey(string $key): string
     {
         $out = sprintf('get%s', md5($key));
-        $this->logger->debug('Name generated: {key} => {out}', [
+        $this->logger?->debug('Name generated: {key} => {out}', [
             'key' => $key,
             'out' => $out,
         ]);
@@ -266,7 +265,7 @@ class Compiler implements BuilderInterface
             return;
         }
 
-        $this->logger->debug('{file} is not writable, making directories', [
+        $this->logger?->debug('{file} is not writable, making directories', [
             'file' => $destFile,
         ]);
         $result = mkdir($pathInfo['dirname'], 0700, true);
