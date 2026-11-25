@@ -112,6 +112,9 @@ Usage: $script [options] <directory> [directory...]
 Scans directories for autowire-eligible classes and generates a container
 configuration file.
 
+WARNING: every class found is loaded, which runs any top-level code in its
+file. Only run this against code you trust.
+
 Options:
   -o, --output <file>   Write output to file instead of stdout
   -e, --exclude <file>  Exclude classes already defined in config file
