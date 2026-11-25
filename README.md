@@ -312,6 +312,9 @@ This drastically reduces the amount of config definition code, along with reduce
 
 _Any class that has zero or more typed, non-scalar constructor parameters can be autowired._
 
+Classes with a variadic constructor parameter (such as `Handler ...$handlers`) cannot be autowired, because the container cannot know which values to pass.
+Use [manual wiring](#manual-wiring) for them instead.
+
 To have the container autowire a class, simply include its fully-qualified class name in the definition array:
 
 ```php
