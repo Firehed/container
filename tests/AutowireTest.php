@@ -10,6 +10,7 @@ use ReflectionClass;
 use ReflectionParameter;
 
 #[CoversClass(Autowire::class)]
+#[CoversClass(Exceptions\VariadicParameter::class)]
 class AutowireTest extends TestCase
 {
     public function testClassWithNoConstructorIsEligible(): void
