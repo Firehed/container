@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Firehed\Container;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Container\ContainerExceptionInterface;
 use SessionHandlerInterface;
 use SessionIdInterface;
@@ -29,13 +30,26 @@ trait ErrorDefinitionsTestTrait
         $c->get(Fixtures\ConstructorUntyped::class);
     }
 
-    public function testConstructorWithVariadicArgErrors(): void
+    /** @return array<string, array{string, class-string}> */
+    public static function variadicDefinitions(): array
+    {
+        return [
+            'typed, type defined' => ['VariadicParam.php', Fixtures\VariadicParam::class],
+            'typed, type not defined' => ['VariadicParamTypeMissing.php', Fixtures\VariadicParam::class],
+            'untyped' => ['UntypedVariadicParam.php', Fixtures\UntypedVariadicParam::class],
+        ];
+    }
+
+    /** @param class-string $class */
+    #[DataProvider('variadicDefinitions')]
+    public function testConstructorWithVariadicArgErrors(string $file, string $class): void
     {
         $builder = $this->getBuilder();
-        $builder->addFile(__DIR__ . '/ErrorDefinitions/VariadicParam.php');
+        $builder->addFile(__DIR__ . '/ErrorDefinitions/' . $file);
         $this->expectException(Exceptions\VariadicParameter::class);
+        $this->expectExceptionMessageMatches(sprintf('/`\$ids`.*`%s`/', preg_quote($class, '/')));
         $c = $builder->build();
-        $c->get(Fixtures\VariadicParam::class);
+        $c->get($class);
     }
 
     public function testConstructorWithUndefinedTypedArgErrors(): void
