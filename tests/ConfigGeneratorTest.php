@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace Firehed\Container;
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers Firehed\Container\ConfigGenerator
- */
+#[CoversClass(ConfigGenerator::class)]
 class ConfigGeneratorTest extends TestCase
 {
     public function testScanFindsEligibleClasses(): void
