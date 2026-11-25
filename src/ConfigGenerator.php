@@ -10,6 +10,8 @@ use Throwable;
 
 /**
  * Discovers autowire-eligible classes and generates container configuration.
+ *
+ * @internal
  */
 class ConfigGenerator
 {
