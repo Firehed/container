@@ -358,6 +358,13 @@ trait ContainerBuilderTestTrait
         $this->assertInstanceOf(Fixtures\NotInContainer::class, $obj->dependency);
     }
 
+    public function testBuildDoesNotCreateDefaultValues(): void
+    {
+        Fixtures\NotInContainer::$instances = 0;
+        $this->getContainer();
+        $this->assertSame(0, Fixtures\NotInContainer::$instances);
+    }
+
     public function testHasWithMissingKeyReturnsFalse(): void
     {
         $container = $this->getContainer();
