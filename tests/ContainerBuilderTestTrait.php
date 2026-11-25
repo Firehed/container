@@ -356,6 +356,13 @@ trait ContainerBuilderTestTrait
         );
     }
 
+    public function testOptionalParamAfterDefaultedParamIsInjected(): void
+    {
+        $container = $this->getContainer();
+        $obj = $container->get(Fixtures\NewInInitializerParam::class);
+        $this->assertInstanceOf(Fixtures\SessionId::class, $obj->sessionId);
+    }
+
     public function testBuildDoesNotCreateDefaultValues(): void
     {
         Fixtures\NotInContainer::$instances = 0;
