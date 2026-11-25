@@ -29,6 +29,15 @@ trait ErrorDefinitionsTestTrait
         $c->get(Fixtures\ConstructorUntyped::class);
     }
 
+    public function testConstructorWithVariadicArgErrors(): void
+    {
+        $builder = $this->getBuilder();
+        $builder->addFile(__DIR__ . '/ErrorDefinitions/VariadicParam.php');
+        $this->expectException(Exceptions\VariadicParameter::class);
+        $c = $builder->build();
+        $c->get(Fixtures\VariadicParam::class);
+    }
+
     public function testConstructorWithUndefinedTypedArgErrors(): void
     {
         $builder = $this->getBuilder();
