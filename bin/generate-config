@@ -3,25 +3,8 @@
 
 declare(strict_types=1);
 
-// Find autoloader
-$autoloadPaths = [
-    __DIR__ . '/../vendor/autoload.php', // When run from this repo
-    __DIR__ . '/../../../autoload.php',  // When installed as a dependency
-];
-
-$autoloaded = false;
-foreach ($autoloadPaths as $path) {
-    if (file_exists($path)) {
-        require $path;
-        $autoloaded = true;
-        break;
-    }
-}
-
-if (!$autoloaded) {
-    fwrite(STDERR, "Could not find Composer autoloader.\n");
-    exit(1);
-}
+// Composer's vendor/bin proxy sets this; fall back to running from this repo.
+require $GLOBALS['_composer_autoload_path'] ?? __DIR__ . '/../vendor/autoload.php';
 
 use Firehed\Container\ConfigGenerator;
 
