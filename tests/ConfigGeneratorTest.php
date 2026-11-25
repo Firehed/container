@@ -79,4 +79,39 @@ class ConfigGeneratorTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $generator->addDirectory('/nonexistent/path');
     }
+
+    public function testExcludeFromFileThrowsForNonArrayConfig(): void
+    {
+        $generator = new ConfigGenerator();
+
+        $this->expectException(\InvalidArgumentException::class);
+        $generator->excludeFromFile(__DIR__ . '/ConfigGeneratorFixtures/not-array.php');
+    }
+
+    public function testClassesThatFailToLoadAreReportedAsErrors(): void
+    {
+        $generator = new ConfigGenerator();
+        $generator->addDirectory(__DIR__ . '/ConfigGeneratorFixtures');
+
+        $classes = $generator->getEligibleClasses();
+        $errors = $generator->getErrors();
+
+        self::assertNotContains(
+            ConfigGeneratorFixtures\ThrowsOnLoad::class,
+            $classes,
+            'Unloadable class should not be marked eligible',
+        );
+        self::assertArrayHasKey(
+            ConfigGeneratorFixtures\ThrowsOnLoad::class,
+            $errors,
+            'Unloadable class should be reported',
+        );
+        $error = $errors[ConfigGeneratorFixtures\ThrowsOnLoad::class];
+        self::assertSame('Side effect during load', $error['error']->getMessage(), 'Original error should be kept');
+        self::assertSame(
+            __DIR__ . '/ConfigGeneratorFixtures/ThrowsOnLoad.php',
+            $error['file'],
+            'Error should identify the source file',
+        );
+    }
 }
