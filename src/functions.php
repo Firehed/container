@@ -34,3 +34,11 @@ function factory(?Closure $def = null): ShorthandDefinitionInterface
 {
     return new Factory($def);
 }
+
+/**
+ * @api
+ */
+function fileContents(string $path): DefinitionInterface
+{
+    return new FileContents($path);
+}
