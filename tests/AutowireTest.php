@@ -109,6 +109,30 @@ class AutowireTest extends TestCase
         self::assertFalse(Autowire::isParameterAutowirable($param));
     }
 
+    public function testVariadicParameterIsNotAutowirable(): void
+    {
+        $param = $this->getConstructorParam(Fixtures\VariadicParam::class, 'ids');
+        self::assertFalse(
+            Autowire::isParameterAutowirable($param),
+            'Variadic params are optional but must not be autowired',
+        );
+    }
+
+    public function testClassWithVariadicParamIsNotEligible(): void
+    {
+        self::assertFalse(
+            Autowire::isEligible(Fixtures\VariadicParam::class),
+            'Classes with variadic constructors must be wired explicitly',
+        );
+    }
+
+    public function testGetOptionalDependencyTypeThrowsForVariadic(): void
+    {
+        $param = $this->getConstructorParam(Fixtures\VariadicParam::class, 'ids');
+        $this->expectException(Exceptions\VariadicParameter::class);
+        Autowire::getOptionalDependencyType($param, Fixtures\VariadicParam::class);
+    }
+
     public function testGetRequiredDependencyTypeReturnsTypeName(): void
     {
         $param = $this->getConstructorParam(Fixtures\SessionHandler::class, 'id');
