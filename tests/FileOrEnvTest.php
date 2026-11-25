@@ -69,6 +69,13 @@ class FileOrEnvTest extends TestCase
         $this->evaluateGeneratedCode($def->generateCode(), $this->envReader($env));
     }
 
+    public function testNotSetMessageNamesBothVariables(): void
+    {
+        $this->expectException(Exceptions\EnvironmentVariableNotSet::class);
+        $this->expectExceptionMessage('FOO or FOO_FILE');
+        $this->resolveDefinition(new FileOrEnv('FOO'), $this->envReader([]));
+    }
+
     /** @return array<string, array{FileOrEnv, array<string, string>, ?string}> */
     public static function values(): array
     {
