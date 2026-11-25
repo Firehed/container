@@ -88,6 +88,23 @@ class ConfigGeneratorTest extends TestCase
         $generator->excludeFromFile(__DIR__ . '/ConfigGeneratorFixtures/not-array.php');
     }
 
+    public function testThrowablesAreExcluded(): void
+    {
+        self::assertTrue(
+            Autowire::isEligible(ConfigGeneratorFixtures\Throwable\SomeException::class),
+            'Precondition: exception should be autowire-eligible',
+        );
+
+        $generator = new ConfigGenerator();
+        $generator->addDirectory(__DIR__ . '/ConfigGeneratorFixtures/Throwable');
+
+        self::assertNotContains(
+            ConfigGeneratorFixtures\Throwable\SomeException::class,
+            $generator->getEligibleClasses(),
+            'Exceptions are never services',
+        );
+    }
+
     public function testClassesThatFailToLoadAreReportedAsErrors(): void
     {
         $generator = new ConfigGenerator();
