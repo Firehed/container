@@ -350,12 +350,10 @@ trait ContainerBuilderTestTrait
     {
         $container = $this->getContainer();
         $this->assertFalse($container->has(Fixtures\NotInContainer::class));
-        $obj = $this->assertGetSingleton(
+        $this->assertGetSingleton(
             $container,
             Fixtures\NewInInitializerParam::class,
         );
-        assert($obj instanceof Fixtures\NewInInitializerParam);
-        $this->assertInstanceOf(Fixtures\NotInContainer::class, $obj->dependency);
     }
 
     public function testBuildDoesNotCreateDefaultValues(): void

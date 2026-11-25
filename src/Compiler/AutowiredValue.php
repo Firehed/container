@@ -26,25 +26,17 @@ class AutowiredValue implements CodeGeneratorInterface
         $this->dependencies = [];
 
         $rc = new ReflectionClass($this->classToAutowire);
-        $args = [];
+        $lines = ['$args = [];'];
         if ($rc->hasMethod('__construct')) {
-            $argClasses = [];
             $constructor = $rc->getMethod('__construct');
             if (!$constructor->isPublic()) {
                 throw new \Exception('not public construct');
             }
-            $params = $constructor->getParameters();
-            $args = array_map([$this, 'getDefaultValue'], $params);
+            $lines = [...$lines, ...$this->generateArguments($constructor->getParameters())];
         }
+        $lines[] = sprintf('return new %s(...$args);', $this->classToAutowire);
 
-        $argInfo = implode(', ', $args);
-
-        $code = <<<PHP
-    return new {$this->classToAutowire}(
-        $argInfo
-    );
-PHP;
-        return $code;
+        return implode("\n", $lines);
     }
 
     public function getDependencies(): array
@@ -55,27 +47,38 @@ PHP;
         return $this->dependencies;
     }
 
-    private function getDefaultValue(ReflectionParameter $param): string
+    /**
+     * Optional parameters are left out unless the container can fill them,
+     * so PHP applies the declared default at runtime. Defaults are never
+     * evaluated here: `new` in an initializer would run at compile time and
+     * could not be exported. Once an argument may be left out, the rest must
+     * be passed by name.
+     *
+     * @param ReflectionParameter[] $params
+     * @return string[]
+     */
+    private function generateArguments(array $params): array
     {
-        if ($param->isOptional()) {
-            $typeName = Autowire::getOptionalDependencyType($param);
-            if ($typeName !== null) {
-                $exported = var_export($typeName, true);
-                $default = var_export($param->getDefaultValue(), true);
-                return sprintf(
-                    '$this->has(%s) ? $this->get(%s) : %s',
-                    $exported,
-                    $exported,
-                    $default,
-                );
+        $lines = [];
+        $byName = false;
+        foreach ($params as $param) {
+            $key = $byName ? var_export($param->getName(), true) : '';
+            if ($param->isOptional()) {
+                $byName = true;
+                $typeName = Autowire::getOptionalDependencyType($param);
+                if ($typeName !== null) {
+                    $lines[] = sprintf(
+                        'if ($this->has(%1$s)) { $args[%2$s] = $this->get(%1$s); }',
+                        var_export($typeName, true),
+                        $key,
+                    );
+                }
+                continue;
             }
-            return var_export($param->getDefaultValue(), true);
+            $fqcn = Autowire::getRequiredDependencyType($param, $this->classToAutowire);
+            $this->dependencies[] = $fqcn;
+            $lines[] = sprintf('$args[%s] = $this->get(%s);', $key, var_export($fqcn, true));
         }
-        $fqcn = Autowire::getRequiredDependencyType($param, $this->classToAutowire);
-        $this->dependencies[] = $fqcn;
-        return sprintf(
-            '$this->get(%s)',
-            var_export($fqcn, true)
-        );
+        return $lines;
     }
 }
