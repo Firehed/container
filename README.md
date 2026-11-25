@@ -282,6 +282,7 @@ return [
 
 To read a file's contents at runtime (commonly a mounted secret), use `Firehed\Container\fileContents`.
 `fileOrEnv('NAME')` reads the file at the path in `NAME_FILE` if that is set, and otherwise reads `NAME` like `env('NAME')`, including the optional default.
+Setting both `NAME` and `NAME_FILE` throws an exception.
 
 ```php
 <?php
@@ -296,7 +297,7 @@ return [
 ```
 
 Trailing newlines are stripped from file contents; all other whitespace is kept.
-An exception is thrown if the file is missing or unreadable, or if both `NAME` and `NAME_FILE` are set.
+An exception is thrown if the file is missing or unreadable.
 Use absolute paths (or `__DIR__`); relative paths depend on the working directory of the running process.
 Files are read at runtime, so their contents are never written into a compiled container.
 Their contents are cached for the lifetime of the request, so a file that's accessed, changed, and re-accessed during a single request will show only the first-read value.
