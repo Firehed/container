@@ -141,7 +141,7 @@ class Autowire
     /**
      * Check if a constructor parameter can be autowired.
      *
-     * A parameter is autowirable if:
+     * A parameter is autowirable if it is not variadic, and:
      * - It is optional (has a default value), OR
      * - It is typed with a non-builtin class/interface type
      */
