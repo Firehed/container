@@ -281,12 +281,18 @@ return [
 ### Files and Secrets
 
 To read a file's contents at runtime (commonly a mounted secret), use `Firehed\Container\fileContents`.
+`fileOrEnv('NAME')` reads the file at the path in `NAME_FILE` if that is set, and otherwise reads `NAME` like `env('NAME')`, including the optional default.
+Setting both `NAME` and `NAME_FILE` throws an exception.
 
 ```php
 <?php
 use function Firehed\Container\fileContents;
+use function Firehed\Container\fileOrEnv;
 return [
     'api_key' => fileContents('/run/secrets/api-key'),
+    // Reads the file at $DATABASE_URL_FILE, or falls back to $DATABASE_URL
+    'database_url' => fileOrEnv('DATABASE_URL'),
+    'smtp_password' => fileOrEnv('SMTP_PASSWORD', null),
 ];
 ```
 
