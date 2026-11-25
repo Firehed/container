@@ -366,6 +366,25 @@ trait ContainerBuilderTestTrait
         self::assertCount(2, $obj->ids, 'The closure passes two ids');
     }
 
+    /** @return array<string, array{string, mixed[]}> */
+    public static function explicitVariadicDefinitions(): array
+    {
+        return [
+            'typed, no args' => ['variadicWithNoArgs', []],
+            'untyped, literal args' => [Fixtures\UntypedVariadicParam::class, ['a', 'b']],
+        ];
+    }
+
+    /** @param mixed[] $expectedIds */
+    #[DataProvider('explicitVariadicDefinitions')]
+    public function testVariadicClassCanBeWiredWithLiterals(string $id, array $expectedIds): void
+    {
+        $container = $this->getContainer();
+        $obj = $container->get($id);
+        assert($obj instanceof Fixtures\VariadicParam || $obj instanceof Fixtures\UntypedVariadicParam);
+        self::assertSame($expectedIds, $obj->ids, 'The closure arguments should reach the constructor');
+    }
+
     public function testClosureUsingMatch(): void
     {
         $container = $this->getContainer();

@@ -38,6 +38,10 @@ return [
         $c->get(SessionIdInterface::class),
     ),
 
+    'variadicWithNoArgs' => fn () => new Fixtures\VariadicParam(),
+
+    Fixtures\UntypedVariadicParam::class => fn () => new Fixtures\UntypedVariadicParam('a', 'b'),
+
     'somethingWithMatch' => fn (TypedContainerInterface $c) => match ($c->get('string_literal')) {
         'UnitTest' => 'foobar',
         'other' => 'bar',
