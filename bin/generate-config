@@ -94,7 +94,8 @@ try {
             $file = $info['file'];
             fwrite(STDERR, sprintf("  %s\n", $className));
             fwrite(STDERR, sprintf("    File: %s\n", $file));
-            fwrite(STDERR, sprintf("    %s: %s\n\n", get_class($error), $error->getMessage()));
+            fwrite(STDERR, sprintf("    %s: %s\n", get_class($error), $error->getMessage()));
+            fwrite(STDERR, sprintf("    Thrown at: %s:%d\n\n", $error->getFile(), $error->getLine()));
         }
     }
 } catch (RuntimeException $e) {
