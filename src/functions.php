@@ -46,12 +46,12 @@ function fileContents(string $path): DefinitionInterface
 /**
  * @api
  */
-function fileOrEnv(string $name, ?string $default = null): DefinitionInterface
+function fileOrEnv(string $envName, ?string $default = null): DefinitionInterface
 {
     // See env()
     if (func_num_args() === 2) {
-        return new FileOrEnv($name, $default);
+        return new FileOrEnv($envName, $default);
     } else {
-        return new FileOrEnv($name);
+        return new FileOrEnv($envName);
     }
 }
