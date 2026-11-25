@@ -56,7 +56,11 @@ class FileOrEnv implements DefinitionInterface
             $env = $this->hasDefault
                 ? new EnvironmentVariable($this->name, $this->default)
                 : new EnvironmentVariable($this->name);
-            return $env->resolve($container, $envReader);
+            try {
+                return $env->resolve($container, $envReader);
+            } catch (Exceptions\EnvironmentVariableNotSet) {
+                throw new Exceptions\EnvironmentVariableNotSet("{$this->name} or {$fileVar}");
+            }
         }
         if ($envReader->read($this->name) !== null) {
             throw new Exceptions\ConflictingEnvironmentVariables($this->name, $fileVar);
