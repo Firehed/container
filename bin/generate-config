@@ -25,45 +25,28 @@ if (!$autoloaded) {
 
 use Firehed\Container\ConfigGenerator;
 
-// Parse arguments
-$args = array_slice($argv, 1);
-$directories = [];
-$excludeFiles = [];
-$outputFile = null;
+$options = getopt('ho:e:', ['help', 'output:', 'exclude:'], $restIndex);
+$directories = array_slice($argv, $restIndex);
 
-for ($i = 0; $i < count($args); $i++) {
-    $arg = $args[$i];
+if (array_key_exists('h', $options) || array_key_exists('help', $options)) {
+    printUsage();
+    exit(0);
+}
 
-    if ($arg === '--help' || $arg === '-h') {
-        printUsage();
-        exit(0);
-    }
+$outputFile = $options['o'] ?? $options['output'] ?? null;
+if (is_array($outputFile)) {
+    fwrite(STDERR, "Error: --output may only be given once\n");
+    exit(1);
+}
 
-    if ($arg === '--exclude' || $arg === '-e') {
-        if (!isset($args[$i + 1])) {
-            fwrite(STDERR, "Error: --exclude requires a file path\n");
-            exit(1);
-        }
-        $excludeFiles[] = $args[++$i];
-        continue;
-    }
+$excludeFiles = array_merge((array) ($options['e'] ?? []), (array) ($options['exclude'] ?? []));
 
-    if ($arg === '--output' || $arg === '-o') {
-        if (!isset($args[$i + 1])) {
-            fwrite(STDERR, "Error: --output requires a file path\n");
-            exit(1);
-        }
-        $outputFile = $args[++$i];
-        continue;
-    }
-
-    if (str_starts_with($arg, '-')) {
-        fwrite(STDERR, "Unknown option: $arg\n");
+foreach ($directories as $dir) {
+    if (str_starts_with($dir, '-')) {
+        fwrite(STDERR, "Error: options must come before directories ($dir)\n\n");
         printUsage();
         exit(1);
     }
-
-    $directories[] = $arg;
 }
 
 if ($directories === []) {
