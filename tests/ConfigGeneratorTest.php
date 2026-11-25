@@ -91,25 +91,25 @@ class ConfigGeneratorTest extends TestCase
     public function testClassesThatFailToLoadAreReportedAsErrors(): void
     {
         $generator = new ConfigGenerator();
-        $generator->addDirectory(__DIR__ . '/ConfigGeneratorFixtures');
+        $generator->addDirectory(__DIR__ . '/ConfigGeneratorFixtures/LoadFailure');
 
         $classes = $generator->getEligibleClasses();
         $errors = $generator->getErrors();
 
         self::assertNotContains(
-            ConfigGeneratorFixtures\ThrowsOnLoad::class,
+            ConfigGeneratorFixtures\LoadFailure\ThrowsOnLoad::class,
             $classes,
             'Unloadable class should not be marked eligible',
         );
         self::assertArrayHasKey(
-            ConfigGeneratorFixtures\ThrowsOnLoad::class,
+            ConfigGeneratorFixtures\LoadFailure\ThrowsOnLoad::class,
             $errors,
             'Unloadable class should be reported',
         );
-        $error = $errors[ConfigGeneratorFixtures\ThrowsOnLoad::class];
+        $error = $errors[ConfigGeneratorFixtures\LoadFailure\ThrowsOnLoad::class];
         self::assertSame('Side effect during load', $error['error']->getMessage(), 'Original error should be kept');
         self::assertSame(
-            __DIR__ . '/ConfigGeneratorFixtures/ThrowsOnLoad.php',
+            __DIR__ . '/ConfigGeneratorFixtures/LoadFailure/ThrowsOnLoad.php',
             $error['file'],
             'Error should identify the source file',
         );
