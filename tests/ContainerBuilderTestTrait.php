@@ -359,6 +359,13 @@ trait ContainerBuilderTestTrait
         $container->get('key_that_does_not_exist');
     }
 
+    public function testVariadicClassCanBeWiredExplicitly(): void
+    {
+        $container = $this->getContainer();
+        $obj = $container->get(Fixtures\VariadicParam::class);
+        self::assertCount(2, $obj->ids, 'The closure passes two ids');
+    }
+
     public function testClosureUsingMatch(): void
     {
         $container = $this->getContainer();

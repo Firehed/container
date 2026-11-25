@@ -33,6 +33,11 @@ return [
         return $c->get(EI::class);
     },
 
+    Fixtures\VariadicParam::class => fn (TypedContainerInterface $c) => new Fixtures\VariadicParam(
+        $c->get(SessionIdInterface::class),
+        $c->get(SessionIdInterface::class),
+    ),
+
     'somethingWithMatch' => fn (TypedContainerInterface $c) => match ($c->get('string_literal')) {
         'UnitTest' => 'foobar',
         'other' => 'bar',
