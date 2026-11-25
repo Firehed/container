@@ -9,10 +9,14 @@ use function enum_exists;
 use function func_num_args;
 use function sprintf;
 
-class EnvironmentVariable implements EnvironmentVariableInterface
+/**
+ * @internal - use `Firehed\Container\env()` to reach this.
+ * @phpstan-import-type Cast from CastableValueInterface
+ */
+class EnvironmentVariable implements CastableValueInterface, DefinitionInterface
 {
-    /** @var EnvironmentVariableInterface::CAST_* | class-string<\BackedEnum> */
-    private string $cast = EnvironmentVariableInterface::CAST_NONE;
+    /** @var ?Cast */
+    private CastType|string|null $cast = null;
 
     private bool $hasDefault;
 
@@ -21,36 +25,18 @@ class EnvironmentVariable implements EnvironmentVariableInterface
         $this->hasDefault = func_num_args() === 2;
     }
 
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    public function hasDefault(): bool
-    {
-        return $this->hasDefault;
-    }
-
-    public function getDefault(): ?string
-    {
-        if (!$this->hasDefault) {
-            throw new Exceptions\EnvironmentVariableNotSet($this->name);
-        }
-        return $this->default;
-    }
-
-    public function getCast(): string
+    public function getCast(): CastType|string|null
     {
         return $this->cast;
     }
 
-    public function asBool(): EnvironmentVariableInterface
+    public function asBool(): CastableValueInterface
     {
-        $this->cast = EnvironmentVariableInterface::CAST_BOOL;
+        $this->cast = CastType::Bool;
         return $this;
     }
 
-    public function asEnum(string $class): EnvironmentVariableInterface
+    public function asEnum(string $class): CastableValueInterface
     {
         if (!enum_exists($class)) {
             throw new InvalidArgumentException(sprintf('Class for enum cast %s does not exist', $class));
@@ -60,15 +46,64 @@ class EnvironmentVariable implements EnvironmentVariableInterface
         return $this;
     }
 
-    public function asFloat(): EnvironmentVariableInterface
+    public function asFloat(): CastableValueInterface
     {
-        $this->cast = EnvironmentVariableInterface::CAST_FLOAT;
+        $this->cast = CastType::Float;
         return $this;
     }
 
-    public function asInt(): EnvironmentVariableInterface
+    public function asInt(): CastableValueInterface
     {
-        $this->cast = EnvironmentVariableInterface::CAST_INT;
+        $this->cast = CastType::Int;
         return $this;
+    }
+
+    // DefinitionInterface implementation
+
+    public function generateCode(): string
+    {
+        return <<<PHP
+\$value = \$this->envReader->read('{$this->name}');
+if (\$value === null) {
+    {$this->getDefaultCodeBody()}
+}
+return \$value;
+PHP;
+    }
+
+    private function getDefaultCodeBody(): string
+    {
+        if ($this->hasDefault) {
+            $default = var_export($this->default, true);
+            return "\$value = $default;";
+        } else {
+            $varName = var_export($this->name, true);
+            return sprintf('throw new %s(%s);', Exceptions\EnvironmentVariableNotSet::class, $varName);
+        }
+    }
+
+    /** @return class-string[] */
+    public function getDependencies(): array
+    {
+        return [];
+    }
+
+    public function resolve(TypedContainerInterface $container, EnvReader $envReader): ?string
+    {
+        $envValue = $envReader->read($this->name);
+        if ($envValue === null) {
+            if ($this->hasDefault) {
+                $envValue = $this->default;
+            } else {
+                throw new Exceptions\EnvironmentVariableNotSet($this->name);
+            }
+        }
+
+        return $envValue;
+    }
+
+    public function isCacheable(): bool
+    {
+        return true;
     }
 }

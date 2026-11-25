@@ -3,15 +3,14 @@ declare(strict_types=1);
 
 namespace Firehed\Container;
 
-use Closure;
-use Exception;
 use Psr\Container\ContainerExceptionInterface;
-use ReflectionClass;
 use Throwable;
 
 class DevContainer implements TypedContainerInterface
 {
     use TypedContainerTrait;
+
+    private Caster $caster;
 
     /** @var mixed[] */
     private $evaluated = [];
@@ -19,6 +18,7 @@ class DevContainer implements TypedContainerInterface
     /** @param mixed[] $definitions */
     public function __construct(private array $definitions, private EnvReader $envReader)
     {
+        $this->caster = new Caster();
     }
 
     /** @return array{ids: list<string>} */
@@ -69,118 +69,15 @@ class DevContainer implements TypedContainerInterface
 
         if ($def instanceof DefinitionInterface) {
             $result = $def->resolve($this, $this->envReader);
+            if ($def instanceof CastableValueInterface) {
+                $result = $this->caster->cast($result, $def->getCast());
+            }
             if ($def->isCacheable()) {
                 $this->evaluated[$id] = $result;
             }
             return $result;
         }
 
-        if ($def instanceof AutowireInterface) {
-            $classToAutowire = $def->getWiredClass() ?? $id;
-            $value = $this->autowire($classToAutowire);
-        } else {
-            $value = $def;
-        }
-
-        if ($value instanceof Closure) {
-            $rebound = $value->bindTo(null);
-            assert($rebound !== null);
-            $evaluated = $rebound($this);
-            $this->evaluated[$id] = $evaluated;
-
-            return $evaluated;
-        }
-
-        if ($value instanceof FactoryInterface) {
-            if ($value->hasDefinition()) {
-                return $value->getDefinition()($this);
-            }
-            return $this->autowire($id)($this);
-        }
-
-        if ($value instanceof EnvironmentVariableInterface) {
-            $varName = $value->getName();
-            $envValue = $this->envReader->read($varName);
-            if ($envValue === null) {
-                if ($value->hasDefault()) {
-                    $envValue = $value->getDefault();
-                } else {
-                    throw new Exceptions\EnvironmentVariableNotSet($varName);
-                }
-            }
-            $cast = $value->getCast();
-            switch ($cast) {
-                case EnvironmentVariableInterface::CAST_NONE:
-                    return $envValue;
-                case EnvironmentVariableInterface::CAST_BOOL:
-                    switch (strtolower((string)$envValue)) {
-                        case '1': // fallthrough
-                        case 'true':
-                            return true;
-                        case '': // fallthrough
-                        case '0': // fallthrough
-                        case 'false':
-                            return false;
-                        default:
-                            throw new \OutOfBoundsException('Invalid boolean value');
-                    }
-                    // comment line for phpcs, otherwise irrelevant
-                case EnvironmentVariableInterface::CAST_INT:
-                    return (int) $envValue;
-                case EnvironmentVariableInterface::CAST_FLOAT:
-                    return (float) $envValue;
-                default:
-                    return $cast::from($envValue);
-            }
-        }
-
-        return $value;
-    }
-
-    /**
-     * Returns a closure that takes the container as its only argument and
-     * returns the instantiated object
-     */
-    private function autowire(string $class): Closure
-    {
-        if (!class_exists($class)) {
-            throw new Exceptions\AmbiguousMapping($class);
-        }
-        $rc = new ReflectionClass($class);
-
-        if (!$rc->hasMethod('__construct')) {
-            return (function () use ($class) {
-                return new $class();
-            })->bindTo(null);
-        }
-
-        $construct = $rc->getMethod('__construct');
-        if (!$construct->isPublic()) {
-            throw new \Exception('non public construct');
-        }
-
-        $params = $construct->getParameters();
-        $needed = [];
-        foreach ($params as $param) {
-            if ($param->isOptional()) {
-                $needed[] = function () use ($param) {
-                    return $param->getDefaultValue();
-                };
-            } else {
-                $name = Autowire::getRequiredDependencyType($param, $class);
-                if (!$this->has($name)) {
-                    throw Exceptions\NotFound::autowireMissing($name, $class, $param->getName());
-                }
-                $needed[] = (function (TypedContainerInterface $c) use ($name) {
-                    return $c->get($name);
-                })->bindTo(null);
-            }
-        }
-        return (function (TypedContainerInterface $container) use ($class, $needed) {
-            $args = array_map(function ($arg) use ($container) {
-                return $arg($container);
-            }, $needed);
-            return new $class(...$args);
-        })->bindTo(null);
+        return $def;
     }
 }

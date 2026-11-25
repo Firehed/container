@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Firehed\Container;
@@ -7,10 +8,13 @@ use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Firehed\Container\Exceptions\IncorrectlyTypedValue;
+use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use SessionHandlerInterface;
 use SessionIdInterface;
+use UnexpectedValueException;
 
 /**
  * This is a test trait to help ensure all processes end up with the same
@@ -21,6 +25,7 @@ trait ContainerBuilderTestTrait
     use CustomDefinitionTestTrait;
     use EnvironmentDefinitionsTestTrait;
     use ErrorDefinitionsTestTrait;
+    use FileDefinitionsTestTrait;
 
     public function getContainer(): TypedContainerInterface
     {
@@ -39,6 +44,7 @@ trait ContainerBuilderTestTrait
         $files = [
             'CustomDefinitions',
             'Environment',
+            'Files',
             'CaseSensitive',
             'RequiredParams',
             'Factories',
@@ -241,10 +247,9 @@ trait ContainerBuilderTestTrait
 
     /**
      * some_string => scalar_literal
-     * @dataProvider scalarLiterals
-     * @param mixed $expectedValue
      */
-    public function testScalarLiteral(string $key, $expectedValue): void
+    #[DataProvider('scalarLiterals')]
+    public function testScalarLiteral(string $key, mixed $expectedValue): void
     {
         $container = $this->getContainer();
         $this->assertTrue($container->has($key), 'has should be true');
@@ -319,6 +324,28 @@ trait ContainerBuilderTestTrait
         $this->assertNull($osp->getParam());
     }
 
+    /**
+     * OptionalObjectParam::class => autowire()
+     * SessionIdInterface::class => Fixtures\SessionId::class
+     *
+     * When the container has an entry for an optional parameter's type,
+     * it should be injected rather than using the default value.
+     */
+    public function testOptionalObjectParamUsesContainerEntryWhenAvailable(): void
+    {
+        $container = $this->getContainer();
+        $oop = $this->assertGetSingleton(
+            $container,
+            Fixtures\OptionalObjectParam::class
+        );
+        assert($oop instanceof Fixtures\OptionalObjectParam);
+        // SessionIdInterface is registered, so it should be injected
+        $this->assertInstanceOf(
+            Fixtures\SessionId::class,
+            $oop->getSessionId(),
+        );
+    }
+
     public function testHasWithMissingKeyReturnsFalse(): void
     {
         $container = $this->getContainer();
@@ -339,10 +366,6 @@ trait ContainerBuilderTestTrait
         self::assertIsString($value);
     }
 
-    /**
-     * @covers \Firehed\Container\Compiler\ClosureValue
-     * @covers \Firehed\Container\Compiler\ClosureVisitor
-     */
     public function testAliasedImportsAreNotMangled(): void
     {
         $container = $this->getContainer();
@@ -360,6 +383,66 @@ trait ContainerBuilderTestTrait
         self::assertStringContainsString('[ids]', $output);
         self::assertStringContainsString(Fixtures\SessionId::class, $output);
         self::assertStringContainsString('string_literal', $output);
+    }
+
+    public function testAddDirectoryLoadsAllPhpFiles(): void
+    {
+        $builder = $this->getBuilder();
+        // OldPhpSafe/one.php defines 'a' => 'b'
+        $builder->addDirectory(__DIR__ . '/ValidDefinitions/OldPhpSafe');
+        $container = $builder->build();
+        $this->assertTrue(
+            $container->has('a'),
+            'Container should have entries from directory',
+        );
+        $this->assertSame('b', $container->get('a'));
+    }
+
+    public function testAddDirectoryThrowsOnEmptyString(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $builder = $this->getBuilder();
+        // @phpstan-ignore argument.type (Explicitly testing the guard)
+        $builder->addDirectory('');
+    }
+
+    public function testAddDirectoryThrowsWhenNoPhpFilesFound(): void
+    {
+        $this->expectException(UnexpectedValueException::class);
+        $this->expectExceptionMessage('No config files');
+        $builder = $this->getBuilder();
+        $builder->addDirectory(__DIR__ . '/../.github');
+    }
+
+    public function testAddDirectoryIsNonRecursive(): void
+    {
+        $builder = $this->getBuilder();
+        $builder->addDirectory(__DIR__ . '/ValidDefinitions');
+        $container = $builder->build();
+        // Files in ValidDefinitions/OldPhpSafe should not be loaded
+        // OldPhpSafe/one.php defines 'a' => 'b'
+        $this->assertFalse(
+            $container->has('a'),
+            'Subdirectory files should not be loaded by addDirectory',
+        );
+    }
+
+    public function testMultipleAddDirectoryCalls(): void
+    {
+        $builder = $this->getBuilder();
+        // OldPhpSafe/one.php defines 'a' => 'b'
+        $builder->addDirectory(__DIR__ . '/ValidDefinitions/OldPhpSafe');
+        // ValidDefinitions/ defines 'string_literal' and Fixtures\SessionId::class
+        $builder->addDirectory(__DIR__ . '/ValidDefinitions');
+        $container = $builder->build();
+        $this->assertTrue(
+            $container->has('a'),
+            'Container should have entries from first directory',
+        );
+        $this->assertTrue(
+            $container->has('string_literal'),
+            'Container should have entries from second directory',
+        );
     }
 
     // Data Providers

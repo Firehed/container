@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace Firehed\Container;
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionParameter;
 
-/**
- * @covers Firehed\Container\Autowire
- */
+#[CoversClass(Autowire::class)]
 class AutowireTest extends TestCase
 {
     public function testClassWithNoConstructorIsEligible(): void
@@ -150,6 +149,20 @@ class AutowireTest extends TestCase
         $param = $this->getConstructorParam(Fixtures\UnionTypeParam::class, 'id');
         $this->expectException(Exceptions\UntypedValue::class);
         Autowire::getRequiredDependencyType($param, Fixtures\UnionTypeParam::class);
+    }
+
+    public function testGetOptionalDependencyTypeReturnsTypeForObjectParam(): void
+    {
+        $param = $this->getConstructorParam(Fixtures\OptionalObjectParam::class, 'sessionId');
+        $type = Autowire::getOptionalDependencyType($param);
+        self::assertSame(\SessionIdInterface::class, $type);
+    }
+
+    public function testGetOptionalDependencyTypeReturnsNullForScalarParam(): void
+    {
+        $param = $this->getConstructorParam(Fixtures\OptionalScalarParam::class, 'param');
+        $type = Autowire::getOptionalDependencyType($param);
+        self::assertNull($type);
     }
 
     /**

@@ -30,6 +30,7 @@ return [
     'env_asbool_false' => env($prefix . 'FALSE')->asBool(),
     'env_asbool_empty' => env($prefix . 'EMPTY')->asBool(),
     'env_asbool_notset' => env($prefix . 'NOT_SET', 'true')->asBool(),
+    'env_asbool_null_default' => env($prefix . 'NOT_SET', null)->asBool(),
 
     // Casting: int
     'env_asint_one' => env($prefix . 'ONE')->asInt(),
@@ -43,6 +44,9 @@ return [
     'env_asfloat_notset' => env($prefix . 'NOT_SET', '3.14')->asFloat(),
 
     'env_asenum' => env($prefix . 'ENV')->asEnum(Environment::class),
+    'env_asenum_valid_default' => env($prefix . 'ENV_NOT_SET', 'production')->asEnum(Environment::class),
+    'env_asenum_null_default' => env($prefix . 'ENV_NOT_SET', null)->asEnum(Environment::class),
+    'env_asenum_invalid_default' => env($prefix . 'ENV_NOT_SET', 'invalid')->asEnum(Environment::class),
 
     // Non-string value test
     'env_nonstring' => env($prefix . 'NONSTRING'),

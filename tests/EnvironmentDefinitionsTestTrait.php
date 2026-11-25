@@ -1,9 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Firehed\Container;
 
 use Firehed\Container\Exceptions\ValueRetrievalException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Container\ContainerExceptionInterface;
 
 trait EnvironmentDefinitionsTestTrait
@@ -25,9 +27,7 @@ trait EnvironmentDefinitionsTestTrait
         $this->assertSame($rawGetEnvValue, $value, 'get should return the value');
     }
 
-    /**
-     * @dataProvider envVarsThatAreSet
-     */
+    #[DataProvider('envVarsThatAreSet')]
     public function testWrappedEnv(string $key): void
     {
         $unittestEnvVar = md5((string)random_int(0, PHP_INT_MAX));
@@ -61,11 +61,11 @@ trait EnvironmentDefinitionsTestTrait
     }
 
     /**
-     * @dataProvider casts
      * @param string $containerKey Access key
      * @param mixed $expected Expected value (post-casting)
      */
-    public function testCastingBehavior(string $containerKey, $expected): void
+    #[DataProvider('casts')]
+    public function testCastingBehavior(string $containerKey, mixed $expected): void
     {
         $_ENV[self::$prefix . 'ONE_POINT_FIVE'] = '1.5';
         $_ENV[self::$prefix . 'ONE'] = '1';
@@ -77,6 +77,7 @@ trait EnvironmentDefinitionsTestTrait
         $container = $this->getContainer();
         $this->assertTrue($container->has($containerKey));
         $this->assertSame($expected, $container->get($containerKey));
+        self::assertSame($expected, $container->get($containerKey), 'Cached value should be the cast value');
     }
 
     public function testEmptyValueBehavior(): void
@@ -114,6 +115,7 @@ trait EnvironmentDefinitionsTestTrait
             ['env_asbool_false', false],
             ['env_asbool_empty', false],
             ['env_asbool_notset', true],
+            ['env_asbool_null_default', false],
             ['env_asint_one', 1],
             ['env_asint_zero', 0],
             ['env_asint_notset', 3],
@@ -122,6 +124,33 @@ trait EnvironmentDefinitionsTestTrait
             ['env_asfloat_zero', 0.0],
             ['env_asfloat_notset', 3.14],
             ['env_asenum', Fixtures\Environment::TESTING],
+            ['env_asenum_valid_default', Fixtures\Environment::PRODUCTION],
         ];
+    }
+
+    public function testEnumWithNullDefaultThrowsTypeError(): void
+    {
+        $container = $this->getContainer();
+        $this->assertTrue($container->has('env_asenum_null_default'));
+        try {
+            $container->get('env_asenum_null_default');
+            self::fail('Expected exception not thrown');
+        } catch (Exceptions\ValueRetrievalException $e) {
+            // BackedEnum::from() throws TypeError when given non-backing type
+            $this->assertInstanceOf(\TypeError::class, $e->getPrevious());
+        }
+    }
+
+    public function testEnumWithInvalidDefaultThrowsValueError(): void
+    {
+        $container = $this->getContainer();
+        $this->assertTrue($container->has('env_asenum_invalid_default'));
+        try {
+            $container->get('env_asenum_invalid_default');
+            self::fail('Expected exception not thrown');
+        } catch (Exceptions\ValueRetrievalException $e) {
+            // BackedEnum::from() throws ValueError for invalid backing values
+            $this->assertInstanceOf(\ValueError::class, $e->getPrevious());
+        }
     }
 }

@@ -6,6 +6,9 @@ on:
       - main
   pull_request:
     # Run on all PRs
+  schedule:
+    # Weekly, to catch breaking changes in dependencies
+    - cron: '17 12 * * 1'
 
 env:
   CI: "true"
@@ -20,16 +23,15 @@ jobs:
           - 'high'
           - 'low'
         php:
-          - '8.1'
           - '8.2'
           - '8.3'
           - '8.4'
           - '8.5'
-          - '8.6-dev'
+          - '8.6'
 
     steps:
       - name: Check out code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -43,7 +45,7 @@ jobs:
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
       - name: Cache Composer packages
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ matrix.dependencies }}-${{ matrix.php }}-${{ hashFiles('**/composer.json') }}
@@ -83,6 +85,6 @@ jobs:
 
       - name: Submit code coverage
         if: ${{ always() }}
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v6
         with:
           token: ${{ secrets.CODECOV_TOKEN }}

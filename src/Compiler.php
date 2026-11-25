@@ -9,29 +9,40 @@ use PhpParser\PhpVersion;
 use PhpParser\PrettyPrinter\Standard;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
 use UnexpectedValueException;
 use UnitEnum;
 
 use function array_key_exists;
 use function assert;
+use function chmod;
 use function class_exists;
+use function dirname;
 use function file_exists;
+use function file_put_contents;
 use function is_array;
 use function is_int;
 use function is_scalar;
 use function is_string;
 use function is_writable;
 use function pathinfo;
+use function rename;
 use function sprintf;
 use function realpath;
+use function tempnam;
+use function umask;
+use function unlink;
 
+/**
+ * @api
+ */
 class Compiler implements BuilderInterface
 {
+    use BuilderTrait;
+
     /** @var class-string<TypedContainerInterface> */
     private string $className;
 
-    /** @var array<string, Compiler\CodeGeneratorInterface|DefinitionInterface> */
+    /** @var array<string, Compiler\CodeGeneratorInterface> */
     private array $definitions = [];
 
     /** @var array<class-string, class-string[]> */
@@ -45,13 +56,13 @@ class Compiler implements BuilderInterface
     /** @var array<string, true> */
     private array $factories = [];
 
-    private LoggerInterface $logger;
+    private ?LoggerInterface $logger;
 
     private string $path;
 
     public function __construct(string $path = 'cc.php', ?LoggerInterface $logger = null)
     {
-        $this->logger = $logger ?? new NullLogger();
+        $this->logger = $logger;
         // @phpstan-ignore-next-line This class will be generated
         $this->className = 'CC_' . md5($path);
 
@@ -74,7 +85,7 @@ class Compiler implements BuilderInterface
 
     public function addFile(string $file): void
     {
-        $this->logger->debug('Adding file {file}', ['file' => $file]);
+        $this->logger?->debug('Adding file {file}', ['file' => $file]);
         if ($this->exists) {
             return;
         }
@@ -85,88 +96,12 @@ class Compiler implements BuilderInterface
                 $file
             ));
         }
-        foreach ($defs as $key => $value) {
-            if (is_int($key)) {
-                $this->logger->debug('Treating bare value {value} as autowired', [
-                    'value' => $value,
-                ]);
-                $key = $value;
-                $value = autowire();
-            }
-            assert(is_string($key));
-            $this->add($key, $value);
-        }
-    }
 
-    /**
-     * @param mixed $value
-     */
-    private function add(string $key, $value): void
-    {
-        $this->logger->debug('Adding definition for "{key}"', ['key' => $key]);
-        if ($value instanceof DefinitionInterface) {
+        foreach ($this->processDefinitions($defs) as $key => $value) {
+            $this->definitions[$key] = $value;
             if (!$value->isCacheable()) {
                 $this->factories[$key] = true;
             }
-            $this->definitions[$key] = $value;
-        } elseif ($value instanceof FactoryInterface) {
-            $this->factories[$key] = true;
-            if ($value->hasDefinition()) {
-                // Something::class => factory(fn ($container) => new Something(...))
-                $this->definitions[$key] = new Compiler\ClosureValue($value->getDefinition());
-            } else {
-                if (class_exists($key)) {
-                    // Something::class => factory()
-                    $this->definitions[$key] = new Compiler\AutowiredValue($key);
-                } else {
-                    $this->errors[] = new Exceptions\AmbiguousMapping($key);
-                }
-            }
-        } elseif ($value instanceof AutowireInterface) {
-            // someName => autowire(...)
-            // someName,
-            $wiredClass = $value->getWiredClass();
-            // autowire called without parameters: assume key is destination
-            if ($wiredClass === null) {
-                $wiredClass = $key;
-            }
-            if (class_exists($wiredClass)) {
-                $this->definitions[$key] = new Compiler\AutowiredValue($wiredClass);
-            } else {
-                $this->errors[] = new Exceptions\AmbiguousMapping($key);
-            }
-        } elseif ($value instanceof Closure) {
-            // someName => fn ($container) => new Something(...)
-            $this->definitions[$key] = new Compiler\ClosureValue($value);
-        } elseif ($value instanceof EnvironmentVariableInterface) {
-            // someName => env('SOME_NAME')
-            $this->definitions[$key] = new Compiler\EnvironmentVariableValue($value);
-        } elseif (interface_exists($key)) {
-            assert(is_string($value), 'Values without keys must be strings that correspond to autowirable classes');
-            if (class_exists($value)) {
-                // Simple autowiring
-                // SomeInterface::class => Something::class
-                $this->logger->debug('Basic autowire {key} => {value}', [
-                    'key' => $key,
-                    'value' => $value,
-                ]);
-                // Never cache proxied values in case they point to a factory
-                $this->factories[$key] = true;
-                $this->definitions[$key] = new Compiler\ProxyValue($value);
-            } else {
-                $this->errors[] = new Exceptions\InvalidClassMapping($key, $value);
-                    // SomeInterface::class => nonClassString
-            }
-        } else {
-            assert(
-                is_scalar($value)
-                || is_array($value)
-                || $value === null
-                || $value instanceof UnitEnum,
-                'Literal values must be scalars or arrays of scalars'
-            );
-            // @phpstan-ignore-next-line
-            $this->definitions[$key] = new Compiler\LiteralValue($value);
         }
     }
 
@@ -187,12 +122,17 @@ class Compiler implements BuilderInterface
         if ($this->exists) {
             return;
         }
+        $casts = [];
         $defs = [];
         $mappings = [];
         foreach ($this->definitions as $key => $value) {
             $name = $this->makeNameForKey($key);
             $mappings[$key] = $name;
             $defs[] = $this->makeFunctionBody($key, $name, $value);
+            $cast = $value instanceof CastableValueInterface ? $value->getCast() : null;
+            if ($cast !== null) {
+                $casts[$key] = $cast;
+            }
         }
 
         // makeFunctionBody fills in dependencies
@@ -208,6 +148,9 @@ class Compiler implements BuilderInterface
         $tpl .= "class {$this->className}\n";
         $tpl .= "extends \\Firehed\\Container\\CompiledContainer\n";
         $tpl .= "{\n";
+        $tpl .= '    protected array $casts = ';
+        $tpl .= var_export($casts, true);
+        $tpl .= ";\n";
         $tpl .= '    protected array $factories = ';
         $tpl .= var_export($this->factories, true);
         $tpl .= ";\n";
@@ -220,14 +163,57 @@ class Compiler implements BuilderInterface
         $tpl .= "}\n";
 
         $code = $this->prettyPrint($tpl);
-        $this->logger->info($code);
+        $this->logger?->info($code);
 
-        file_put_contents($this->path, $code);
+        $this->writeAtomically($code);
+    }
+
+    /**
+     * Write the compiled code to a temporary file in the destination
+     * directory, then rename it into place. `rename()` is atomic on the same
+     * filesystem, so a concurrent process (e.g. another php-fpm worker
+     * handling a cold-start request at the same time) either sees no file or
+     * the complete one. A plain `file_put_contents` would let that process
+     * `require` a partially-written file and fatal on a syntax error.
+     */
+    private function writeAtomically(string $code): void
+    {
+        $dir = dirname($this->path);
+        $tmp = tempnam($dir, 'cc');
+        if ($tmp === false) {
+            throw new UnexpectedValueException(sprintf(
+                'Could not create a temporary file in %s',
+                $dir,
+            ));
+        }
+        try {
+            if (file_put_contents($tmp, $code) === false) {
+                throw new UnexpectedValueException(sprintf(
+                    'Could not write compiled container to %s',
+                    $tmp,
+                ));
+            }
+            // tempnam creates the file 0600; give it the permissions a direct
+            // write would have had so other users can still read it.
+            chmod($tmp, 0666 & ~umask());
+            if (!rename($tmp, $this->path)) {
+                throw new UnexpectedValueException(sprintf(
+                    'Could not move compiled container to %s',
+                    $this->path,
+                ));
+            }
+        } finally {
+            // A successful rename leaves nothing behind; only clean up after
+            // a failure.
+            if (file_exists($tmp)) {
+                unlink($tmp);
+            }
+        }
     }
 
     private function prettyPrint(string $code): string
     {
-        $parser = Compiler\ParserLoader::getParser();
+        $parser = (new ParserFactory())->createForVersion(PhpVersion::fromString('8.2'));
         $ast = $parser->parse($code);
 
         $printer = new Standard(['shortArraySyntax' => true]);
@@ -256,7 +242,7 @@ class Compiler implements BuilderInterface
     private function makeNameForKey(string $key): string
     {
         $out = sprintf('get%s', md5($key));
-        $this->logger->debug('Name generated: {key} => {out}', [
+        $this->logger?->debug('Name generated: {key} => {out}', [
             'key' => $key,
             'out' => $out,
         ]);
@@ -279,7 +265,7 @@ class Compiler implements BuilderInterface
             return;
         }
 
-        $this->logger->debug('{file} is not writable, making directories', [
+        $this->logger?->debug('{file} is not writable, making directories', [
             'file' => $destFile,
         ]);
         $result = mkdir($pathInfo['dirname'], 0700, true);

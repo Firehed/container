@@ -1,13 +1,20 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Firehed\Container;
 
-/**
- * @covers Firehed\Container\Builder
- * @covers Firehed\Container\DevContainer
- */
-class BuilderTest extends \PHPUnit\Framework\TestCase
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
+
+#[CoversClass(Autowire::class)]
+#[CoversClass(AutowiredClass::class)]
+#[CoversClass(Builder::class)]
+#[CoversClass(ClosureDefinition::class)]
+#[CoversClass(DevContainer::class)]
+#[CoversClass(Factory::class)]
+#[CoversClass(ScalarDefinition::class)]
+class BuilderTest extends TestCase
 {
     use ContainerBuilderTestTrait;
 

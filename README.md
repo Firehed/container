@@ -167,6 +167,7 @@ return $container; // Or use inline, as you see fit.
 Table of Contents:
 
 - [Environment Variables](#environment-variables)
+- [Files and Secrets](#files-and-secrets)
 - [Autowired classes](#class-autowiring)
 - [Manually-wired classes](#manual-wiring)
 - [Interface mapping and aliases](#aliases-and-mapping-interfaces-to-implementations)
@@ -276,6 +277,30 @@ return [
     'some_enum' => env('SOME_ENUM')->asEnum(MyEnum::class),
 ];
 ```
+
+### Files and Secrets
+
+To read a file's contents at runtime (commonly a mounted secret), use `Firehed\Container\fileContents`.
+`fileOrEnv('NAME')` reads the file at the path in `NAME_FILE` if that is set, and otherwise reads `NAME` like `env('NAME')`, including the optional default.
+Setting both `NAME` and `NAME_FILE` throws an exception.
+
+```php
+<?php
+use function Firehed\Container\fileContents;
+use function Firehed\Container\fileOrEnv;
+return [
+    'api_key' => fileContents('/run/secrets/api-key'),
+    // Reads the file at $DATABASE_URL_FILE, or falls back to $DATABASE_URL
+    'database_url' => fileOrEnv('DATABASE_URL'),
+    'smtp_password' => fileOrEnv('SMTP_PASSWORD', null),
+];
+```
+
+Trailing newlines are stripped from file contents; all other whitespace is kept.
+An exception is thrown if the file is missing or unreadable.
+Use absolute paths (or `__DIR__`); relative paths depend on the working directory of the running process.
+Files are read at runtime, so their contents are never written into a compiled container.
+Their contents are cached for the lifetime of the request, so a file that's accessed, changed, and re-accessed during a single request will show only the first-read value.
 
 
 ### Class Autowiring
