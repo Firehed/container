@@ -346,6 +346,18 @@ trait ContainerBuilderTestTrait
         );
     }
 
+    public function testOptionalParamUsesNewInInitializerDefault(): void
+    {
+        $container = $this->getContainer();
+        $this->assertFalse($container->has(Fixtures\NotInContainer::class));
+        $obj = $this->assertGetSingleton(
+            $container,
+            Fixtures\NewInInitializerParam::class,
+        );
+        assert($obj instanceof Fixtures\NewInInitializerParam);
+        $this->assertInstanceOf(Fixtures\NotInContainer::class, $obj->dependency);
+    }
+
     public function testHasWithMissingKeyReturnsFalse(): void
     {
         $container = $this->getContainer();

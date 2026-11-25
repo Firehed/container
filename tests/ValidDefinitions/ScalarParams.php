@@ -8,4 +8,5 @@ return [
     Fixtures\DefaultScalarParam::class => autowire(),
     Fixtures\OptionalScalarParam::class => autowire(),
     Fixtures\OptionalObjectParam::class => autowire(),
+    Fixtures\NewInInitializerParam::class => autowire(),
 ];
