@@ -39,7 +39,7 @@ class Autowire
 
         foreach ($params as $param) {
             if ($param->isOptional()) {
-                $typeName = self::getOptionalDependencyType($param);
+                $typeName = self::getOptionalDependencyType($param, $class);
                 if ($typeName !== null && $container->has($typeName)) {
                     $args[] = $container->get($typeName);
                 } else {
@@ -105,10 +105,15 @@ class Autowire
      * Returns the type name if the parameter has an autowirable object type,
      * null otherwise (scalar, untyped, union, etc).
      *
+     * @param class-string $declaringClass The class containing this parameter (for error messages)
      * @return ?class-string
+     * @throws Exceptions\VariadicParameter If the parameter is variadic
      */
-    public static function getOptionalDependencyType(ReflectionParameter $param): ?string
+    public static function getOptionalDependencyType(ReflectionParameter $param, string $declaringClass): ?string
     {
+        if ($param->isVariadic()) {
+            throw new Exceptions\VariadicParameter($param->getName(), $declaringClass);
+        }
         return self::getResolvableTypeName($param);
     }
 
@@ -142,6 +147,9 @@ class Autowire
      */
     public static function isParameterAutowirable(ReflectionParameter $param): bool
     {
+        if ($param->isVariadic()) {
+            return false;
+        }
         return $param->isOptional() || self::getResolvableTypeName($param) !== null;
     }
 
