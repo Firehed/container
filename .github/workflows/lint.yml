@@ -6,6 +6,9 @@ on:
       - main
   pull_request:
     # Run on all PRs
+  schedule:
+    # Weekly, to catch breaking changes in dependencies
+    - cron: '17 12 * * 1'
 
 env:
   CI: "true"
