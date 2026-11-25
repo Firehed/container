@@ -101,7 +101,7 @@ class ConfigGenerator
             // Suppress warnings/deprecations during autoload - they're noise
             $previousLevel = error_reporting(E_ERROR);
             try {
-                if (Autowire::isEligible($className)) {
+                if (Autowire::isEligible($className) && !is_subclass_of($className, Throwable::class)) {
                     $eligible[] = $className;
                 }
             } catch (Throwable $e) {
