@@ -51,8 +51,8 @@ class AutowiredValue implements CodeGeneratorInterface
      * Optional parameters are left out unless the container can fill them,
      * so PHP applies the declared default at runtime. Defaults are never
      * evaluated here: `new` in an initializer would run at compile time and
-     * could not be exported. Once an argument may be left out, the rest must
-     * be passed by name.
+     * could not be exported. Arguments are passed by name so that leaving one
+     * out does not shift the rest.
      *
      * @param ReflectionParameter[] $params
      * @return string[]
@@ -60,24 +60,22 @@ class AutowiredValue implements CodeGeneratorInterface
     private function generateArguments(array $params): array
     {
         $lines = [];
-        $byName = false;
         foreach ($params as $param) {
-            $key = $byName ? var_export($param->getName(), true) : '';
+            $name = var_export($param->getName(), true);
             if ($param->isOptional()) {
-                $byName = true;
                 $typeName = Autowire::getOptionalDependencyType($param, $this->classToAutowire);
                 if ($typeName !== null) {
                     $lines[] = sprintf(
                         'if ($this->has(%1$s)) { $args[%2$s] = $this->get(%1$s); }',
                         var_export($typeName, true),
-                        $key,
+                        $name,
                     );
                 }
-                continue;
+            } else {
+                $fqcn = Autowire::getRequiredDependencyType($param, $this->classToAutowire);
+                $this->dependencies[] = $fqcn;
+                $lines[] = sprintf('$args[%s] = $this->get(%s);', $name, var_export($fqcn, true));
             }
-            $fqcn = Autowire::getRequiredDependencyType($param, $this->classToAutowire);
-            $this->dependencies[] = $fqcn;
-            $lines[] = sprintf('$args[%s] = $this->get(%s);', $key, var_export($fqcn, true));
         }
         return $lines;
     }
