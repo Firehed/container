@@ -178,24 +178,14 @@ class Autowire
      */
     public static function isEligible(string $className): bool
     {
-        $rc = new ReflectionClass($className);
-
-        if (!$rc->isInstantiable()) {
+        if (!(new ReflectionClass($className))->isInstantiable()) {
             return false;
         }
-
-        // No constructor = eligible
-        if (!$rc->hasMethod('__construct')) {
-            return true;
+        try {
+            self::getConstructorArguments($className);
+        } catch (Exceptions\NonPublicConstructor | Exceptions\UntypedValue | Exceptions\VariadicParameter) {
+            return false;
         }
-
-        // Non-public constructors are already excluded by isInstantiable() above
-        foreach ($rc->getMethod('__construct')->getParameters() as $param) {
-            if (!self::isParameterAutowirable($param)) {
-                return false;
-            }
-        }
-
         return true;
     }
 }
