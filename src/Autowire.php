@@ -58,6 +58,42 @@ class Autowire
     }
 
     /**
+     * Decide which constructor params autowiring fills from the container.
+     * Optional params without an autowirable type are left out so PHP
+     * applies their default.
+     *
+     * @param class-string $class
+     * @return list<ConstructorArgument>
+     * @throws Exceptions\NonPublicConstructor
+     * @throws Exceptions\UntypedValue
+     * @throws Exceptions\VariadicParameter
+     */
+    public static function getConstructorArguments(string $class): array
+    {
+        $constructor = (new ReflectionClass($class))->getConstructor();
+        if ($constructor === null) {
+            return [];
+        }
+        if (!$constructor->isPublic()) {
+            throw new Exceptions\NonPublicConstructor($class);
+        }
+
+        $arguments = [];
+        foreach ($constructor->getParameters() as $param) {
+            if ($param->isOptional()) {
+                $type = self::getOptionalDependencyType($param, $class);
+                if ($type !== null) {
+                    $arguments[] = new ConstructorArgument($param->getName(), $type, isRequired: false);
+                }
+            } else {
+                $type = self::getRequiredDependencyType($param, $class);
+                $arguments[] = new ConstructorArgument($param->getName(), $type, isRequired: true);
+            }
+        }
+        return $arguments;
+    }
+
+    /**
      * Types that cannot meaningfully be autowired from a container.
      * These are internal PHP types that are not instantiable or are
      * created through special language constructs.
