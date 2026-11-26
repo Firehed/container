@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace Firehed\Container;
 
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionParameter;
 
 #[CoversClass(Autowire::class)]
+#[CoversClass(ConstructorArgument::class)]
+#[CoversClass(Exceptions\NonPublicConstructor::class)]
 #[CoversClass(Exceptions\VariadicParameter::class)]
 class AutowireTest extends TestCase
 {
@@ -132,6 +135,43 @@ class AutowireTest extends TestCase
         $param = $this->getConstructorParam(Fixtures\VariadicParam::class, 'ids');
         $this->expectException(Exceptions\VariadicParameter::class);
         Autowire::getOptionalDependencyType($param, Fixtures\VariadicParam::class);
+    }
+
+    /** @return array<string, array{class-string, ConstructorArgument[]}> */
+    public static function constructorArgumentCases(): array
+    {
+        return [
+            'no constructor' => [Fixtures\NoConstructorFactory::class, []],
+            'required object' => [
+                Fixtures\SessionHandler::class,
+                [new ConstructorArgument('id', \SessionIdInterface::class, true)],
+            ],
+            'optional object' => [
+                Fixtures\OptionalObjectParam::class,
+                [new ConstructorArgument('sessionId', \SessionIdInterface::class, false)],
+            ],
+            'optional scalar' => [Fixtures\OptionalScalarParam::class, []],
+        ];
+    }
+
+    /**
+     * @param class-string $class
+     * @param ConstructorArgument[] $expected
+     */
+    #[DataProvider('constructorArgumentCases')]
+    public function testGetConstructorArguments(string $class, array $expected): void
+    {
+        self::assertEquals(
+            $expected,
+            Autowire::getConstructorArguments($class),
+            'Only params the container may fill are listed; others are left to PHP',
+        );
+    }
+
+    public function testGetConstructorArgumentsThrowsForNonPublicConstructor(): void
+    {
+        $this->expectException(Exceptions\NonPublicConstructor::class);
+        Autowire::getConstructorArguments(Fixtures\PrivateConstructor::class);
     }
 
     public function testGetRequiredDependencyTypeReturnsTypeName(): void
