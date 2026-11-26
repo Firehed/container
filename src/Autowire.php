@@ -27,30 +27,12 @@ class Autowire
         if (!class_exists($class)) {
             throw new Exceptions\AmbiguousMapping($class);
         }
-        $rc = new ReflectionClass($class);
-
-        if (!$rc->hasMethod('__construct')) {
-            return new $class();
-        }
-
-        $construct = $rc->getMethod('__construct');
-        $params = $construct->getParameters();
         $args = [];
-
-        foreach ($params as $param) {
-            if ($param->isOptional()) {
-                $typeName = self::getOptionalDependencyType($param, $class);
-                if ($typeName !== null && $container->has($typeName)) {
-                    $args[] = $container->get($typeName);
-                } else {
-                    $args[] = $param->getDefaultValue();
-                }
-            } else {
-                $name = self::getRequiredDependencyType($param, $class);
-                if (!$container->has($name)) {
-                    throw Exceptions\NotFound::autowireMissing($name, $class, $param->getName());
-                }
-                $args[] = $container->get($name);
+        foreach (self::getConstructorArguments($class) as $argument) {
+            if ($container->has($argument->type)) {
+                $args[$argument->name] = $container->get($argument->type);
+            } elseif ($argument->isRequired) {
+                throw Exceptions\NotFound::autowireMissing($argument->type, $class, $argument->name);
             }
         }
 
