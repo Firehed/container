@@ -58,7 +58,7 @@ PHP;
     private function getDefaultValue(ReflectionParameter $param): string
     {
         if ($param->isOptional()) {
-            $typeName = Autowire::getOptionalDependencyType($param);
+            $typeName = Autowire::getOptionalDependencyType($param, $this->classToAutowire);
             if ($typeName !== null) {
                 $exported = var_export($typeName, true);
                 $default = var_export($param->getDefaultValue(), true);
