@@ -346,6 +346,41 @@ trait ContainerBuilderTestTrait
         );
     }
 
+    public function testOptionalParamUsesNewInInitializerDefault(): void
+    {
+        $container = $this->getContainer();
+        self::assertFalse(
+            $container->has(Fixtures\NotInContainer::class),
+            'The default must come from the initializer, not the container',
+        );
+        $this->assertGetSingleton(
+            $container,
+            Fixtures\NewInInitializerParam::class,
+        );
+    }
+
+    public function testOptionalParamAfterDefaultedParamIsInjected(): void
+    {
+        $container = $this->getContainer();
+        $obj = $container->get(Fixtures\NewInInitializerParam::class);
+        self::assertInstanceOf(
+            Fixtures\SessionId::class,
+            $obj->sessionId,
+            'A container value must still reach a param after a left-out default',
+        );
+    }
+
+    public function testBuildDoesNotCreateDefaultValues(): void
+    {
+        Fixtures\NotInContainer::$instances = 0;
+        $this->getContainer();
+        self::assertSame(
+            0,
+            Fixtures\NotInContainer::$instances,
+            'Building must not run default-value initializers',
+        );
+    }
+
     public function testHasWithMissingKeyReturnsFalse(): void
     {
         $container = $this->getContainer();
