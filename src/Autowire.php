@@ -27,34 +27,53 @@ class Autowire
         if (!class_exists($class)) {
             throw new Exceptions\AmbiguousMapping($class);
         }
-        $rc = new ReflectionClass($class);
-
-        if (!$rc->hasMethod('__construct')) {
-            return new $class();
-        }
-
-        $construct = $rc->getMethod('__construct');
-        $params = $construct->getParameters();
         $args = [];
-
-        foreach ($params as $param) {
-            if ($param->isOptional()) {
-                $typeName = self::getOptionalDependencyType($param, $class);
-                if ($typeName !== null && $container->has($typeName)) {
-                    $args[] = $container->get($typeName);
-                } else {
-                    $args[] = $param->getDefaultValue();
-                }
-            } else {
-                $name = self::getRequiredDependencyType($param, $class);
-                if (!$container->has($name)) {
-                    throw Exceptions\NotFound::autowireMissing($name, $class, $param->getName());
-                }
-                $args[] = $container->get($name);
+        foreach (self::getConstructorArguments($class) as $argument) {
+            if ($container->has($argument->type)) {
+                $args[$argument->name] = $container->get($argument->type);
+            } elseif ($argument->isRequired) {
+                throw Exceptions\NotFound::autowireMissing($argument->type, $class, $argument->name);
             }
         }
 
         return new $class(...$args);
+    }
+
+    /**
+     * Decide which constructor params autowiring fills from the container.
+     * Optional params without an autowirable type are left out so PHP
+     * applies their default. Because of that, callers must pass arguments by
+     * name: a left-out param would otherwise shift the ones after it.
+     *
+     * @param class-string $class
+     * @return list<ConstructorArgument>
+     * @throws Exceptions\NonPublicConstructor
+     * @throws Exceptions\UntypedValue
+     * @throws Exceptions\VariadicParameter
+     */
+    public static function getConstructorArguments(string $class): array
+    {
+        $constructor = (new ReflectionClass($class))->getConstructor();
+        if ($constructor === null) {
+            return [];
+        }
+        if (!$constructor->isPublic()) {
+            throw new Exceptions\NonPublicConstructor($class);
+        }
+
+        $arguments = [];
+        foreach ($constructor->getParameters() as $param) {
+            if ($param->isOptional()) {
+                $type = self::getOptionalDependencyType($param, $class);
+                if ($type !== null) {
+                    $arguments[] = new ConstructorArgument($param->getName(), $type, isRequired: false);
+                }
+            } else {
+                $type = self::getRequiredDependencyType($param, $class);
+                $arguments[] = new ConstructorArgument($param->getName(), $type, isRequired: true);
+            }
+        }
+        return $arguments;
     }
 
     /**
@@ -139,45 +158,20 @@ class Autowire
     }
 
     /**
-     * Check if a constructor parameter can be autowired.
-     *
-     * A parameter is autowirable if it is not variadic, and:
-     * - It is optional (has a default value), OR
-     * - It is typed with a non-builtin class/interface type
-     */
-    public static function isParameterAutowirable(ReflectionParameter $param): bool
-    {
-        if ($param->isVariadic()) {
-            return false;
-        }
-        return $param->isOptional() || self::getResolvableTypeName($param) !== null;
-    }
-
-    /**
      * Check if a class can be autowired based on its constructor signature.
      *
      * @param class-string $className
      */
     public static function isEligible(string $className): bool
     {
-        $rc = new ReflectionClass($className);
-
-        if (!$rc->isInstantiable()) {
+        if (!(new ReflectionClass($className))->isInstantiable()) {
             return false;
         }
-
-        // No constructor = eligible
-        if (!$rc->hasMethod('__construct')) {
-            return true;
+        try {
+            self::getConstructorArguments($className);
+        } catch (Exceptions\NonPublicConstructor | Exceptions\UntypedValue | Exceptions\VariadicParameter) {
+            return false;
         }
-
-        // Non-public constructors are already excluded by isInstantiable() above
-        foreach ($rc->getMethod('__construct')->getParameters() as $param) {
-            if (!self::isParameterAutowirable($param)) {
-                return false;
-            }
-        }
-
         return true;
     }
 }

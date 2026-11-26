@@ -370,6 +370,13 @@ trait ContainerBuilderTestTrait
         );
     }
 
+    public function testUnfilledOptionalParamsAreNotPassed(): void
+    {
+        $container = $this->getContainer();
+        $obj = $container->get(Fixtures\CountsArguments::class);
+        self::assertSame(0, $obj->count, 'Dev and compiled containers must call constructors the same way');
+    }
+
     public function testBuildDoesNotCreateDefaultValues(): void
     {
         Fixtures\NotInContainer::$instances = 0;

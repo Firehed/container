@@ -52,6 +52,15 @@ trait ErrorDefinitionsTestTrait
         $c->get($class);
     }
 
+    public function testNonPublicConstructorErrors(): void
+    {
+        $builder = $this->getBuilder();
+        $builder->addFile(__DIR__ . '/ErrorDefinitions/PrivateConstructor.php');
+        $this->expectException(Exceptions\NonPublicConstructor::class);
+        $c = $builder->build();
+        $c->get(Fixtures\PrivateConstructor::class);
+    }
+
     public function testConstructorWithUndefinedTypedArgErrors(): void
     {
         $builder = $this->getBuilder();

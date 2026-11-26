@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace Firehed\Container;
 
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionParameter;
 
 #[CoversClass(Autowire::class)]
+#[CoversClass(ConstructorArgument::class)]
+#[CoversClass(Exceptions\NonPublicConstructor::class)]
 #[CoversClass(Exceptions\VariadicParameter::class)]
 class AutowireTest extends TestCase
 {
@@ -68,57 +71,6 @@ class AutowireTest extends TestCase
         self::assertFalse(Autowire::isEligible(Fixtures\PrivateConstructor::class));
     }
 
-    public function testOptionalParameterIsAutowirable(): void
-    {
-        $param = $this->getConstructorParam(Fixtures\OptionalScalarParam::class, 'param');
-        self::assertTrue(Autowire::isParameterAutowirable($param));
-    }
-
-    public function testRequiredObjectParameterIsAutowirable(): void
-    {
-        $param = $this->getConstructorParam(Fixtures\SessionHandler::class, 'id');
-        self::assertTrue(Autowire::isParameterAutowirable($param));
-    }
-
-    public function testRequiredScalarParameterIsNotAutowirable(): void
-    {
-        $param = $this->getConstructorParam(Fixtures\ConstructorScalar::class, 'string');
-        self::assertFalse(Autowire::isParameterAutowirable($param));
-    }
-
-    public function testUntypedParameterIsNotAutowirable(): void
-    {
-        $param = $this->getConstructorParam(Fixtures\ConstructorUntyped::class, 'var');
-        self::assertFalse(Autowire::isParameterAutowirable($param));
-    }
-
-    public function testClosureParameterIsNotAutowirable(): void
-    {
-        $param = $this->getConstructorParam(Fixtures\RequiresClosure::class, 'callback');
-        self::assertFalse(Autowire::isParameterAutowirable($param));
-    }
-
-    public function testNoTypeHintParameterIsNotAutowirable(): void
-    {
-        $param = $this->getConstructorParam(Fixtures\NoTypeHint::class, 'value');
-        self::assertFalse(Autowire::isParameterAutowirable($param));
-    }
-
-    public function testUnionTypeParameterIsNotAutowirable(): void
-    {
-        $param = $this->getConstructorParam(Fixtures\UnionTypeParam::class, 'id');
-        self::assertFalse(Autowire::isParameterAutowirable($param));
-    }
-
-    public function testVariadicParameterIsNotAutowirable(): void
-    {
-        $param = $this->getConstructorParam(Fixtures\VariadicParam::class, 'ids');
-        self::assertFalse(
-            Autowire::isParameterAutowirable($param),
-            'Variadic params are optional but must not be autowired',
-        );
-    }
-
     public function testClassWithVariadicParamIsNotEligible(): void
     {
         self::assertFalse(
@@ -132,6 +84,65 @@ class AutowireTest extends TestCase
         $param = $this->getConstructorParam(Fixtures\VariadicParam::class, 'ids');
         $this->expectException(Exceptions\VariadicParameter::class);
         Autowire::getOptionalDependencyType($param, Fixtures\VariadicParam::class);
+    }
+
+    /** @return array<string, array{class-string, ConstructorArgument[]}> */
+    public static function constructorArgumentCases(): array
+    {
+        return [
+            'no constructor' => [Fixtures\NoConstructorFactory::class, []],
+            'required object' => [
+                Fixtures\SessionHandler::class,
+                [new ConstructorArgument('id', \SessionIdInterface::class, true)],
+            ],
+            'optional object' => [
+                Fixtures\OptionalObjectParam::class,
+                [new ConstructorArgument('sessionId', \SessionIdInterface::class, false)],
+            ],
+            'optional scalar' => [Fixtures\OptionalScalarParam::class, []],
+            'mixed, in declaration order' => [
+                Fixtures\MixedParams::class,
+                [
+                    new ConstructorArgument('id', \SessionIdInterface::class, true),
+                    new ConstructorArgument('handler', \SessionHandlerInterface::class, false),
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @param class-string $class
+     * @param ConstructorArgument[] $expected
+     */
+    #[DataProvider('constructorArgumentCases')]
+    public function testGetConstructorArguments(string $class, array $expected): void
+    {
+        self::assertEquals(
+            $expected,
+            Autowire::getConstructorArguments($class),
+            'Only params the container may fill are listed; others are left to PHP',
+        );
+    }
+
+    /** @return array<string, array{class-string, class-string<\Throwable>}> */
+    public static function unautowirableClasses(): array
+    {
+        return [
+            'non-public constructor' => [Fixtures\PrivateConstructor::class, Exceptions\NonPublicConstructor::class],
+            'untyped required param' => [Fixtures\ConstructorUntyped::class, Exceptions\UntypedValue::class],
+            'variadic param' => [Fixtures\VariadicParam::class, Exceptions\VariadicParameter::class],
+        ];
+    }
+
+    /**
+     * @param class-string $class
+     * @param class-string<\Throwable> $exception
+     */
+    #[DataProvider('unautowirableClasses')]
+    public function testGetConstructorArgumentsThrowsForUnautowirableClass(string $class, string $exception): void
+    {
+        $this->expectException($exception);
+        Autowire::getConstructorArguments($class);
     }
 
     public function testGetRequiredDependencyTypeReturnsTypeName(): void
