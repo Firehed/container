@@ -42,7 +42,8 @@ class Autowire
     /**
      * Decide which constructor params autowiring fills from the container.
      * Optional params without an autowirable type are left out so PHP
-     * applies their default.
+     * applies their default. Because of that, callers must pass arguments by
+     * name: a left-out param would otherwise shift the ones after it.
      *
      * @param class-string $class
      * @return list<ConstructorArgument>
