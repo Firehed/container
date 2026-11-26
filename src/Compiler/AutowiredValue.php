@@ -65,7 +65,7 @@ class AutowiredValue implements CodeGeneratorInterface
             $key = $byName ? var_export($param->getName(), true) : '';
             if ($param->isOptional()) {
                 $byName = true;
-                $typeName = Autowire::getOptionalDependencyType($param);
+                $typeName = Autowire::getOptionalDependencyType($param, $this->classToAutowire);
                 if ($typeName !== null) {
                     $lines[] = sprintf(
                         'if ($this->has(%1$s)) { $args[%2$s] = $this->get(%1$s); }',
