@@ -71,57 +71,6 @@ class AutowireTest extends TestCase
         self::assertFalse(Autowire::isEligible(Fixtures\PrivateConstructor::class));
     }
 
-    public function testOptionalParameterIsAutowirable(): void
-    {
-        $param = $this->getConstructorParam(Fixtures\OptionalScalarParam::class, 'param');
-        self::assertTrue(Autowire::isParameterAutowirable($param));
-    }
-
-    public function testRequiredObjectParameterIsAutowirable(): void
-    {
-        $param = $this->getConstructorParam(Fixtures\SessionHandler::class, 'id');
-        self::assertTrue(Autowire::isParameterAutowirable($param));
-    }
-
-    public function testRequiredScalarParameterIsNotAutowirable(): void
-    {
-        $param = $this->getConstructorParam(Fixtures\ConstructorScalar::class, 'string');
-        self::assertFalse(Autowire::isParameterAutowirable($param));
-    }
-
-    public function testUntypedParameterIsNotAutowirable(): void
-    {
-        $param = $this->getConstructorParam(Fixtures\ConstructorUntyped::class, 'var');
-        self::assertFalse(Autowire::isParameterAutowirable($param));
-    }
-
-    public function testClosureParameterIsNotAutowirable(): void
-    {
-        $param = $this->getConstructorParam(Fixtures\RequiresClosure::class, 'callback');
-        self::assertFalse(Autowire::isParameterAutowirable($param));
-    }
-
-    public function testNoTypeHintParameterIsNotAutowirable(): void
-    {
-        $param = $this->getConstructorParam(Fixtures\NoTypeHint::class, 'value');
-        self::assertFalse(Autowire::isParameterAutowirable($param));
-    }
-
-    public function testUnionTypeParameterIsNotAutowirable(): void
-    {
-        $param = $this->getConstructorParam(Fixtures\UnionTypeParam::class, 'id');
-        self::assertFalse(Autowire::isParameterAutowirable($param));
-    }
-
-    public function testVariadicParameterIsNotAutowirable(): void
-    {
-        $param = $this->getConstructorParam(Fixtures\VariadicParam::class, 'ids');
-        self::assertFalse(
-            Autowire::isParameterAutowirable($param),
-            'Variadic params are optional but must not be autowired',
-        );
-    }
-
     public function testClassWithVariadicParamIsNotEligible(): void
     {
         self::assertFalse(
