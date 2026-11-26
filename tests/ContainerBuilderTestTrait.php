@@ -349,7 +349,10 @@ trait ContainerBuilderTestTrait
     public function testOptionalParamUsesNewInInitializerDefault(): void
     {
         $container = $this->getContainer();
-        $this->assertFalse($container->has(Fixtures\NotInContainer::class));
+        self::assertFalse(
+            $container->has(Fixtures\NotInContainer::class),
+            'The default must come from the initializer, not the container',
+        );
         $this->assertGetSingleton(
             $container,
             Fixtures\NewInInitializerParam::class,
@@ -360,14 +363,22 @@ trait ContainerBuilderTestTrait
     {
         $container = $this->getContainer();
         $obj = $container->get(Fixtures\NewInInitializerParam::class);
-        $this->assertInstanceOf(Fixtures\SessionId::class, $obj->sessionId);
+        self::assertInstanceOf(
+            Fixtures\SessionId::class,
+            $obj->sessionId,
+            'A container value must still reach a param after a left-out default',
+        );
     }
 
     public function testBuildDoesNotCreateDefaultValues(): void
     {
         Fixtures\NotInContainer::$instances = 0;
         $this->getContainer();
-        $this->assertSame(0, Fixtures\NotInContainer::$instances);
+        self::assertSame(
+            0,
+            Fixtures\NotInContainer::$instances,
+            'Building must not run default-value initializers',
+        );
     }
 
     public function testHasWithMissingKeyReturnsFalse(): void
