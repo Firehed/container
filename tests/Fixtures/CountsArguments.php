@@ -8,7 +8,7 @@ class CountsArguments
 {
     public readonly int $count;
 
-    public function __construct(int $value = 5)
+    public function __construct(public readonly int $value = 5)
     {
         $this->count = func_num_args();
     }
