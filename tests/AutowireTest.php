@@ -100,6 +100,13 @@ class AutowireTest extends TestCase
                 [new ConstructorArgument('sessionId', \SessionIdInterface::class, false)],
             ],
             'optional scalar' => [Fixtures\OptionalScalarParam::class, []],
+            'mixed, in declaration order' => [
+                Fixtures\MixedParams::class,
+                [
+                    new ConstructorArgument('id', \SessionIdInterface::class, true),
+                    new ConstructorArgument('handler', \SessionHandlerInterface::class, false),
+                ],
+            ],
         ];
     }
 
@@ -117,10 +124,25 @@ class AutowireTest extends TestCase
         );
     }
 
-    public function testGetConstructorArgumentsThrowsForNonPublicConstructor(): void
+    /** @return array<string, array{class-string, class-string<\Throwable>}> */
+    public static function unautowirableClasses(): array
     {
-        $this->expectException(Exceptions\NonPublicConstructor::class);
-        Autowire::getConstructorArguments(Fixtures\PrivateConstructor::class);
+        return [
+            'non-public constructor' => [Fixtures\PrivateConstructor::class, Exceptions\NonPublicConstructor::class],
+            'untyped required param' => [Fixtures\ConstructorUntyped::class, Exceptions\UntypedValue::class],
+            'variadic param' => [Fixtures\VariadicParam::class, Exceptions\VariadicParameter::class],
+        ];
+    }
+
+    /**
+     * @param class-string $class
+     * @param class-string<\Throwable> $exception
+     */
+    #[DataProvider('unautowirableClasses')]
+    public function testGetConstructorArgumentsThrowsForUnautowirableClass(string $class, string $exception): void
+    {
+        $this->expectException($exception);
+        Autowire::getConstructorArguments($class);
     }
 
     public function testGetRequiredDependencyTypeReturnsTypeName(): void
